@@ -151,8 +151,8 @@ pub const Client = struct {
         }
     }
 
-        const     fn pingEndpoint(self: *Client, endpoint: []const u8) !u64 {
-start_time = time.nanoTimestamp();
+    fn pingEndpoint(self: *Client, endpoint: []const u8) !u64 {
+        const start_time = time.nanoTimestamp();
         var ping_url_buf: [256]u8 = undefined;
         const ping_url = try std.fmt.bufPrint(&ping_url_buf, "{s}{s}", .{ endpoint, PING_API });
         const uri = try std.Uri.parse(ping_url);
