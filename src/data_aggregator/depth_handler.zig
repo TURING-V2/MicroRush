@@ -8,6 +8,7 @@ const OHLC = @import("../types.zig").OHLC;
 const Symbol = @import("../types.zig").Symbol;
 const OrderBook = @import("../types.zig").OrderBook;
 const DepthError = @import("../errors.zig").DepthError;
+const metrics = @import("../metrics.zig");
 
 const DEPTH_API = "https://api.binance.com/api/v3/depth?symbol={s}&limit=10";
 
@@ -52,8 +53,9 @@ pub const DepthHandler = struct {
     mutex: std.Thread.Mutex = .{},
     message_count: u64,
     last_reset_time: i64,
+    metrics_collector: ?*metrics.MetricsCollector,
 
-    pub fn init(symbol_map: *SymbolMap, allocator: std.mem.Allocator, http_client: *http.Client) !DepthHandler {
+    pub fn init(symbol_map: *SymbolMap, allocator: std.mem.Allocator, http_client: *http.Client, metrics_collector: ?*metrics.MetricsCollector) !DepthHandler {
         return DepthHandler{
             .symbol_map = symbol_map,
             .allocator = allocator,
@@ -63,6 +65,7 @@ pub const DepthHandler = struct {
             .last_update_ids = std.StringHashMap(i64).init(allocator),
             .message_count = 0,
             .last_reset_time = std.time.milliTimestamp(),
+            .metrics_collector = metrics_collector,
         };
     }
 
@@ -80,13 +83,17 @@ pub const DepthHandler = struct {
     }
 
     pub fn serverMessage(self: *DepthHandler, data: []u8, message_type: websocket.MessageType) !void {
+        if (self.metrics_collector) |collector| {
+            const start_time = std.time.nanoTimestamp();
+            defer {
+                const end_time = std.time.nanoTimestamp();
+                const duration_ns = end_time - start_time;
+                const duration_us = @as(f64, @floatFromInt(duration_ns)) / 1000.0;
+                collector.recordDepthMessage(duration_us);
+            }
+        }
+
         if (message_type != .text) return;
-
-        self.mutex.lock();
-        self.message_count += 1;
-        self.mutex.unlock();
-
-        try self.printMessagesPerSecond();
 
         const json_str = data;
         const parsed = json.parseFromSlice(json.Value, self.allocator, json_str, .{}) catch |err| {
@@ -100,27 +107,11 @@ pub const DepthHandler = struct {
 
         const symbol_val = root.object.get("s") orelse return;
         if (symbol_val != .string) return;
+
         const symbol = try self.allocator.dupe(u8, symbol_val.string);
         defer self.allocator.free(symbol);
 
         try self.handleDepthUpdate(root, symbol, data);
-    }
-
-    fn printMessagesPerSecond(self: *DepthHandler) !void {
-        const current_time = std.time.milliTimestamp();
-        const elapsed_ms = current_time - self.last_reset_time;
-
-        // Print every ~1000ms (1 second)
-        if (elapsed_ms >= 1000) {
-            self.mutex.lock();
-            const messages = self.message_count;
-            self.message_count = 0; // Reset counter
-            self.last_reset_time = current_time;
-            self.mutex.unlock();
-
-            const messages_per_sec = @as(f64, @floatFromInt(messages)) / (@as(f64, @floatFromInt(elapsed_ms)) / 1000.0);
-            std.debug.print("DepthHandler messages per second: {d:.2}\n", .{messages_per_sec});
-        }
     }
 
     fn handleDepthUpdate(self: *DepthHandler, root: json.Value, symbol: []const u8, original_data: []u8) DepthError!void {
@@ -324,18 +315,18 @@ pub const DepthHandler = struct {
             const temp_sym = try self.allocator.dupe(u8, symbol);
             try self.last_update_ids.put(temp_sym, snapshot.lastUpdateId);
         } else {
-            std.log.warn("Symbol {s} not found in symbol_map", .{symbol});
+            std.debug.print("Symbol {s} not found in symbol_map\n", .{symbol});
         }
     }
 
     fn applyDepthUpdate(self: *DepthHandler, symbol: []const u8, root: json.Value, first_update_id: i64, last_update_id: i64) !void {
         const current_update_id = self.last_update_ids.get(symbol) orelse {
-            std.log.warn("Order book for {s} not initialized", .{symbol});
+            std.debug.print("Order book for {s} not initialized\n", .{symbol});
             return;
         };
 
         if (first_update_id > current_update_id + 1) {
-            std.log.warn("Gap detected for {s}. Reinitializing...", .{symbol});
+            std.debug.print("Gap detected for {s}. Reinitializing...\n", .{symbol});
             self.mutex.lock();
             defer self.mutex.unlock();
             try self.orderbook_initialized.put(symbol, false);
@@ -344,7 +335,7 @@ pub const DepthHandler = struct {
         }
 
         if (last_update_id <= current_update_id) {
-            std.log.info("Ignoring outdated update for {s}: u={d} <= current={d}", .{ symbol, last_update_id, current_update_id });
+            std.debug.print("Ignoring outdated update for {s}: u={d} <= current={d}\n", .{ symbol, last_update_id, current_update_id });
             return;
         }
 
@@ -369,7 +360,7 @@ pub const DepthHandler = struct {
             defer self.mutex.unlock();
             try self.last_update_ids.put(symbol, last_update_id);
         } else {
-            std.log.warn("Symbol {s} not found in symbol_map", .{symbol});
+            std.debug.print("Symbol {s} not found in symbol_map\n", .{symbol});
         }
     }
 };

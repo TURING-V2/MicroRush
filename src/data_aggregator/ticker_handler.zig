@@ -4,6 +4,7 @@ const websocket = @import("websocket");
 
 const SymbolMap = @import("../symbol-map.zig").SymbolMap;
 const OHLC = @import("../types.zig").OHLC;
+const metrics = @import("../metrics.zig");
 
 pub const TickerHandler = struct {
     symbol_map: *SymbolMap,
@@ -11,13 +12,15 @@ pub const TickerHandler = struct {
     mutex: std.Thread.Mutex = .{},
     message_count: u64,
     last_reset_time: i64,
+    metrics_collector: ?*metrics.MetricsCollector,
 
-    pub fn init(symbol_map: *SymbolMap, allocator: std.mem.Allocator) !TickerHandler {
+    pub fn init(symbol_map: *SymbolMap, allocator: std.mem.Allocator, metrics_collector: ?*metrics.MetricsCollector) !TickerHandler {
         return TickerHandler{
             .symbol_map = symbol_map,
             .allocator = allocator,
             .message_count = 0,
             .last_reset_time = std.time.milliTimestamp(),
+            .metrics_collector = metrics_collector,
         };
     }
 
@@ -26,12 +29,17 @@ pub const TickerHandler = struct {
     }
 
     pub fn serverMessage(self: *TickerHandler, data: []u8, message_type: websocket.MessageType) !void {
-        if (message_type != .text) return;
-        self.mutex.lock();
-        self.message_count += 1;
-        self.mutex.unlock();
+        if (self.metrics_collector) |collector| {
+            const start_time = std.time.nanoTimestamp();
+            defer {
+                const end_time = std.time.nanoTimestamp();
+                const duration_ns = end_time - start_time;
+                const duration_us = @as(f64, @floatFromInt(duration_ns)) / 1000.0;
+                collector.recordTickerMessage(duration_us);
+            }
+        }
 
-        try self.printMessagesPerSecond();
+        if (message_type != .text) return;
 
         const parsed = json.parseFromSlice(json.Value, self.allocator, data, .{}) catch |err| {
             std.log.err("Failed to parse ticker JSON: {}", .{err});
@@ -41,24 +49,8 @@ pub const TickerHandler = struct {
 
         const root = parsed.value;
         if (root != .object) return;
+
         try self.handleMiniTicker(root);
-    }
-
-    fn printMessagesPerSecond(self: *TickerHandler) !void {
-        const current_time = std.time.milliTimestamp();
-        const elapsed_ms = current_time - self.last_reset_time;
-
-        // Print every ~1000ms (1 second)
-        if (elapsed_ms >= 1000) {
-            self.mutex.lock();
-            const messages = self.message_count;
-            self.message_count = 0; // Reset counter
-            self.last_reset_time = current_time;
-            self.mutex.unlock();
-
-            const messages_per_sec = @as(f64, @floatFromInt(messages)) / (@as(f64, @floatFromInt(elapsed_ms)) / 1000.0);
-            std.debug.print("TickerHandler messages per second: {d:.2}\n", .{messages_per_sec});
-        }
     }
 
     fn handleMiniTicker(self: *TickerHandler, root: json.Value) !void {

@@ -7,6 +7,7 @@ const _ = @import("../errors.zig");
 const SymbolMap = @import("../symbol-map.zig").SymbolMap;
 const Symbol = @import("../types.zig").Symbol;
 const WSClient = @import("binance_ws.zig").WSClient;
+const metrics = @import("../metrics.zig");
 
 const REST_ENDPOINTS = [6][]const u8{
     "https://api.binance.com",
@@ -26,15 +27,17 @@ pub const Client = struct {
     http_client: http.Client,
     ws_client: WSClient,
     allocator: std.mem.Allocator,
+    metrics_collector: ?*metrics.MetricsCollector,
 
-    pub fn init(allocator: std.mem.Allocator) !Client {
+    pub fn init(allocator: std.mem.Allocator, metrics_collector: ?*metrics.MetricsCollector) !Client {
         return Client{
             .selected_endpoint = REST_ENDPOINTS[0],
             .http_client = http.Client{
                 .allocator = allocator,
             },
-            .ws_client = try WSClient.init(allocator),
+            .ws_client = try WSClient.init(allocator, metrics_collector),
             .allocator = allocator,
+            .metrics_collector = metrics_collector,
         };
     }
 
@@ -45,11 +48,11 @@ pub const Client = struct {
 
     pub fn connect(self: *Client) !void {
         try self.selectBestEndpoint();
-        std.log.info("Connecting to Binance using endpoint: {s}", .{self.selected_endpoint});
+        std.debug.print("Connecting to Binance using endpoint: {s}\n", .{self.selected_endpoint});
     }
 
     pub fn loadSymbols(self: *Client, sym_map: *SymbolMap) !void {
-        std.log.info("Loading symbols from exchange info...", .{});
+        std.debug.print("Loading symbols from exchange info...\n", .{});
         var exchange_url_buf: [256]u8 = undefined;
         const exchange_url = try std.fmt.bufPrint(&exchange_url_buf, "{s}{s}", .{ self.selected_endpoint, EXCHANGE_INFO_API });
         const uri = try std.Uri.parse(exchange_url);
@@ -68,7 +71,7 @@ pub const Client = struct {
         defer self.allocator.free(body);
         try self.parseAndStoreSymbols(body, sym_map);
 
-        std.log.info("Loaded {} symbols", .{sym_map.count()});
+        std.debug.print("Loaded {} symbols\n", .{sym_map.count()});
     }
 
     fn parseAndStoreSymbols(self: *Client, json_data: []const u8, sym_map: *SymbolMap) !void {
@@ -124,15 +127,15 @@ pub const Client = struct {
 
     fn selectBestEndpoint(self: *Client) !void {
         var ping_ms = [_]u64{0} ** REST_ENDPOINTS.len;
-        std.log.info("Testing ping for {} Binance REST_ENDPOINTS...", .{REST_ENDPOINTS.len});
+        std.debug.print("Testing ping for {} Binance REST_ENDPOINTS...\n", .{REST_ENDPOINTS.len});
         for (REST_ENDPOINTS, 0..) |endpoint, i| {
             const ping_result = self.pingEndpoint(endpoint) catch |err| {
-                std.log.warn("Failed to ping {s}: {}", .{ endpoint, err });
+                std.debug.print("Failed to ping {s}: {}", .{ endpoint, err });
                 continue;
             };
 
             ping_ms[i] = ping_result;
-            std.log.info("Endpoint {s}: {}ms", .{ endpoint, ping_result });
+            std.debug.print("Endpoint {s}: {}ms\n", .{ endpoint, ping_result });
         }
         var best_endpoint: ?[]const u8 = null;
         var lowest_ping: u64 = std.math.maxInt(u64);
@@ -144,9 +147,9 @@ pub const Client = struct {
         }
         if (best_endpoint) |endpoint| {
             self.selected_endpoint = endpoint;
-            std.log.info("Selected best endpoint: {s} ({}ms)", .{ endpoint, lowest_ping });
+            std.debug.print("Selected best endpoint: {s} ({}ms)\n", .{ endpoint, lowest_ping });
         } else {
-            std.log.warn("No REST_ENDPOINTS responded, using default: {s}", .{REST_ENDPOINTS[0]});
+            std.debug.print("No REST_ENDPOINTS responded, using default: {s}", .{REST_ENDPOINTS[0]});
             self.selected_endpoint = REST_ENDPOINTS[0];
         }
     }

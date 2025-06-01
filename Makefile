@@ -5,14 +5,19 @@ build:
 	clear && zig build
 
 build-fast:
-	zig build -Doptimize=ReleaseFast -Dtarget=native -Dcpu=znver2
+	clear && zig build -Doptimize=ReleaseFast -Dtarget=native -Dcpu=native
+
+build-safe:
+	clear && zig build -Doptimize=ReleaseSafe -Dtarget=native -Dcpu=native
 
 run:
 	./zig-out/bin/MicroRush
 
-clean: 
+run-metrics:
+	./zig-out/bin/MicroRush --metrics
+
+clean:
 	rm -rf zig-out
 	rm -rf .zig-cache
 
-.PHONY: fmt build run 
-
+.PHONY: fmt build-fast run clean

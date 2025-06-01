@@ -9,6 +9,7 @@ const Symbol = @import("../types.zig").Symbol;
 const OrderBook = @import("../types.zig").OrderBook;
 const TickerHandler = @import("ticker_handler.zig").TickerHandler;
 const DepthHandler = @import("depth_handler.zig").DepthHandler;
+const metrics = @import("../metrics.zig");
 
 pub const WSClient = struct {
     ticker_client: websocket.Client,
@@ -19,8 +20,9 @@ pub const WSClient = struct {
     ticker_handler: ?*TickerHandler = null,
     depth_handler: ?*DepthHandler = null,
     http_client: http.Client,
+    metrics_collector: ?*metrics.MetricsCollector,
 
-    pub fn init(allocator: std.mem.Allocator) !WSClient {
+    pub fn init(allocator: std.mem.Allocator, metrics_collector: ?*metrics.MetricsCollector) !WSClient {
         return WSClient{
             .ticker_client = undefined,
             .depth_client = undefined,
@@ -28,6 +30,7 @@ pub const WSClient = struct {
             .depth_streams = std.ArrayList([]const u8).init(allocator),
             .allocator = allocator,
             .http_client = http.Client{ .allocator = allocator },
+            .metrics_collector = metrics_collector,
         };
     }
 
@@ -45,28 +48,9 @@ pub const WSClient = struct {
         self.ticker_handler.?.deinit();
         self.ticker_client.deinit();
         self.depth_client.deinit();
-
-        // if (self.ticker_handler) |handler| {
-        //     handler.deinit(); // Call TickerHandler.deinit
-        //     self.allocator.destroy(handler);
-        //     self.ticker_handler = null;
-        // }
-
-        // // Destroy depth_handler if allocated
-        // if (self.depth_handler) |handler| {
-        //     handler.deinit(); // Call DepthHandler.deinit
-        //     self.allocator.destroy(handler);
-        //     self.depth_handler = null;
-        // }
     }
 
     pub fn startListener(self: *WSClient, symbol_map: *SymbolMap) !void {
-        // var arena1 = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-        // defer arena1.deinit();
-        // const allocator1 = arena1.allocator();
-        // var arena2 = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-        // defer arena2.deinit();
-        // const allocator2 = arena2.allocator();
         self.ticker_client = try websocket.Client.init(self.allocator, .{
             .host = "stream.binance.com",
             .port = 9443,
@@ -118,10 +102,10 @@ pub const WSClient = struct {
         try self.depth_client.write(depth_subscribe_json);
 
         self.ticker_handler = try self.allocator.create(TickerHandler);
-        self.ticker_handler.?.* = try TickerHandler.init(symbol_map, self.allocator);
+        self.ticker_handler.?.* = try TickerHandler.init(symbol_map, self.allocator, self.metrics_collector);
 
         self.depth_handler = try self.allocator.create(DepthHandler);
-        self.depth_handler.?.* = try DepthHandler.init(symbol_map, self.allocator, &self.http_client);
+        self.depth_handler.?.* = try DepthHandler.init(symbol_map, self.allocator, &self.http_client, self.metrics_collector);
 
         _ = self.ticker_client.readLoopInNewThread(self.ticker_handler.?) catch |err| {
             std.log.err("Error in ticker read loop: {}", .{err});

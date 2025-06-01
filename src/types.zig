@@ -35,7 +35,6 @@ pub const OrderBook = struct {
     }
 
     pub fn updateLevel(self: *OrderBook, price: f64, quantity: f64, is_bid: bool) void {
-        std.log.info("Updating level: price={d:.8}, quantity={d:.8}, is_bid={}", .{ price, quantity, is_bid });
         if (is_bid) {
             self.updateBidLevel(price, quantity);
         } else {
