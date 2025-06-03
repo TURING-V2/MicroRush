@@ -14,8 +14,8 @@ pub const DataAggregator = struct {
     metrics_collector: ?metrics.MetricsCollector,
 
     pub fn init(enable_metrics: bool) !DataAggregator {
-        const allocator = std.heap.smp_allocator;
-
+        var arena = std.heap.ArenaAllocator.init(std.heap.smp_allocator);
+        const allocator = arena.allocator();
         var metrics_channel: ?*metrics.MetricsChannel = null;
         var metrics_thread: ?*std.Thread = null;
         var metrics_collector: ?metrics.MetricsCollector = null;

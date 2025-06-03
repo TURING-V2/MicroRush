@@ -2,13 +2,16 @@ fmt:
 	zig fmt .
 
 build:
-	clear && zig build
+	clear && zig build -Dtarget=native -Dcpu=native
 
 build-fast:
 	clear && zig build -Doptimize=ReleaseFast -Dtarget=native -Dcpu=native
 
 build-safe:
 	clear && zig build -Doptimize=ReleaseSafe -Dtarget=native -Dcpu=native
+
+build-small:
+	clear && zig build -Doptimize=ReleaseSmall -Dtarget=native -Dcpu=native
 
 run:
 	./zig-out/bin/MicroRush
