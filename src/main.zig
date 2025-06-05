@@ -6,11 +6,6 @@ const std = @import("std");
 
 var should_stop: bool = false;
 
-// fn handleSigint(_: c_int) callconv(.C) void {
-//     should_stop = true;
-//     std.log.info("Received SIGINT, stopping gracefully...", .{});
-// }
-
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -38,13 +33,12 @@ pub fn main() !void {
     try aggregator.connectToBinance();
     try aggregator.run();
 
-    // const act = std.posix.Sigaction{};
-    // try std.posix.sigaction(std.posix.SIG.INT, &act, null);
-
     std.debug.print("WebSockets flowing, starting continuous CUDA calculations (Ctrl+C to stop)...\n", .{});
     std.log.info("=== Starting CUDA calculations with default parameters ===", .{});
 
     var mutex = std.Thread.Mutex{};
+    const sleep_ns = 500_000_000; // 500 ms
+
     while (!should_stop) {
         std.log.info("Running batch calculation...", .{});
         mutex.lock();
@@ -54,6 +48,8 @@ pub fn main() !void {
             continue;
         };
         mutex.unlock();
+
+        std.time.sleep(sleep_ns);
     }
 
     std.log.info("Stopping aggregator...", .{});
