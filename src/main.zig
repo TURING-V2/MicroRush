@@ -36,18 +36,20 @@ pub fn main() !void {
     std.debug.print("WebSockets flowing, starting continuous CUDA calculations (Ctrl+C to stop)...\n", .{});
     std.log.info("=== Starting CUDA calculations with default parameters ===", .{});
 
-    var mutex = std.Thread.Mutex{};
     const sleep_ns = 500_000_000; // 500 ms
-
+    const max_duration_ns = 2 * 60 * 1_000_000_000; // 2 min
+    const start_time = std.time.nanoTimestamp();
     while (!should_stop) {
+        const now = std.time.nanoTimestamp();
+        if (now - start_time >= max_duration_ns) {
+            std.log.info("Reached 2-minute limit, stopping loop.", .{});
+            break;
+        }
         std.log.info("Running batch calculation...", .{});
-        mutex.lock();
         stat_calc.calculateSymbolMapBatch(&aggregator.symbol_map, 14, 14) catch |err| {
             std.log.err("Batch calculation failed: {}", .{err});
-            mutex.unlock();
             continue;
         };
-        mutex.unlock();
 
         std.time.sleep(sleep_ns);
     }

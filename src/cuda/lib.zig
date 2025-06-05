@@ -182,27 +182,47 @@ pub const StatCalc = struct {
             std.log.warn("SymbolMap is empty, nothing to calculate", .{});
             return;
         }
-        if (symbol_count > MAX_SYMBOLS) {
-            std.log.warn("Symbol count {} exceeds MAX_SYMBOLS {}, truncating.", .{ symbol_count, MAX_SYMBOLS });
+
+        var valid_symbol_count: usize = 0;
+        var iterator = symbol_map.iterator();
+        while (iterator.next()) |entry| {
+            if (entry.value_ptr.*.count >= 14) {
+                valid_symbol_count += 1;
+            }
         }
 
-        std.log.info("Processing {} symbols in batch mode...", .{symbol_count});
+        if (valid_symbol_count == 0) {
+            std.log.warn("No symbols have count >= 14, nothing to calculate", .{});
+            return;
+        }
 
-        var symbols_slice = try self.allocator.alloc(Symbol, symbol_count);
+        if (valid_symbol_count > MAX_SYMBOLS) {
+            std.log.warn("Valid symbol count {} exceeds MAX_SYMBOLS {}, truncating to {}", .{ valid_symbol_count, MAX_SYMBOLS, MAX_SYMBOLS });
+            valid_symbol_count = MAX_SYMBOLS;
+        }
+
+        std.log.info("Processing {} valid symbols in batch mode...", .{valid_symbol_count});
+
+        var symbols_slice = try self.allocator.alloc(Symbol, valid_symbol_count);
         defer self.allocator.free(symbols_slice);
-        var symbol_names = try self.allocator.alloc([]const u8, symbol_count);
+        var symbol_names = try self.allocator.alloc([]const u8, valid_symbol_count);
         defer self.allocator.free(symbol_names);
 
-        var iterator = symbol_map.iterator();
+        iterator = symbol_map.iterator();
         var index: usize = 0;
+        var mutex = std.Thread.Mutex{};
+        mutex.lock();
         while (iterator.next()) |entry| {
-            if (index >= symbol_count) break;
-            symbol_names[index] = entry.key_ptr.*;
-            symbols_slice[index] = entry.value_ptr.*;
-            index += 1;
+            if (index >= valid_symbol_count) break;
+            if (entry.value_ptr.*.count >= 14) {
+                symbol_names[index] = entry.key_ptr.*;
+                symbols_slice[index] = entry.value_ptr.*;
+                index += 1;
+            }
         }
+        mutex.unlock();
 
-        const num_symbols_to_process = @min(symbol_count, MAX_SYMBOLS);
+        const num_symbols_to_process = valid_symbol_count;
 
         const stoch_results = try self.calculateStochRSIBatch(symbols_slice[0..num_symbols_to_process], rsi_period, stoch_period);
         const orderbook_results = try self.calculateOrderBookPercentageBatch(symbols_slice[0..num_symbols_to_process]);
