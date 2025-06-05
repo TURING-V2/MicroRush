@@ -34,3 +34,16 @@ pub const DepthError = error{
     DepthRequestFailed,
     OutOfMemory,
 } || std.json.Error || std.http.Client.RequestError || std.Uri.ParseError;
+
+pub const StatCalcError = error{
+    CUDAInitFailed,
+    CUDAMemoryAllocationFailed,
+    CUDAMemcpyFailed,
+    CUDAKernelLaunchFailed,
+    CUDAKernelExecutionFailed,
+    CUDAGetPropertiesFailed,
+    CUDAGetDeviceCountFailed,
+    NoCUDADevicesFound,
+    CUDADeviceResetFailed,
+    CUDAFreeMemoryFailed,
+};

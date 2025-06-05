@@ -55,7 +55,7 @@ pub const SimpleLockFreeRingBuffer = struct {
         const current_tail = self.tail.load(.acquire);
 
         if (current_head == current_tail) {
-            return null; // Buffer empty
+            return null; // buffer empty
         }
 
         const item = self.buffer[current_head];
@@ -102,7 +102,7 @@ pub const LockFreeRingBuffer = struct {
             const current_head = self.head.load(.acquire);
 
             if (next_tail == current_head) {
-                return false; // Buffer full
+                return false; // buffer full
             }
 
             if (self.tail.cmpxchgWeak(current_tail, next_tail, .acq_rel, .acquire)) |_| {

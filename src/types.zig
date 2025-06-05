@@ -234,7 +234,7 @@ pub const OrderBook = struct {
         std.log.info("BIDS:", .{});
         i = 0;
         while (i < self.bid_count) : (i += 1) {
-            const idx = (self.bid_head + i) % 10;
+            const idx = (self.bid_head + self.bid_count - 1 + i) % 10;
             const level = self.bids[idx];
             std.log.info("  {d:.8} @ {d:.8}", .{ level.quantity, level.price });
         }

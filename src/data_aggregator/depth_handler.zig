@@ -122,15 +122,15 @@ pub const DepthHandler = struct {
         const first_update_id = U_val.integer;
         const last_update_id = u_val.integer;
 
-        // Check if order book is initialized for this symbol
+        // check if order book is initialized for this symbol
         const is_initialized = self.orderbook_initialized.get(symbol) orelse false;
 
         if (!is_initialized) {
-            // Buffer the event and initialize order book
+            // buffer the event and initialize order book
             try self.bufferDepthEvent(symbol, original_data);
             try self.initializeOrderBook(symbol);
         } else {
-            // Apply the update directly
+            // apply the update directly
             try self.applyDepthUpdate(symbol, root, first_update_id, last_update_id);
         }
     }
