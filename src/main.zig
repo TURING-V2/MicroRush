@@ -4,6 +4,13 @@ const StatCalc = cuda.StatCalc;
 const SymbolMap = @import("symbol-map.zig").SymbolMap;
 const std = @import("std");
 
+var should_stop: bool = false;
+
+// fn handleSigint(_: c_int) callconv(.C) void {
+//     should_stop = true;
+//     std.log.info("Received SIGINT, stopping gracefully...", .{});
+// }
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -31,11 +38,25 @@ pub fn main() !void {
     try aggregator.connectToBinance();
     try aggregator.run();
 
-    std.debug.print("WebSockets flowing warming up in 2 mins...\n", .{});
-    std.log.info("=== Starting CUDA calculations with default parameters ===", .{});
-    try stat_calc.calculateSymbolMapBatch(&aggregator.symbol_map, 14, 14);
-    std.time.sleep(2 * std.time.ns_per_min);
+    // const act = std.posix.Sigaction{};
+    // try std.posix.sigaction(std.posix.SIG.INT, &act, null);
 
+    std.debug.print("WebSockets flowing, starting continuous CUDA calculations (Ctrl+C to stop)...\n", .{});
+    std.log.info("=== Starting CUDA calculations with default parameters ===", .{});
+
+    var mutex = std.Thread.Mutex{};
+    while (!should_stop) {
+        std.log.info("Running batch calculation...", .{});
+        mutex.lock();
+        stat_calc.calculateSymbolMapBatch(&aggregator.symbol_map, 14, 14) catch |err| {
+            std.log.err("Batch calculation failed: {}", .{err});
+            mutex.unlock();
+            continue;
+        };
+        mutex.unlock();
+    }
+
+    std.log.info("Stopping aggregator...", .{});
     try aggregator.stop();
     //SymbolMap.dump(&aggregator.symbol_map);
 }

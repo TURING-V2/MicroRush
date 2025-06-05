@@ -22,8 +22,12 @@ static const KernelError KERNEL_ERROR_DEVICE_RESET = {9, "Device reset failed"};
 static const KernelError KERNEL_ERROR_GET_PROPERTIES = {10, "Failed to get device properties"};
 static const KernelError KERNEL_ERROR_GET_DEVICE_COUNT = {11, "Failed to get device count"};
 
-// Forward declaration of cudaDeviceProp to avoid including cuda_runtime.h
-struct cudaDeviceProp;
+typedef struct {
+    char name[256];
+    int major;
+    int minor;
+    size_t totalGlobalMem;
+} DeviceInfo;
 
 struct GPUOHLCDataBatch_C {
     float close_prices[MAX_SYMBOLS_CUDA][15];
@@ -56,10 +60,9 @@ extern "C" {
     KernelError cuda_wrapper_init_device(int device_id);
     KernelError cuda_wrapper_reset_device();
     KernelError cuda_wrapper_get_device_count(int* count);
-    KernelError cuda_wrapper_get_device_properties(int device_id, struct cudaDeviceProp* props);
+    KernelError cuda_wrapper_get_device_info(int device_id, DeviceInfo* info);
     KernelError cuda_wrapper_select_best_device(int* best_device_id);
 
-    // Memory Management
     KernelError cuda_wrapper_allocate_memory(
         struct GPUOHLCDataBatch_C** d_ohlc_batch,
         struct GPUOrderBookDataBatch_C** d_orderbook_batch,
@@ -74,7 +77,6 @@ extern "C" {
         struct GPUOrderBookResultBatch_C* d_orderbook_result
     );
 
-    // Computation Kernels
     KernelError cuda_wrapper_run_stoch_rsi_batch(
         struct GPUOHLCDataBatch_C* d_ohlc_batch_ptr,
         struct GPUStochRSIResultBatch_C* d_results_ptr,

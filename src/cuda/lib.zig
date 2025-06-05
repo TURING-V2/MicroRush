@@ -28,19 +28,12 @@ pub const KERNEL_ERROR_DEVICE_RESET = KernelError{ .code = 9, .message = "Device
 pub const KERNEL_ERROR_GET_PROPERTIES = KernelError{ .code = 10, .message = "Failed to get device properties" };
 pub const KERNEL_ERROR_GET_DEVICE_COUNT = KernelError{ .code = 11, .message = "Failed to get device count" };
 
-// CUDA device properties struct (simplified version)
-pub const cudaDeviceProp = extern struct {
+// Simplified device properties struct
+pub const DeviceInfo = extern struct {
     name: [256]u8,
     major: c_int,
     minor: c_int,
     totalGlobalMem: usize,
-    sharedMemPerBlock: usize,
-    maxThreadsPerBlock: c_int,
-    maxGridSize: [3]c_int,
-    warpSize: c_int,
-    memoryClockRate: c_int,
-    memoryBusWidth: c_int,
-    l2CacheSize: c_int,
 };
 
 pub const GPUOHLCDataBatch = extern struct {
@@ -73,7 +66,7 @@ pub const GPUOrderBookResultBatch = extern struct {
 extern "c" fn cuda_wrapper_init_device(device_id: c_int) KernelError;
 extern "c" fn cuda_wrapper_reset_device() KernelError;
 extern "c" fn cuda_wrapper_get_device_count(count: *c_int) KernelError;
-extern "c" fn cuda_wrapper_get_device_properties(device_id: c_int, props: *cudaDeviceProp) KernelError;
+extern "c" fn cuda_wrapper_get_device_info(device_id: c_int, info: *DeviceInfo) KernelError;
 extern "c" fn cuda_wrapper_select_best_device(best_device_id: *c_int) KernelError;
 
 extern "c" fn cuda_wrapper_allocate_memory(
@@ -147,20 +140,19 @@ pub const StatCalc = struct {
             return StatCalcError.CUDAInitFailed;
         }
 
-        var props: cudaDeviceProp = undefined;
-        const kerr_props = cuda_wrapper_get_device_properties(self.device_id, &props);
-        if (kerr_props.code != 0) {
-            std.log.err("Failed to get device properties via wrapper: {} ({s})", .{ kerr_props.code, kerr_props.message });
+        var info: DeviceInfo = undefined;
+        const kerr_info = cuda_wrapper_get_device_info(self.device_id, &info);
+        if (kerr_info.code != 0) {
+            std.log.err("Failed to get device info via wrapper: {} ({s})", .{ kerr_info.code, kerr_info.message });
             return StatCalcError.CUDAGetPropertiesFailed;
         }
 
-        std.log.info("Using CUDA device: {s}", .{props.name});
-        std.log.info("Compute capability: {}.{}", .{ props.major, props.minor });
-        std.log.info("Global memory: {} MB", .{props.totalGlobalMem / (1024 * 1024)});
+        std.log.info("Using CUDA device: {s}", .{info.name});
+        std.log.info("Compute capability: {}.{}", .{ info.major, info.minor });
+        std.log.info("Global memory: {} MB", .{info.totalGlobalMem / (1024 * 1024)});
     }
 
     fn allocateDeviceMemory(self: *StatCalc) !void {
-        // Ensure pointers are non-null or handle the optional case
         var d_ohlc_batch_ptr: *GPUOHLCDataBatch = undefined;
         var d_orderbook_batch_ptr: *GPUOrderBookDataBatch = undefined;
         var d_stoch_result_ptr: *GPUStochRSIResultBatch = undefined;
@@ -178,7 +170,6 @@ pub const StatCalc = struct {
             return StatCalcError.CUDAMemoryAllocationFailed;
         }
 
-        // Assign the allocated pointers back to the struct fields
         self.d_ohlc_batch = d_ohlc_batch_ptr;
         self.d_orderbook_batch = d_orderbook_batch_ptr;
         self.d_stoch_result = d_stoch_result_ptr;
@@ -315,24 +306,17 @@ pub const StatCalc = struct {
     }
 
     pub fn getDeviceInfo(self: *StatCalc) !void {
-        var props: cudaDeviceProp = undefined;
-        const kerr = cuda_wrapper_get_device_properties(self.device_id, &props);
+        var info: DeviceInfo = undefined;
+        const kerr = cuda_wrapper_get_device_info(self.device_id, &info);
         if (kerr.code != 0) {
-            std.log.err("Failed to get device properties via wrapper: {} ({s})", .{ kerr.code, kerr.message });
+            std.log.err("Failed to get device info via wrapper: {} ({s})", .{ kerr.code, kerr.message });
             return StatCalcError.CUDAGetPropertiesFailed;
         }
 
         std.log.info("=== CUDA Device Information ===", .{});
-        std.log.info("Device Name: {s}", .{props.name});
-        std.log.info("Compute Capability: {}.{}", .{ props.major, props.minor });
-        std.log.info("Total Global Memory: {} MB", .{@divTrunc(props.totalGlobalMem, 1024 * 1024)});
-        std.log.info("Shared Memory per Block: {} KB", .{@divTrunc(props.sharedMemPerBlock, 1024)});
-        std.log.info("Max Threads per Block: {}", .{props.maxThreadsPerBlock});
-        std.log.info("Max Grid Size: [{}, {}, {}]", .{ props.maxGridSize[0], props.maxGridSize[1], props.maxGridSize[2] });
-        std.log.info("Warp Size: {}", .{props.warpSize});
-        std.log.info("Memory Clock Rate: {} MHz", .{@divTrunc(props.memoryClockRate, 1000)});
-        std.log.info("Memory Bus Width: {} bits", .{props.memoryBusWidth});
-        std.log.info("L2 Cache Size: {} KB", .{@divTrunc(props.l2CacheSize, 1024)});
+        std.log.info("Device Name: {s}", .{info.name});
+        std.log.info("Compute Capability: {}.{}", .{ info.major, info.minor });
+        std.log.info("Total Global Memory: {} MB", .{@divTrunc(info.totalGlobalMem, 1024 * 1024)});
         std.log.info("==============================", .{});
     }
 

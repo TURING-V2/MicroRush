@@ -416,4 +416,19 @@ extern "C" {
 
         return KERNEL_SUCCESS;
     }
+
+    KernelError cuda_wrapper_get_device_info(int device_id, DeviceInfo* info) {
+        cudaDeviceProp prop;
+        cudaError_t err = cudaGetDeviceProperties(&prop, device_id);
+        if (err != cudaSuccess) {
+            return (KernelError){ .code = 10, .message = "Failed to get device properties" };
+        }
+
+        strncpy(info->name, prop.name, 256);
+        info->major = prop.major;
+        info->minor = prop.minor;
+        info->totalGlobalMem = prop.totalGlobalMem;
+
+        return (KernelError){ .code = 0, .message = "Success" };
+    }
 }
