@@ -1,6 +1,5 @@
 const DataAggregator = @import("data_aggregator/lib.zig").DataAggregator;
-const stat_calc = @import("stat_calc/lib.zig");
-const StatCalc = stat_calc.StatCalc;
+const SignalEngine = @import("signal_engine/lib.zig").SignalEngine;
 const symbol_map = @import("symbol-map.zig");
 const SymbolMap = symbol_map.SymbolMap;
 const std = @import("std");
@@ -21,20 +20,18 @@ pub fn main() !void {
         }
     }
 
-    const device_id = try stat_calc.selectBestCUDADevice();
     const smp_allocator = std.heap.smp_allocator;
-    std.log.info("Selected CUDA device: {}", .{device_id});
-    var stat_cal = try StatCalc.init(smp_allocator, device_id);
-    defer stat_cal.deinit();
-    try stat_cal.getDeviceInfo();
-    try stat_cal.warmUp();
 
     var aggregator = try DataAggregator.init(enable_metrics, smp_allocator);
     defer aggregator.deinit();
+
+    const aggregator_sym_map = aggregator.symbol_map;
+    var signal_engine = try SignalEngine.init(smp_allocator, aggregator_sym_map);
+
     try aggregator.connectToBinance();
     try aggregator.run();
 
-    std.debug.print("WebSockets flowing, starting continuous CUDA calculations (Ctrl+C to stop)...\n", .{});
+    std.debug.print("WebSockets flowing, starting continuous Signal Engine and Trading...\n", .{});
     std.log.info("=== Starting CUDA calculations with default parameters ===", .{});
 
     const sleep_ns = 500_000_000; //500 ms
@@ -49,11 +46,7 @@ pub fn main() !void {
             break;
         }
         if (now - start_time >= warm_up_duration_ns) {
-            std.log.info("Running batch calculation...", .{});
-            stat_cal.calculateSymbolMapBatch(&aggregator.symbol_map, 6) catch |err| {
-                std.log.err("Batch calculation failed: {}", .{err});
-                continue;
-            };
+            try signal_engine.run();
         }
         // mutex.lock();
         // symbol_map.dump(&aggregator.symbol_map);

@@ -3,16 +3,16 @@ const types = @import("types.zig");
 
 pub const SymbolMap = types.SymbolMap;
 
-pub fn init(allocator: std.mem.Allocator) !SymbolMap {
-    return SymbolMap.init(allocator);
+pub fn init(self: *SymbolMap, allocator: std.mem.Allocator) !SymbolMap {
+    return self.init(allocator);
 }
 
-pub fn deinit(symbol_map: *SymbolMap) void {
-    symbol_map.deinit();
+pub fn deinit(self: *SymbolMap) void {
+    self.deinit();
 }
 
-pub fn dump(symbol_map: *const SymbolMap) void {
-    var it = symbol_map.iterator();
+pub fn dump(self: *const SymbolMap) void {
+    var it = self.iterator();
     while (it.next()) |entry| {
         const symbol = entry.value_ptr;
         std.log.info("Symbol: {s}", .{entry.key_ptr.*});

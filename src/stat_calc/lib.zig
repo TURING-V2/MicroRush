@@ -1,91 +1,38 @@
 const std = @import("std");
-const SymbolMap = @import("../types.zig").SymbolMap;
-const Symbol = @import("../types.zig").Symbol;
-const OHLC = @import("../types.zig").OHLC;
+const SymbolMap = @import("../symbol-map.zig").SymbolMap;
+const types = @import("../types.zig");
+const Symbol = types.Symbol;
+const OHLC = types.OHLC;
+const ERR = @import("../errors.zig");
 const StatCalcError = @import("../errors.zig").StatCalcError;
+const DeviceInfo = types.DeviceInfo;
+const GPUOHLCDataBatch = types.GPUOHLCDataBatch;
+const GPURSIResultBatch = types.GPURSIResultBatch;
+const GPUOrderBookDataBatch = types.GPUOrderBookDataBatch;
+const GPUOrderBookResultBatch = types.GPUOrderBookResultBatch;
+const MAX_SYMBOLS = types.MAX_SYMBOLS;
 
-const MAX_SYMBOLS_CUDA = 402;
-const MAX_SYMBOLS = MAX_SYMBOLS_CUDA;
-const MAX_RSI_VALUES_PER_SYMBOL = 15;
+pub const KERNEL_SUCCESS = ERR.KernelError{ .code = 0, .message = "Success" };
 
-pub const KernelError = extern struct {
-    code: c_int,
-    message: [*:0]const u8,
-};
-
-pub const KERNEL_SUCCESS = KernelError{ .code = 0, .message = "Success" };
-pub const KERNEL_ERROR_INVALID_DEVICE = KernelError{ .code = 1, .message = "Invalid device ID" };
-pub const KERNEL_ERROR_NO_DEVICE = KernelError{ .code = 2, .message = "No CUDA devices found" };
-pub const KERNEL_ERROR_MEMORY_ALLOCATION = KernelError{ .code = 3, .message = "Memory allocation failed" };
-pub const KERNEL_ERROR_MEMORY_SET = KernelError{ .code = 4, .message = "Memory set failed" };
-pub const KERNEL_ERROR_MEMORY_FREE = KernelError{ .code = 5, .message = "Memory free failed" };
-pub const KERNEL_ERROR_MEMCPY = KernelError{ .code = 6, .message = "Memory copy failed" };
-pub const KERNEL_ERROR_KERNEL_LAUNCH = KernelError{ .code = 7, .message = "Kernel launch failed" };
-pub const KERNEL_ERROR_KERNEL_EXECUTION = KernelError{ .code = 8, .message = "Kernel execution failed" };
-pub const KERNEL_ERROR_DEVICE_RESET = KernelError{ .code = 9, .message = "Device reset failed" };
-pub const KERNEL_ERROR_GET_PROPERTIES = KernelError{ .code = 10, .message = "Failed to get device properties" };
-pub const KERNEL_ERROR_GET_DEVICE_COUNT = KernelError{ .code = 11, .message = "Failed to get device count" };
-
-pub const DeviceInfo = extern struct {
-    name: [256]u8,
-    major: c_int,
-    minor: c_int,
-    totalGlobalMem: usize,
-};
-
-pub const GPUOHLCDataBatch = extern struct {
-    close_prices: [MAX_SYMBOLS][15]f32,
-    counts: [MAX_SYMBOLS]u32,
-};
-
-pub const GPURSIResultBatch = extern struct {
-    rsi_values: [MAX_SYMBOLS][MAX_RSI_VALUES_PER_SYMBOL]f32,
-    valid_rsi_count: [MAX_SYMBOLS]c_int,
-};
-
-pub const GPUOrderBookDataBatch = extern struct {
-    bid_prices: [MAX_SYMBOLS][10]f32,
-    bid_quantities: [MAX_SYMBOLS][10]f32,
-    ask_prices: [MAX_SYMBOLS][10]f32,
-    ask_quantities: [MAX_SYMBOLS][10]f32,
-    bid_counts: [MAX_SYMBOLS]u32,
-    ask_counts: [MAX_SYMBOLS]u32,
-};
-
-// pub const GPUStochRSIResultBatch = extern struct {
-//     stoch_rsi_k: [MAX_SYMBOLS]f32,
-//     stoch_rsi_d: [MAX_SYMBOLS]f32,
-//     rsi: [MAX_SYMBOLS]f32,
-// };
-
-pub const GPUOrderBookResultBatch = extern struct {
-    bid_percentage: [MAX_SYMBOLS]f32,
-    ask_percentage: [MAX_SYMBOLS]f32,
-    total_bid_volume: [MAX_SYMBOLS]f32,
-    total_ask_volume: [MAX_SYMBOLS]f32,
-};
-
-extern "c" fn cuda_wrapper_init_device(device_id: c_int) KernelError;
-extern "c" fn cuda_wrapper_reset_device() KernelError;
-extern "c" fn cuda_wrapper_get_device_count(count: *c_int) KernelError;
-extern "c" fn cuda_wrapper_get_device_info(device_id: c_int, info: *DeviceInfo) KernelError;
-extern "c" fn cuda_wrapper_select_best_device(best_device_id: *c_int) KernelError;
+extern "c" fn cuda_wrapper_init_device(device_id: c_int) ERR.KernelError;
+extern "c" fn cuda_wrapper_reset_device() ERR.KernelError;
+extern "c" fn cuda_wrapper_get_device_count(count: *c_int) ERR.KernelError;
+extern "c" fn cuda_wrapper_get_device_info(device_id: c_int, info: *DeviceInfo) ERR.KernelError;
+extern "c" fn cuda_wrapper_select_best_device(best_device_id: *c_int) ERR.KernelError;
 
 extern "c" fn cuda_wrapper_allocate_memory(
     d_ohlc_batch: **GPUOHLCDataBatch,
     d_orderbook_batch: **GPUOrderBookDataBatch,
     d_rsi_result: **GPURSIResultBatch,
-    //d_stoch_result: **GPUStochRSIResultBatch,
     d_orderbook_result: **GPUOrderBookResultBatch,
-) KernelError;
+) ERR.KernelError;
 
 extern "c" fn cuda_wrapper_free_memory(
     d_ohlc_batch: ?*GPUOHLCDataBatch,
     d_orderbook_batch: ?*GPUOrderBookDataBatch,
     d_rsi_result: ?*GPURSIResultBatch,
-    //d_stoch_result: ?*GPUStochRSIResultBatch,
     d_orderbook_result: ?*GPUOrderBookResultBatch,
-) KernelError;
+) ERR.KernelError;
 
 extern "c" fn cuda_wrapper_run_rsi_batch(
     d_ohlc_batch_ptr: *GPUOHLCDataBatch,
@@ -94,16 +41,7 @@ extern "c" fn cuda_wrapper_run_rsi_batch(
     h_rsi_results: *GPURSIResultBatch,
     num_symbols: c_int,
     rsi_period: c_int,
-) KernelError;
-
-extern "c" fn cuda_wrapper_run_stoch_rsi_batch(
-    d_rsi_results_ptr: *GPURSIResultBatch,
-    //d_stoch_results_ptr: *GPUStochRSIResultBatch,
-    h_rsi_results: *const GPURSIResultBatch,
-    //h_stoch_results: *GPUStochRSIResultBatch,
-    num_symbols: c_int,
-    stoch_period: c_int,
-) KernelError;
+) ERR.KernelError;
 
 extern "c" fn cuda_wrapper_run_orderbook_batch(
     d_orderbook_batch_ptr: *GPUOrderBookDataBatch,
@@ -111,22 +49,18 @@ extern "c" fn cuda_wrapper_run_orderbook_batch(
     h_orderbook_batch: *const GPUOrderBookDataBatch,
     h_results: *GPUOrderBookResultBatch,
     num_symbols: c_int,
-) KernelError;
+) ERR.KernelError;
 
 pub const StatCalc = struct {
     allocator: std.mem.Allocator,
     device_id: c_int,
 
-    // Device pointers
     d_ohlc_batch: ?*GPUOHLCDataBatch,
     d_orderbook_batch: ?*GPUOrderBookDataBatch,
     d_rsi_result: ?*GPURSIResultBatch,
-    //d_stoch_result: ?*GPUStochRSIResultBatch,
     d_orderbook_result: ?*GPUOrderBookResultBatch,
 
-    // Host copies of results
     h_rsi_result: GPURSIResultBatch,
-    //h_stoch_result: GPUStochRSIResultBatch,
     h_orderbook_result: GPUOrderBookResultBatch,
 
     pub fn init(allocator: std.mem.Allocator, device_id: c_int) !StatCalc {
@@ -136,10 +70,8 @@ pub const StatCalc = struct {
             .d_ohlc_batch = null,
             .d_orderbook_batch = null,
             .d_rsi_result = null,
-            //.d_stoch_result = null,
             .d_orderbook_result = null,
             .h_rsi_result = std.mem.zeroes(GPURSIResultBatch),
-            //.h_stoch_result = std.mem.zeroes(GPUStochRSIResultBatch),
             .h_orderbook_result = std.mem.zeroes(GPUOrderBookResultBatch),
         };
 
@@ -191,7 +123,6 @@ pub const StatCalc = struct {
         self.d_ohlc_batch = d_ohlc_batch_ptr;
         self.d_orderbook_batch = d_orderbook_batch_ptr;
         self.d_rsi_result = d_rsi_result_ptr;
-        //self.d_stoch_result = d_stoch_result_ptr;
         self.d_orderbook_result = d_orderbook_result_ptr;
     }
 
@@ -488,7 +419,7 @@ pub fn selectBestCUDADevice() !c_int {
     var best_device: c_int = 0;
     const kerr = cuda_wrapper_select_best_device(&best_device);
 
-    if (kerr.code == KERNEL_ERROR_NO_DEVICE.code) {
+    if (kerr.code == ERR.KERNEL_ERROR_NO_DEVICE.code) {
         return StatCalcError.NoCUDADevicesFound;
     }
     if (kerr.code != 0) {

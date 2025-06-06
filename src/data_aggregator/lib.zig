@@ -1,11 +1,11 @@
 const binance = @import("binance.zig");
-const symbol_map = @import("../symbol-map.zig");
+const SymbolMap = @import("../symbol-map.zig").SymbolMap;
 const metrics = @import("../metrics.zig");
 
 const std = @import("std");
 
 pub const DataAggregator = struct {
-    symbol_map: symbol_map.SymbolMap,
+    symbol_map: *SymbolMap,
     binance: binance.Client,
     allocator: std.mem.Allocator,
     enable_metrics: bool,
@@ -27,7 +27,7 @@ pub const DataAggregator = struct {
             metrics_thread = thread;
         }
 
-        const sym_map = try symbol_map.init(allocator);
+        var sym_map = SymbolMap.init(allocator);
         const binance_client = try binance.Client.init(allocator, if (enable_metrics) &metrics_collector.? else null);
 
         return DataAggregator{
@@ -36,13 +36,13 @@ pub const DataAggregator = struct {
             .metrics_channel = metrics_channel,
             .metrics_thread = metrics_thread,
             .metrics_collector = metrics_collector,
-            .symbol_map = sym_map,
+            .symbol_map = &sym_map,
             .binance = binance_client,
         };
     }
 
     pub fn deinit(self: *DataAggregator) void {
-        symbol_map.deinit(&self.symbol_map);
+        self.symbol_map.deinit();
         self.binance.deinit();
         if (self.enable_metrics) {
             if (self.metrics_channel) |channel| {
@@ -59,11 +59,11 @@ pub const DataAggregator = struct {
 
     pub fn connectToBinance(self: *DataAggregator) !void {
         try self.binance.connect();
-        try self.binance.loadSymbols(&self.symbol_map);
+        try self.binance.loadSymbols(self.symbol_map);
     }
 
     pub fn run(self: *DataAggregator) !void {
-        try self.binance.ws_client.startListener(&self.symbol_map);
+        try self.binance.ws_client.startListener(self.symbol_map);
         std.debug.print("WebSocket listener started\n", .{});
     }
 

@@ -1,5 +1,44 @@
 const std = @import("std");
 
+//////////////////////////////////////////////////////////
+pub const MAX_SYMBOLS_CUDA = 402;
+pub const MAX_SYMBOLS = MAX_SYMBOLS_CUDA;
+pub const MAX_RSI_VALUES_PER_SYMBOL = 15;
+
+pub const DeviceInfo = extern struct {
+    name: [256]u8,
+    major: c_int,
+    minor: c_int,
+    totalGlobalMem: usize,
+};
+
+pub const GPUOHLCDataBatch = extern struct {
+    close_prices: [MAX_SYMBOLS][15]f32,
+    counts: [MAX_SYMBOLS]u32,
+};
+
+pub const GPURSIResultBatch = extern struct {
+    rsi_values: [MAX_SYMBOLS][MAX_RSI_VALUES_PER_SYMBOL]f32,
+    valid_rsi_count: [MAX_SYMBOLS]c_int,
+};
+
+pub const GPUOrderBookDataBatch = extern struct {
+    bid_prices: [MAX_SYMBOLS][10]f32,
+    bid_quantities: [MAX_SYMBOLS][10]f32,
+    ask_prices: [MAX_SYMBOLS][10]f32,
+    ask_quantities: [MAX_SYMBOLS][10]f32,
+    bid_counts: [MAX_SYMBOLS]u32,
+    ask_counts: [MAX_SYMBOLS]u32,
+};
+
+pub const GPUOrderBookResultBatch = extern struct {
+    bid_percentage: [MAX_SYMBOLS]f32,
+    ask_percentage: [MAX_SYMBOLS]f32,
+    total_bid_volume: [MAX_SYMBOLS]f32,
+    total_ask_volume: [MAX_SYMBOLS]f32,
+};
+
+/////////////////////////////////////////////////////////////
 pub const OHLC = struct {
     open_price: f64,
     high_price: f64,
