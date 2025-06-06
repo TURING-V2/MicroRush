@@ -336,7 +336,6 @@ pub const DepthHandler = struct {
 
             sym.orderbook.last_update_id = snapshot.lastUpdateId;
 
-            // Use consistent key management
             const temp_symbol = try self.allocator.dupe(u8, symbol);
             try self.last_update_ids.put(temp_symbol, snapshot.lastUpdateId);
         } else {
@@ -352,7 +351,6 @@ pub const DepthHandler = struct {
 
         if (first_update_id > current_update_id + 1) {
             std.debug.print("Gap detected for {s}. Reinitializing...\n", .{symbol});
-            // Use consistent key - duplicate the symbol
             const temp_symbol = try self.allocator.dupe(u8, symbol);
             try self.orderbook_initialized.put(temp_symbol, false);
             try self.initializeOrderBook(symbol);
@@ -397,7 +395,6 @@ pub const DepthHandler = struct {
 
             sym.orderbook.last_update_id = last_update_id;
 
-            // Use consistent key management
             const temp_symbol = try self.allocator.dupe(u8, symbol);
             try self.last_update_ids.put(temp_symbol, last_update_id);
         } else {

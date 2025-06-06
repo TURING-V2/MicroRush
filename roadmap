@@ -2,9 +2,10 @@ Data aggregator
     Kline
     order book
 
-Cuda processor
-    stoch rsi
+Stat clac
     % buy sell
+    rsi
+    rsi up down trends
 
 Signal Engine
     

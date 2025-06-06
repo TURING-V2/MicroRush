@@ -4,9 +4,9 @@ CUDA_FLAGS = -c -O2 -arch=sm_75 -allow-unsupported-compiler
 
 CUDA_SYSTEM_INCLUDE_DIR = /opt/cuda/include/
 
-PROJECT_CUDA_HEADER_DIR = src/cuda
+PROJECT_CUDA_HEADER_DIR = src/stat_calc
 
-CUDA_SOURCE_DIR = src/cuda
+CUDA_SOURCE_DIR = src/stat_calc
 CUDA_SOURCE_FILE = kernel.cu
 
 CUDA_C_API_HEADER = $(PROJECT_CUDA_HEADER_DIR)/kernel.h

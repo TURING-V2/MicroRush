@@ -1,6 +1,6 @@
 const DataAggregator = @import("data_aggregator/lib.zig").DataAggregator;
-const cuda = @import("cuda/lib.zig");
-const StatCalc = cuda.StatCalc;
+const stat_calc = @import("stat_calc/lib.zig");
+const StatCalc = stat_calc.StatCalc;
 const symbol_map = @import("symbol-map.zig");
 const SymbolMap = symbol_map.SymbolMap;
 const std = @import("std");
@@ -21,13 +21,13 @@ pub fn main() !void {
         }
     }
 
-    const device_id = try cuda.selectBestCUDADevice();
+    const device_id = try stat_calc.selectBestCUDADevice();
     const smp_allocator = std.heap.smp_allocator;
     std.log.info("Selected CUDA device: {}", .{device_id});
-    var stat_calc = try StatCalc.init(smp_allocator, device_id);
-    defer stat_calc.deinit();
-    try stat_calc.getDeviceInfo();
-    try stat_calc.warmUp();
+    var stat_cal = try StatCalc.init(smp_allocator, device_id);
+    defer stat_cal.deinit();
+    try stat_cal.getDeviceInfo();
+    try stat_cal.warmUp();
 
     var aggregator = try DataAggregator.init(enable_metrics, smp_allocator);
     defer aggregator.deinit();
@@ -50,7 +50,7 @@ pub fn main() !void {
         }
         if (now - start_time >= warm_up_duration_ns) {
             std.log.info("Running batch calculation...", .{});
-            stat_calc.calculateSymbolMapBatch(&aggregator.symbol_map, 14, 14) catch |err| {
+            stat_cal.calculateSymbolMapBatch(&aggregator.symbol_map, 6) catch |err| {
                 std.log.err("Batch calculation failed: {}", .{err});
                 continue;
             };

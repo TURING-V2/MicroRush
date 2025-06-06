@@ -71,81 +71,74 @@ __global__ void rsi_kernel_batch(const GPUOHLCDataBatch_C *ohlc_batch, int num_s
     }
 }
 
-__global__ void stoch_rsi_kernel_batch(const GPURSIResultBatch_C *rsi_results, int num_symbols, int stoch_period, GPUStochRSIResultBatch_C *stoch_results) {
-    int symbol_idx = blockIdx.x;
-    if (symbol_idx >= num_symbols) return;
+// __global__ void stoch_rsi_kernel_batch(const GPURSIResultBatch_C *rsi_results, int num_symbols, int stoch_period, GPUStochRSIResultBatch_C *stoch_results) {
+//     int symbol_idx = blockIdx.x;
+//     if (symbol_idx >= num_symbols) return;
     
-    int valid_rsi_count = rsi_results->valid_rsi_count[symbol_idx];
+//     int valid_rsi_count = rsi_results->valid_rsi_count[symbol_idx];
 
-    if (valid_rsi_count <= 0) {
-        if (threadIdx.x == 0) {
-            stoch_results->rsi[symbol_idx] = 50.0f;
-            stoch_results->stoch_rsi_k[symbol_idx] = 50.0f;
-            stoch_results->stoch_rsi_d[symbol_idx] = 50.0f;
-        }
-        return;
-    }
+//     if (valid_rsi_count <= 15) {
+//         return;
+//     }
     
-    if (stoch_period < 1) stoch_period = 1;
+//     if (stoch_period < 1) stoch_period = 1;
     
-    __shared__ float stoch_k[15];
-    int idx = threadIdx.x;
+//     __shared__ float stoch_k[15];
+//     int idx = threadIdx.x;
     
-    if (idx < valid_rsi_count) {
-        int start_idx = (idx >= stoch_period - 1) ? (idx - stoch_period + 1) : 0;
-        int end_idx = idx;
+//     if (idx < valid_rsi_count) {
+//         int start_idx = (idx >= stoch_period - 1) ? (idx - stoch_period + 1) : 0;
+//         int end_idx = idx;
         
-        float min_rsi = rsi_results->rsi_values[symbol_idx][start_idx];
-        float max_rsi = rsi_results->rsi_values[symbol_idx][start_idx];
+//         float min_rsi = rsi_results->rsi_values[symbol_idx][start_idx];
+//         float max_rsi = rsi_results->rsi_values[symbol_idx][start_idx];
         
-        for (int m = start_idx; m <= end_idx; m++) {
-            if (m < valid_rsi_count) {  // Boundary check
-                float current_rsi_val = rsi_results->rsi_values[symbol_idx][m];
-                if (current_rsi_val < min_rsi) min_rsi = current_rsi_val;
-                if (current_rsi_val > max_rsi) max_rsi = current_rsi_val;
-            }
-        }
+//         for (int m = start_idx; m <= end_idx; m++) {
+//             if (m < valid_rsi_count) { 
+//                 float current_rsi_val = rsi_results->rsi_values[symbol_idx][m];
+//                 if (current_rsi_val < min_rsi) min_rsi = current_rsi_val;
+//                 if (current_rsi_val > max_rsi) max_rsi = current_rsi_val;
+//             }
+//         }
         
-        float current_rsi = rsi_results->rsi_values[symbol_idx][idx];
-        if (fabsf(max_rsi - min_rsi) > 0.000001f) {
-            stoch_k[idx] = ((current_rsi - min_rsi) / (max_rsi - min_rsi)) * 100.0f;
-        } else {
-            stoch_k[idx] = 50.0f;
-        }
-    }
+//         float current_rsi = rsi_results->rsi_values[symbol_idx][idx];
+//         if (fabsf(max_rsi - min_rsi) > 0.000001f) {
+//             stoch_k[idx] = ((current_rsi - min_rsi) / (max_rsi - min_rsi)) * 100.0f;
+//         } else {
+//             return;
+//         }
+//     }
     
-    __syncthreads();
+//     __syncthreads();
 
-    if (threadIdx.x == 0) {
-        int last_rsi_idx = valid_rsi_count - 1;
-        if (last_rsi_idx >= 0) {
-            stoch_results->rsi[symbol_idx] = rsi_results->rsi_values[symbol_idx][last_rsi_idx];
-            stoch_results->stoch_rsi_k[symbol_idx] = stoch_k[last_rsi_idx];
+//     if (threadIdx.x == 0) {
+//         int last_rsi_idx = valid_rsi_count - 1;
+//         if (last_rsi_idx >= 0) {
+//             stoch_results->rsi[symbol_idx] = rsi_results->rsi_values[symbol_idx][last_rsi_idx];
+//             stoch_results->stoch_rsi_k[symbol_idx] = stoch_k[last_rsi_idx];
             
-            int D_period = 3;
-            float sum_k_for_d = 0.0f;
-            int actual_d_count = 0;
+//             int D_period = 15;
+//             float sum_k_for_d = 0.0f;
+//             int actual_d_count = 0;
             
-            for (int p = 0; p < D_period && p <= last_rsi_idx; p++) {
-                int k_idx_for_d = last_rsi_idx - p;
-                if (k_idx_for_d >= 0) {
-                    sum_k_for_d += stoch_k[k_idx_for_d];
-                    actual_d_count++;
-                }
-            }
+//             for (int p = 0; p < D_period && p <= last_rsi_idx; p++) {
+//                 int k_idx_for_d = last_rsi_idx - p;
+//                 if (k_idx_for_d >= 0) {
+//                     sum_k_for_d += stoch_k[k_idx_for_d];
+//                     actual_d_count++;
+//                 }
+//             }
             
-            if (actual_d_count > 0) {
-                stoch_results->stoch_rsi_d[symbol_idx] = sum_k_for_d / (float)actual_d_count;
-            } else {
-                stoch_results->stoch_rsi_d[symbol_idx] = 50.0f;
-            }
-        } else {
-            stoch_results->rsi[symbol_idx] = 50.0f;
-            stoch_results->stoch_rsi_k[symbol_idx] = 50.0f;
-            stoch_results->stoch_rsi_d[symbol_idx] = 50.0f;
-        }
-    }
-}
+//             if (actual_d_count > 0) {
+//                 stoch_results->stoch_rsi_d[symbol_idx] = sum_k_for_d / (float)actual_d_count;
+//             } else {
+//                 return;
+//             }
+//         } else {
+//             return;
+//         }
+//     }
+// }
 
 __global__ void orderbook_kernel_batch(const GPUOrderBookDataBatch_C *orderbook_batch, int num_symbols, GPUOrderBookResultBatch_C *results) {
     int symbol_idx = blockIdx.x;
@@ -229,22 +222,22 @@ static KernelError launch_rsi_kernel_internal(
     return KERNEL_SUCCESS;
 }
 
-static KernelError launch_stoch_rsi_kernel_internal(
-    const GPURSIResultBatch_C *d_rsi_results,
-    GPUStochRSIResultBatch_C *d_stoch_results,
-    int num_symbols,
-    int stoch_period)
-{
-    const int THREADS_PER_BLOCK = 32;
-    if (num_symbols > 0) {
-        stoch_rsi_kernel_batch<<<num_symbols, THREADS_PER_BLOCK>>>(d_rsi_results, num_symbols, stoch_period, d_stoch_results);
-        cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess) {
-            return map_cuda_error(err, "CUDA StochRSI kernel launch failed");
-        }
-    }
-    return KERNEL_SUCCESS;
-}
+// static KernelError launch_stoch_rsi_kernel_internal(
+//     const GPURSIResultBatch_C *d_rsi_results,
+//     GPUStochRSIResultBatch_C *d_stoch_results,
+//     int num_symbols,
+//     int stoch_period)
+// {
+//     const int THREADS_PER_BLOCK = 32;
+//     if (num_symbols > 0) {
+//         stoch_rsi_kernel_batch<<<num_symbols, THREADS_PER_BLOCK>>>(d_rsi_results, num_symbols, stoch_period, d_stoch_results);
+//         cudaError_t err = cudaGetLastError();
+//         if (err != cudaSuccess) {
+//             return map_cuda_error(err, "CUDA StochRSI kernel launch failed");
+//         }
+//     }
+//     return KERNEL_SUCCESS;
+// }
 
 static KernelError launch_orderbook_kernel_internal(
     const GPUOrderBookDataBatch_C *d_orderbook_batch,
@@ -328,7 +321,7 @@ extern "C" {
         GPUOHLCDataBatch_C** d_ohlc_batch,
         GPUOrderBookDataBatch_C** d_orderbook_batch,
         GPURSIResultBatch_C** d_rsi_result,
-        GPUStochRSIResultBatch_C** d_stoch_result,
+        //GPUStochRSIResultBatch_C** d_stoch_result,
         GPUOrderBookResultBatch_C** d_orderbook_result
     ) {
         cudaError_t err;
@@ -360,14 +353,14 @@ extern "C" {
             return map_cuda_error(err, "CUDA Memset failed for d_rsi_result");
         }
         
-        err = cudaMalloc((void**)d_stoch_result, sizeof(GPUStochRSIResultBatch_C));
-        if (err != cudaSuccess) {
-            return map_cuda_error(err, "CUDA Malloc failed for d_stoch_result");
-        }
-        err = cudaMemset(*d_stoch_result, 0, sizeof(GPUStochRSIResultBatch_C));
-        if (err != cudaSuccess) {
-            return map_cuda_error(err, "CUDA Memset failed for d_stoch_result");
-        }
+        // err = cudaMalloc((void**)d_stoch_result, sizeof(GPUStochRSIResultBatch_C));
+        // if (err != cudaSuccess) {
+        //     return map_cuda_error(err, "CUDA Malloc failed for d_stoch_result");
+        // }
+        // err = cudaMemset(*d_stoch_result, 0, sizeof(GPUStochRSIResultBatch_C));
+        // if (err != cudaSuccess) {
+        //     return map_cuda_error(err, "CUDA Memset failed for d_stoch_result");
+        // }
         
         err = cudaMalloc((void**)d_orderbook_result, sizeof(GPUOrderBookResultBatch_C));
         if (err != cudaSuccess) {
@@ -385,7 +378,7 @@ extern "C" {
         GPUOHLCDataBatch_C* d_ohlc_batch,
         GPUOrderBookDataBatch_C* d_orderbook_batch,
         GPURSIResultBatch_C* d_rsi_result,
-        GPUStochRSIResultBatch_C* d_stoch_result,
+        //GPUStochRSIResultBatch_C* d_stoch_result,
         GPUOrderBookResultBatch_C* d_orderbook_result
     ) {
         KernelError last_err = KERNEL_SUCCESS;
@@ -412,12 +405,12 @@ extern "C" {
             }
         }
         
-        if (d_stoch_result) {
-            current_err = cudaFree(d_stoch_result);
-            if (current_err != cudaSuccess && last_err.code == 0) {
-                last_err = map_cuda_error(current_err, "CUDA Free failed for d_stoch_result");
-            }
-        }
+        // if (d_stoch_result) {
+        //     current_err = cudaFree(d_stoch_result);
+        //     if (current_err != cudaSuccess && last_err.code == 0) {
+        //         last_err = map_cuda_error(current_err, "CUDA Free failed for d_stoch_result");
+        //     }
+        // }
         
         if (d_orderbook_result) {
             current_err = cudaFree(d_orderbook_result);
@@ -464,40 +457,40 @@ extern "C" {
         return KERNEL_SUCCESS;
     }
     
-    KernelError cuda_wrapper_run_stoch_rsi_batch(
-        GPURSIResultBatch_C* d_rsi_results_ptr,
-        GPUStochRSIResultBatch_C* d_stoch_results_ptr,
-        const GPURSIResultBatch_C* h_rsi_results,
-        GPUStochRSIResultBatch_C* h_stoch_results,
-        int num_symbols,
-        int stoch_period
-    ) {
-        if (num_symbols == 0) return KERNEL_SUCCESS;
+    // KernelError cuda_wrapper_run_stoch_rsi_batch(
+    //     GPURSIResultBatch_C* d_rsi_results_ptr,
+    //     GPUStochRSIResultBatch_C* d_stoch_results_ptr,
+    //     const GPURSIResultBatch_C* h_rsi_results,
+    //     GPUStochRSIResultBatch_C* h_stoch_results,
+    //     int num_symbols,
+    //     int stoch_period
+    // ) {
+    //     if (num_symbols == 0) return KERNEL_SUCCESS;
         
-        cudaError_t err;
+    //     cudaError_t err;
         
-        err = cudaMemcpy(d_rsi_results_ptr, h_rsi_results, sizeof(GPURSIResultBatch_C), cudaMemcpyHostToDevice);
-        if (err != cudaSuccess) {
-            return map_cuda_error(err, "CUDA Memcpy H2D failed for StochRSI input");
-        }
+    //     err = cudaMemcpy(d_rsi_results_ptr, h_rsi_results, sizeof(GPURSIResultBatch_C), cudaMemcpyHostToDevice);
+    //     if (err != cudaSuccess) {
+    //         return map_cuda_error(err, "CUDA Memcpy H2D failed for StochRSI input");
+    //     }
         
-        KernelError kerr = launch_stoch_rsi_kernel_internal(d_rsi_results_ptr, d_stoch_results_ptr, num_symbols, stoch_period);
-        if (kerr.code != 0) {
-            return kerr;
-        }
+    //     KernelError kerr = launch_stoch_rsi_kernel_internal(d_rsi_results_ptr, d_stoch_results_ptr, num_symbols, stoch_period);
+    //     if (kerr.code != 0) {
+    //         return kerr;
+    //     }
         
-        err = cudaDeviceSynchronize();
-        if (err != cudaSuccess) {
-            return map_cuda_error(err, "CUDA StochRSI kernel execution failed");
-        }
+    //     err = cudaDeviceSynchronize();
+    //     if (err != cudaSuccess) {
+    //         return map_cuda_error(err, "CUDA StochRSI kernel execution failed");
+    //     }
         
-        err = cudaMemcpy(h_stoch_results, d_stoch_results_ptr, sizeof(GPUStochRSIResultBatch_C), cudaMemcpyDeviceToHost);
-        if (err != cudaSuccess) {
-            return map_cuda_error(err, "CUDA Memcpy D2H failed for StochRSI results");
-        }
+    //     err = cudaMemcpy(h_stoch_results, d_stoch_results_ptr, sizeof(GPUStochRSIResultBatch_C), cudaMemcpyDeviceToHost);
+    //     if (err != cudaSuccess) {
+    //         return map_cuda_error(err, "CUDA Memcpy D2H failed for StochRSI results");
+    //     }
         
-        return KERNEL_SUCCESS;
-    }
+    //     return KERNEL_SUCCESS;
+    // }
     
     KernelError cuda_wrapper_run_orderbook_batch(
         GPUOrderBookDataBatch_C* d_orderbook_batch_ptr,
