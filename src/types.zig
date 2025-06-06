@@ -221,8 +221,9 @@ pub const OrderBook = struct {
 
     pub fn dump(self: *const OrderBook) void {
         std.log.info("=== Order Book (Update ID: {}) ===", .{self.last_update_id});
-        std.log.info("ASKS:", .{});
+        std.log.info("ASKS (ascending - lowest first):", .{});
         var i: usize = 0;
+        // Display asks in reverse order so highest ask is at top (traditional order book view)
         while (i < self.ask_count) : (i += 1) {
             const idx = (self.ask_head + self.ask_count - 1 - i) % 10;
             const level = self.asks[idx];
@@ -231,14 +232,39 @@ pub const OrderBook = struct {
         if (self.getSpread()) |spread| {
             std.log.info("--- SPREAD: {d:.8} ---", .{spread});
         }
-        std.log.info("BIDS:", .{});
+        std.log.info("BIDS (descending - highest first):", .{});
         i = 0;
         while (i < self.bid_count) : (i += 1) {
-            const idx = (self.bid_head + self.bid_count - 1 + i) % 10;
+            const idx = (self.bid_head + i) % 10;
             const level = self.bids[idx];
             std.log.info("  {d:.8} @ {d:.8}", .{ level.quantity, level.price });
         }
         std.log.info("================================", .{});
+        //_ = self.validate();
+    }
+
+    pub fn validate(self: *const OrderBook) bool {
+        var i: usize = 1;
+        while (i < self.bid_count) : (i += 1) {
+            const prev_idx = (self.bid_head + i - 1) % 10;
+            const curr_idx = (self.bid_head + i) % 10;
+            if (self.bids[prev_idx].price < self.bids[curr_idx].price) {
+                std.log.err("Bid order violation at index {}: {} < {}", .{ i, self.bids[prev_idx].price, self.bids[curr_idx].price });
+                return false;
+            }
+        }
+
+        i = 1;
+        while (i < self.ask_count) : (i += 1) {
+            const prev_idx = (self.ask_head + i - 1) % 10;
+            const curr_idx = (self.ask_head + i) % 10;
+            if (self.asks[prev_idx].price > self.asks[curr_idx].price) {
+                std.log.err("Ask order violation at index {}: {} > {}", .{ i, self.asks[prev_idx].price, self.asks[curr_idx].price });
+                return false;
+            }
+        }
+
+        return true;
     }
 };
 

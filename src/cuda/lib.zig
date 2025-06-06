@@ -7,6 +7,7 @@ const StatCalcError = @import("../errors.zig").StatCalcError;
 // Constants
 const MAX_SYMBOLS_CUDA = 402;
 const MAX_SYMBOLS = MAX_SYMBOLS_CUDA;
+const MAX_RSI_VALUES_PER_SYMBOL = 15; // Max RSI values based on 15 OHLC points
 
 // Type definitions matching the C header
 pub const KernelError = extern struct {
@@ -41,6 +42,12 @@ pub const GPUOHLCDataBatch = extern struct {
     counts: [MAX_SYMBOLS]u32,
 };
 
+// New struct for intermediate RSI results
+pub const GPURSIResultBatch = extern struct {
+    rsi_values: [MAX_SYMBOLS][MAX_RSI_VALUES_PER_SYMBOL]f32,
+    valid_rsi_count: [MAX_SYMBOLS]c_int,
+};
+
 pub const GPUOrderBookDataBatch = extern struct {
     bid_prices: [MAX_SYMBOLS][10]f32,
     bid_quantities: [MAX_SYMBOLS][10]f32,
@@ -53,7 +60,7 @@ pub const GPUOrderBookDataBatch = extern struct {
 pub const GPUStochRSIResultBatch = extern struct {
     stoch_rsi_k: [MAX_SYMBOLS]f32,
     stoch_rsi_d: [MAX_SYMBOLS]f32,
-    rsi: [MAX_SYMBOLS]f32,
+    rsi: [MAX_SYMBOLS]f32, // This is the latest RSI value
 };
 
 pub const GPUOrderBookResultBatch = extern struct {
@@ -72,6 +79,7 @@ extern "c" fn cuda_wrapper_select_best_device(best_device_id: *c_int) KernelErro
 extern "c" fn cuda_wrapper_allocate_memory(
     d_ohlc_batch: **GPUOHLCDataBatch,
     d_orderbook_batch: **GPUOrderBookDataBatch,
+    d_rsi_result: **GPURSIResultBatch, // Added
     d_stoch_result: **GPUStochRSIResultBatch,
     d_orderbook_result: **GPUOrderBookResultBatch,
 ) KernelError;
@@ -79,17 +87,27 @@ extern "c" fn cuda_wrapper_allocate_memory(
 extern "c" fn cuda_wrapper_free_memory(
     d_ohlc_batch: ?*GPUOHLCDataBatch,
     d_orderbook_batch: ?*GPUOrderBookDataBatch,
+    d_rsi_result: ?*GPURSIResultBatch, // Added
     d_stoch_result: ?*GPUStochRSIResultBatch,
     d_orderbook_result: ?*GPUOrderBookResultBatch,
 ) KernelError;
 
-extern "c" fn cuda_wrapper_run_stoch_rsi_batch(
+// New extern for running RSI calculation kernel
+extern "c" fn cuda_wrapper_run_rsi_batch(
     d_ohlc_batch_ptr: *GPUOHLCDataBatch,
-    d_results_ptr: *GPUStochRSIResultBatch,
+    d_rsi_results_ptr: *GPURSIResultBatch,
     h_ohlc_batch: *const GPUOHLCDataBatch,
-    h_results: *GPUStochRSIResultBatch,
+    h_rsi_results: *GPURSIResultBatch,
     num_symbols: c_int,
     rsi_period: c_int,
+) KernelError;
+
+extern "c" fn cuda_wrapper_run_stoch_rsi_batch(
+    d_rsi_results_ptr: *GPURSIResultBatch,
+    d_stoch_results_ptr: *GPUStochRSIResultBatch,
+    h_rsi_results: *const GPURSIResultBatch,
+    h_stoch_results: *GPUStochRSIResultBatch,
+    num_symbols: c_int,
     stoch_period: c_int,
 ) KernelError;
 
@@ -108,10 +126,12 @@ pub const StatCalc = struct {
     // Device pointers
     d_ohlc_batch: ?*GPUOHLCDataBatch,
     d_orderbook_batch: ?*GPUOrderBookDataBatch,
+    d_rsi_result: ?*GPURSIResultBatch, // Added
     d_stoch_result: ?*GPUStochRSIResultBatch,
     d_orderbook_result: ?*GPUOrderBookResultBatch,
 
     // Host copies of results
+    h_rsi_result: GPURSIResultBatch, // Added
     h_stoch_result: GPUStochRSIResultBatch,
     h_orderbook_result: GPUOrderBookResultBatch,
 
@@ -121,8 +141,10 @@ pub const StatCalc = struct {
             .device_id = device_id,
             .d_ohlc_batch = null,
             .d_orderbook_batch = null,
+            .d_rsi_result = null, // Added
             .d_stoch_result = null,
             .d_orderbook_result = null,
+            .h_rsi_result = std.mem.zeroes(GPURSIResultBatch), // Added
             .h_stoch_result = std.mem.zeroes(GPUStochRSIResultBatch),
             .h_orderbook_result = std.mem.zeroes(GPUOrderBookResultBatch),
         };
@@ -155,12 +177,14 @@ pub const StatCalc = struct {
     fn allocateDeviceMemory(self: *StatCalc) !void {
         var d_ohlc_batch_ptr: *GPUOHLCDataBatch = undefined;
         var d_orderbook_batch_ptr: *GPUOrderBookDataBatch = undefined;
+        var d_rsi_result_ptr: *GPURSIResultBatch = undefined; // Added
         var d_stoch_result_ptr: *GPUStochRSIResultBatch = undefined;
         var d_orderbook_result_ptr: *GPUOrderBookResultBatch = undefined;
 
         const kerr = cuda_wrapper_allocate_memory(
             &d_ohlc_batch_ptr,
             &d_orderbook_batch_ptr,
+            &d_rsi_result_ptr,
             &d_stoch_result_ptr,
             &d_orderbook_result_ptr,
         );
@@ -172,6 +196,7 @@ pub const StatCalc = struct {
 
         self.d_ohlc_batch = d_ohlc_batch_ptr;
         self.d_orderbook_batch = d_orderbook_batch_ptr;
+        self.d_rsi_result = d_rsi_result_ptr;
         self.d_stoch_result = d_stoch_result_ptr;
         self.d_orderbook_result = d_orderbook_result_ptr;
     }
@@ -184,67 +209,96 @@ pub const StatCalc = struct {
         }
 
         var valid_symbol_count: usize = 0;
+        var mutex = std.Thread.Mutex{}; // Assuming SymbolMap is thread-safe or accessed carefully
+        mutex.lock();
         var iterator = symbol_map.iterator();
         while (iterator.next()) |entry| {
-            if (entry.value_ptr.*.count >= 14) {
+            if (entry.value_ptr.*.count == 15) { // Condition for OHLC data processing
                 valid_symbol_count += 1;
-            }
-        }
-
-        if (valid_symbol_count == 0) {
-            std.log.warn("No symbols have count >= 14, nothing to calculate", .{});
-            return;
-        }
-
-        if (valid_symbol_count > MAX_SYMBOLS) {
-            std.log.warn("Valid symbol count {} exceeds MAX_SYMBOLS {}, truncating to {}", .{ valid_symbol_count, MAX_SYMBOLS, MAX_SYMBOLS });
-            valid_symbol_count = MAX_SYMBOLS;
-        }
-
-        std.log.info("Processing {} valid symbols in batch mode...", .{valid_symbol_count});
-
-        var symbols_slice = try self.allocator.alloc(Symbol, valid_symbol_count);
-        defer self.allocator.free(symbols_slice);
-        var symbol_names = try self.allocator.alloc([]const u8, valid_symbol_count);
-        defer self.allocator.free(symbol_names);
-
-        iterator = symbol_map.iterator();
-        var index: usize = 0;
-        var mutex = std.Thread.Mutex{};
-        mutex.lock();
-        while (iterator.next()) |entry| {
-            if (index >= valid_symbol_count) break;
-            if (entry.value_ptr.*.count >= 14) {
-                symbol_names[index] = entry.key_ptr.*;
-                symbols_slice[index] = entry.value_ptr.*;
-                index += 1;
             }
         }
         mutex.unlock();
 
-        const num_symbols_to_process = valid_symbol_count;
+        if (valid_symbol_count == 0) {
+            std.log.warn("No symbols have count == 15 for OHLC, nothing to calculate for StochRSI", .{});
+        }
+        var stoch_valid_symbol_count = valid_symbol_count;
 
-        const stoch_results = try self.calculateStochRSIBatch(symbols_slice[0..num_symbols_to_process], rsi_period, stoch_period);
-        const orderbook_results = try self.calculateOrderBookPercentageBatch(symbols_slice[0..num_symbols_to_process]);
+        if (stoch_valid_symbol_count > MAX_SYMBOLS) {
+            std.log.warn("Valid symbol count {} for StochRSI exceeds MAX_SYMBOLS {}, truncating to {}", .{ stoch_valid_symbol_count, MAX_SYMBOLS, MAX_SYMBOLS });
+            stoch_valid_symbol_count = MAX_SYMBOLS;
+        }
 
-        for (0..num_symbols_to_process) |i| {
-            const name = symbol_names[i];
+        std.log.info("Processing {} valid symbols for StochRSI in batch mode...", .{stoch_valid_symbol_count});
+
+        var symbols_slice = try self.allocator.alloc(Symbol, symbol_map.count()); // Allocate for all symbols initially
+        defer self.allocator.free(symbols_slice);
+        var symbol_names = try self.allocator.alloc([]const u8, symbol_map.count());
+        defer self.allocator.free(symbol_names);
+
+        var stoch_symbols_slice_temp = try self.allocator.alloc(Symbol, stoch_valid_symbol_count);
+        defer self.allocator.free(stoch_symbols_slice_temp);
+        var stoch_symbol_names_temp = try self.allocator.alloc([]const u8, stoch_valid_symbol_count);
+        defer self.allocator.free(stoch_symbol_names_temp);
+
+        var orderbook_symbols_slice_temp = try self.allocator.alloc(Symbol, symbol_map.count());
+        defer self.allocator.free(orderbook_symbols_slice_temp);
+        var orderbook_symbol_names_temp = try self.allocator.alloc([]const u8, symbol_map.count());
+        defer self.allocator.free(orderbook_symbol_names_temp);
+
+        iterator = symbol_map.iterator();
+        var stoch_idx: usize = 0;
+        var orderbook_idx: usize = 0;
+        var all_idx: usize = 0;
+
+        mutex.lock();
+        while (iterator.next()) |entry| {
+            symbols_slice[all_idx] = entry.value_ptr.*;
+            symbol_names[all_idx] = entry.key_ptr.*;
+
+            if (stoch_idx < stoch_valid_symbol_count and entry.value_ptr.*.count == 15) {
+                stoch_symbol_names_temp[stoch_idx] = entry.key_ptr.*;
+                stoch_symbols_slice_temp[stoch_idx] = entry.value_ptr.*;
+                stoch_idx += 1;
+            }
+            if (orderbook_idx < MAX_SYMBOLS) {
+                orderbook_symbol_names_temp[orderbook_idx] = entry.key_ptr.*;
+                orderbook_symbols_slice_temp[orderbook_idx] = entry.value_ptr.*;
+                orderbook_idx += 1;
+            }
+            all_idx += 1;
+        }
+        mutex.unlock();
+
+        const num_stoch_symbols_to_process = stoch_idx;
+        const num_orderbook_symbols_to_process = @min(all_idx, MAX_SYMBOLS);
+
+        const stoch_results = try self.calculateStochRSIBatch(stoch_symbols_slice_temp[0..num_stoch_symbols_to_process], rsi_period, stoch_period);
+
+        const orderbook_results = try self.calculateOrderBookPercentageBatch(symbols_slice[0..num_orderbook_symbols_to_process]);
+
+        for (0..num_stoch_symbols_to_process) |i| {
+            const name = stoch_symbol_names_temp[i];
             if (stoch_results.rsi[i] != 0.0 or stoch_results.stoch_rsi_k[i] != 0.0 or stoch_results.stoch_rsi_d[i] != 0.0) {
                 std.log.info("Symbol '{s}': StochRSI K={d:.4}, D={d:.4}, RSI={d:.4}", .{ name, stoch_results.stoch_rsi_k[i], stoch_results.stoch_rsi_d[i], stoch_results.rsi[i] });
             }
-
             if (orderbook_results.bid_percentage[i] != 0.0 or orderbook_results.ask_percentage[i] != 0.0) {
                 std.log.info("Symbol '{s}': Bid%={d:.2}, Ask%={d:.2}, BidVol={d:.2}, AskVol={d:.2}", .{ name, orderbook_results.bid_percentage[i], orderbook_results.ask_percentage[i], orderbook_results.total_bid_volume[i], orderbook_results.total_ask_volume[i] });
             }
         }
 
-        std.log.info("Batch processing completed for {} symbols", .{num_symbols_to_process});
+        std.log.info("Batch processing completed. StochRSI: {} symbols, OrderBook: {} symbols", .{ num_stoch_symbols_to_process, num_orderbook_symbols_to_process });
     }
 
-    fn calculateStochRSIBatch(self: *StatCalc, symbols: []const Symbol, rsi_period: u32, stoch_period: u32) !GPUStochRSIResultBatch {
+    fn calculateStochRSIBatch(self: *StatCalc, symbols: []const Symbol, rsi_period_u32: u32, stoch_period_u32: u32) !GPUStochRSIResultBatch {
         const num_symbols = @min(symbols.len, MAX_SYMBOLS);
-        if (num_symbols == 0) return self.h_stoch_result;
+        if (num_symbols == 0) return self.h_stoch_result; // Return empty/default if no symbols
 
+        const rsi_period: c_int = @intCast(rsi_period_u32);
+        const stoch_period: c_int = @intCast(stoch_period_u32);
+        const num_symbols_c: c_int = @intCast(num_symbols);
+
+        // Step 1: Prepare OHLC data and calculate RSI
         var h_ohlc_batch_zig = GPUOHLCDataBatch{
             .close_prices = [_][15]f32{[_]f32{0.0} ** 15} ** MAX_SYMBOLS,
             .counts = [_]u32{0} ** MAX_SYMBOLS,
@@ -253,18 +307,51 @@ pub const StatCalc = struct {
         for (0..num_symbols) |i| {
             h_ohlc_batch_zig.counts[i] = @intCast(symbols[i].count);
             var data_idx: usize = 0;
-            var circ_idx = symbols[i].head;
-            if (symbols[i].count < 15) circ_idx = 0;
+            var circ_buffer_start_idx = symbols[i].head;
+            if (symbols[i].count < 15) {
+                circ_buffer_start_idx = 0;
+            } else {
+                circ_buffer_start_idx = symbols[i].head;
+            }
 
             for (0..symbols[i].count) |j| {
                 if (data_idx >= 15) break;
-                const current_ohlc_idx = (circ_idx + j) % 15;
+                const current_ohlc_idx = (circ_buffer_start_idx + j) % 15;
                 h_ohlc_batch_zig.close_prices[i][data_idx] = @floatCast(symbols[i].ticker_queue[current_ohlc_idx].close_price);
                 data_idx += 1;
             }
         }
 
-        const kerr = cuda_wrapper_run_stoch_rsi_batch(self.d_ohlc_batch.?, self.d_stoch_result.?, &h_ohlc_batch_zig, &self.h_stoch_result, @intCast(num_symbols), @intCast(rsi_period), @intCast(stoch_period));
+        // Initialize h_rsi_result before passing its address
+        self.h_rsi_result = std.mem.zeroes(GPURSIResultBatch);
+
+        var kerr = cuda_wrapper_run_rsi_batch(
+            self.d_ohlc_batch.?,
+            self.d_rsi_result.?,
+            &h_ohlc_batch_zig,
+            &self.h_rsi_result,
+            num_symbols_c,
+            rsi_period,
+        );
+
+        if (kerr.code != 0) {
+            std.log.err("RSI kernel execution failed via wrapper: {} ({s})", .{ kerr.code, kerr.message });
+            return StatCalcError.CUDAKernelExecutionFailed;
+        }
+
+        // Step 2: Calculate StochRSI using the RSI results from self.h_rsi_result
+        // self.h_rsi_result is already populated by the previous call (D2H copy in cuda_wrapper_run_rsi_batch)
+        // initialize h_stoch_result before passing its address
+        self.h_stoch_result = std.mem.zeroes(GPUStochRSIResultBatch);
+
+        kerr = cuda_wrapper_run_stoch_rsi_batch(
+            self.d_rsi_result.?,
+            self.d_stoch_result.?,
+            &self.h_rsi_result,
+            &self.h_stoch_result,
+            num_symbols_c,
+            stoch_period,
+        );
 
         if (kerr.code != 0) {
             std.log.err("StochRSI kernel execution failed via wrapper: {} ({s})", .{ kerr.code, kerr.message });
@@ -315,6 +402,9 @@ pub const StatCalc = struct {
             }
         }
 
+        // Initialize h_orderbook_result before passing its address
+        self.h_orderbook_result = std.mem.zeroes(GPUOrderBookResultBatch);
+
         const kerr = cuda_wrapper_run_orderbook_batch(self.d_orderbook_batch.?, self.d_orderbook_result.?, &h_orderbook_batch_zig, &self.h_orderbook_result, @intCast(num_symbols));
 
         if (kerr.code != 0) {
@@ -350,9 +440,10 @@ pub const StatCalc = struct {
             .volume = 1000.0,
         };
 
-        for (0..14) |_| {
+        for (0..15) |_| {
             dummy_symbol.addTicker(dummy_ohlc);
         }
+        std.debug.assert(dummy_symbol.count == 15);
 
         for (0..5) |i| {
             dummy_symbol.orderbook.updateLevel(102.5 - @as(f64, @floatFromInt(i)) * 0.1, 100.0 + @as(f64, @floatFromInt(i)) * 10.0, true);
@@ -367,13 +458,20 @@ pub const StatCalc = struct {
     }
 
     pub fn deinit(self: *StatCalc) void {
-        const kerr = cuda_wrapper_free_memory(self.d_ohlc_batch, self.d_orderbook_batch, self.d_stoch_result, self.d_orderbook_result);
+        const kerr = cuda_wrapper_free_memory(
+            self.d_ohlc_batch,
+            self.d_orderbook_batch,
+            self.d_rsi_result, // Added
+            self.d_stoch_result,
+            self.d_orderbook_result,
+        );
         if (kerr.code != 0) {
             std.log.err("CUDA free memory failed via wrapper: {} ({s})", .{ kerr.code, kerr.message });
         }
 
         self.d_ohlc_batch = null;
         self.d_orderbook_batch = null;
+        self.d_rsi_result = null; // Added
         self.d_stoch_result = null;
         self.d_orderbook_result = null;
 
@@ -403,7 +501,7 @@ pub fn selectBestCUDADevice() !c_int {
     }
     if (kerr.code != 0) {
         std.log.err("Failed to select best CUDA device via wrapper: {} ({s})", .{ kerr.code, kerr.message });
-        return StatCalcError.CUDAGetDeviceCountFailed;
+        return StatCalcError.CUDAGetDeviceCountFailed; // Or a more specific error
     }
     return best_device;
 }

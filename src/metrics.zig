@@ -276,10 +276,10 @@ pub fn metricsThread(channel: *MetricsChannel) void {
                     std.debug.print("TickerHandler messages per second: {d:.2}\n", .{metric.value});
                 },
                 .depth_handler_duration => {
-                    std.debug.print("DepthHandler.serverMessage took: {d:.2} μs\n", .{metric.value});
+                    //std.debug.print("DepthHandler.serverMessage took: {d:.2} μs\n", .{metric.value});
                 },
                 .ticker_handler_duration => {
-                    std.debug.print("TickerHandler.serverMessage took: {d:.2} μs\n", .{metric.value});
+                    //std.debug.print("TickerHandler.serverMessage took: {d:.2} μs\n", .{metric.value});
                 },
             }
         }

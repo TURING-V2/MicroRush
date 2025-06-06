@@ -1,7 +1,8 @@
 const DataAggregator = @import("data_aggregator/lib.zig").DataAggregator;
 const cuda = @import("cuda/lib.zig");
 const StatCalc = cuda.StatCalc;
-const SymbolMap = @import("symbol-map.zig").SymbolMap;
+const symbol_map = @import("symbol-map.zig");
+const SymbolMap = symbol_map.SymbolMap;
 const std = @import("std");
 
 var should_stop: bool = false;
@@ -36,25 +37,31 @@ pub fn main() !void {
     std.debug.print("WebSockets flowing, starting continuous CUDA calculations (Ctrl+C to stop)...\n", .{});
     std.log.info("=== Starting CUDA calculations with default parameters ===", .{});
 
-    const sleep_ns = 500_000_000; // 500 ms
-    const max_duration_ns = 2 * 60 * 1_000_000_000; // 2 min
+    const sleep_ns = 500_000_000; //500 ms
+    const max_duration_ns = 10 * 60 * 1_000_000_000; //2 min
+    const warm_up_duration_ns = 5 * 60 * 1_000_000_000; //5 min
     const start_time = std.time.nanoTimestamp();
+    //var mutex = std.Thread.Mutex{};
     while (!should_stop) {
         const now = std.time.nanoTimestamp();
         if (now - start_time >= max_duration_ns) {
             std.log.info("Reached 2-minute limit, stopping loop.", .{});
             break;
         }
-        std.log.info("Running batch calculation...", .{});
-        stat_calc.calculateSymbolMapBatch(&aggregator.symbol_map, 14, 14) catch |err| {
-            std.log.err("Batch calculation failed: {}", .{err});
-            continue;
-        };
+        if (now - start_time >= warm_up_duration_ns) {
+            std.log.info("Running batch calculation...", .{});
+            stat_calc.calculateSymbolMapBatch(&aggregator.symbol_map, 14, 14) catch |err| {
+                std.log.err("Batch calculation failed: {}", .{err});
+                continue;
+            };
+        }
+        // mutex.lock();
+        // symbol_map.dump(&aggregator.symbol_map);
+        // mutex.unlock();
 
         std.time.sleep(sleep_ns);
     }
 
     std.log.info("Stopping aggregator...", .{});
     try aggregator.stop();
-    //SymbolMap.dump(&aggregator.symbol_map);
 }

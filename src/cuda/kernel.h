@@ -43,6 +43,11 @@ struct GPUOrderBookDataBatch_C {
     unsigned int ask_counts[MAX_SYMBOLS_CUDA];
 };
 
+struct GPURSIResultBatch_C {
+    float rsi_values[MAX_SYMBOLS_CUDA][15];
+    unsigned int valid_rsi_count[MAX_SYMBOLS_CUDA];
+};
+
 struct GPUStochRSIResultBatch_C {
     float stoch_rsi_k[MAX_SYMBOLS_CUDA];
     float stoch_rsi_d[MAX_SYMBOLS_CUDA];
@@ -62,31 +67,41 @@ extern "C" {
     KernelError cuda_wrapper_get_device_count(int* count);
     KernelError cuda_wrapper_get_device_info(int device_id, DeviceInfo* info);
     KernelError cuda_wrapper_select_best_device(int* best_device_id);
-
+    
     KernelError cuda_wrapper_allocate_memory(
         struct GPUOHLCDataBatch_C** d_ohlc_batch,
         struct GPUOrderBookDataBatch_C** d_orderbook_batch,
+        struct GPURSIResultBatch_C** d_rsi_result,
         struct GPUStochRSIResultBatch_C** d_stoch_result,
         struct GPUOrderBookResultBatch_C** d_orderbook_result
     );
-
+    
     KernelError cuda_wrapper_free_memory(
         struct GPUOHLCDataBatch_C* d_ohlc_batch,
         struct GPUOrderBookDataBatch_C* d_orderbook_batch,
+        struct GPURSIResultBatch_C* d_rsi_result,
         struct GPUStochRSIResultBatch_C* d_stoch_result,
         struct GPUOrderBookResultBatch_C* d_orderbook_result
     );
-
-    KernelError cuda_wrapper_run_stoch_rsi_batch(
+    
+    KernelError cuda_wrapper_run_rsi_batch(
         struct GPUOHLCDataBatch_C* d_ohlc_batch_ptr,
-        struct GPUStochRSIResultBatch_C* d_results_ptr,
+        struct GPURSIResultBatch_C* d_rsi_results_ptr,
         const struct GPUOHLCDataBatch_C* h_ohlc_batch,
-        struct GPUStochRSIResultBatch_C* h_results,
+        struct GPURSIResultBatch_C* h_rsi_results,
         int num_symbols,
-        int rsi_period,
+        int rsi_period
+    );
+    
+    KernelError cuda_wrapper_run_stoch_rsi_batch(
+        struct GPURSIResultBatch_C* d_rsi_results_ptr,
+        struct GPUStochRSIResultBatch_C* d_stoch_results_ptr,
+        const struct GPURSIResultBatch_C* h_rsi_results,
+        struct GPUStochRSIResultBatch_C* h_stoch_results,
+        int num_symbols,
         int stoch_period
     );
-
+    
     KernelError cuda_wrapper_run_orderbook_batch(
         struct GPUOrderBookDataBatch_C* d_orderbook_batch_ptr,
         struct GPUOrderBookResultBatch_C* d_results_ptr,

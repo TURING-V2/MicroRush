@@ -152,6 +152,8 @@ pub const DepthHandler = struct {
     }
 
     fn initializeOrderBook(self: *DepthHandler, symbol: []const u8) DepthError!void {
+        std.debug.print("Initializing orderbook for symbol: {s}\n", .{symbol});
+
         // Step 3: Get depth snapshot
         const snapshot = self.getDepthSnapshot(symbol) catch |err| {
             std.log.err("Failed to get depth snapshot for {s}: {}", .{ symbol, err });
@@ -188,13 +190,15 @@ pub const DepthHandler = struct {
                 }
             }
 
+            std.debug.print("Found {d} valid buffered events for {s}\n", .{ valid_events.items.len, symbol });
+
             // Step 6: Set local order book to snapshot
             try self.applySnapshot(symbol, snapshot);
 
             // Step 7: Apply buffered events
             for (valid_events.items) |i| {
                 const buffered_event = buffer.items[i];
-                const parsed = json.parseFromSlice(json.Value, std.heap.page_allocator, buffered_event.data, .{}) catch continue;
+                const parsed = json.parseFromSlice(json.Value, self.allocator, buffered_event.data, .{}) catch continue;
                 defer parsed.deinit();
 
                 const root = parsed.value;
@@ -204,17 +208,21 @@ pub const DepthHandler = struct {
                 try self.applyDepthUpdate(symbol, root, U_val.integer, u_val.integer);
             }
 
-            // Clean up buffer
             for (buffer.items) |buffered_event| {
                 self.allocator.free(buffered_event.data);
             }
             buffer.deinit();
             _ = self.depth_event_buffers.remove(symbol);
+        } else {
+            // no buffered events, just apply snapshot
+            try self.applySnapshot(symbol, snapshot);
         }
-        self.mutex.lock();
-        defer self.mutex.unlock();
+
+        // Use consistent key management
         const temp_symbol = try self.allocator.dupe(u8, symbol);
         try self.orderbook_initialized.put(temp_symbol, true);
+
+        std.debug.print("Orderbook initialization complete for {s}\n", .{symbol});
     }
 
     fn getDepthSnapshot(self: *DepthHandler, symbol: []const u8) !DepthSnapshot {
@@ -290,32 +298,49 @@ pub const DepthHandler = struct {
     }
 
     fn applySnapshot(self: *DepthHandler, symbol: []const u8, snapshot: DepthSnapshot) !void {
+        std.debug.print("Applying snapshot for {s}\n", .{symbol});
+
+        self.mutex.lock();
+        defer self.mutex.unlock();
+
         if (self.symbol_map.getPtr(symbol)) |sym| {
             sym.orderbook = OrderBook.init();
 
             var bid_i: usize = 0;
             while (bid_i < snapshot.bids.len and bid_i < 10) : (bid_i += 1) {
-                const price = std.fmt.parseFloat(f64, snapshot.bids[bid_i][0]) catch continue;
-                const quantity = std.fmt.parseFloat(f64, snapshot.bids[bid_i][1]) catch continue;
+                const price = std.fmt.parseFloat(f64, snapshot.bids[bid_i][0]) catch {
+                    std.debug.print("Failed to parse snapshot bid price\n", .{});
+                    continue;
+                };
+                const quantity = std.fmt.parseFloat(f64, snapshot.bids[bid_i][1]) catch {
+                    std.debug.print("Failed to parse snapshot bid quantity\n", .{});
+                    continue;
+                };
                 sym.orderbook.bids[bid_i] = .{ .price = price, .quantity = quantity };
             }
             sym.orderbook.bid_count = bid_i;
 
             var ask_i: usize = 0;
             while (ask_i < snapshot.asks.len and ask_i < 10) : (ask_i += 1) {
-                const price = std.fmt.parseFloat(f64, snapshot.asks[ask_i][0]) catch continue;
-                const quantity = std.fmt.parseFloat(f64, snapshot.asks[ask_i][1]) catch continue;
+                const price = std.fmt.parseFloat(f64, snapshot.asks[ask_i][0]) catch {
+                    std.debug.print("Failed to parse snapshot ask price\n", .{});
+                    continue;
+                };
+                const quantity = std.fmt.parseFloat(f64, snapshot.asks[ask_i][1]) catch {
+                    std.debug.print("Failed to parse snapshot ask quantity\n", .{});
+                    continue;
+                };
                 sym.orderbook.asks[ask_i] = .{ .price = price, .quantity = quantity };
             }
             sym.orderbook.ask_count = ask_i;
 
             sym.orderbook.last_update_id = snapshot.lastUpdateId;
-            self.mutex.lock();
-            defer self.mutex.unlock();
-            const temp_sym = try self.allocator.dupe(u8, symbol);
-            try self.last_update_ids.put(temp_sym, snapshot.lastUpdateId);
+
+            // Use consistent key management
+            const temp_symbol = try self.allocator.dupe(u8, symbol);
+            try self.last_update_ids.put(temp_symbol, snapshot.lastUpdateId);
         } else {
-            std.debug.print("Symbol {s} not found in symbol_map\n", .{symbol});
+            std.debug.print("Symbol {s} not found in symbol_map during snapshot application\n", .{symbol});
         }
     }
 
@@ -327,9 +352,9 @@ pub const DepthHandler = struct {
 
         if (first_update_id > current_update_id + 1) {
             std.debug.print("Gap detected for {s}. Reinitializing...\n", .{symbol});
-            self.mutex.lock();
-            defer self.mutex.unlock();
-            try self.orderbook_initialized.put(symbol, false);
+            // Use consistent key - duplicate the symbol
+            const temp_symbol = try self.allocator.dupe(u8, symbol);
+            try self.orderbook_initialized.put(temp_symbol, false);
             try self.initializeOrderBook(symbol);
             return;
         }
@@ -342,23 +367,39 @@ pub const DepthHandler = struct {
         const bids_array = root.object.get("b").?.array;
         const asks_array = root.object.get("a").?.array;
 
+        self.mutex.lock();
+        defer self.mutex.unlock();
+
         if (self.symbol_map.getPtr(symbol)) |sym| {
             for (bids_array.items) |bid| {
-                const price = std.fmt.parseFloat(f64, bid.array.items[0].string) catch continue;
-                const quantity = std.fmt.parseFloat(f64, bid.array.items[1].string) catch continue;
+                const price = std.fmt.parseFloat(f64, bid.array.items[0].string) catch {
+                    std.debug.print("Failed to parse bid price for {s}\n", .{symbol});
+                    continue;
+                };
+                const quantity = std.fmt.parseFloat(f64, bid.array.items[1].string) catch {
+                    std.debug.print("Failed to parse bid quantity for {s}\n", .{symbol});
+                    continue;
+                };
                 sym.orderbook.updateLevel(price, quantity, true);
             }
 
             for (asks_array.items) |ask| {
-                const price = std.fmt.parseFloat(f64, ask.array.items[0].string) catch continue;
-                const quantity = std.fmt.parseFloat(f64, ask.array.items[1].string) catch continue;
+                const price = std.fmt.parseFloat(f64, ask.array.items[0].string) catch {
+                    std.debug.print("Failed to parse ask price for {s}\n", .{symbol});
+                    continue;
+                };
+                const quantity = std.fmt.parseFloat(f64, ask.array.items[1].string) catch {
+                    std.debug.print("Failed to parse ask quantity for {s}\n", .{symbol});
+                    continue;
+                };
                 sym.orderbook.updateLevel(price, quantity, false);
             }
 
             sym.orderbook.last_update_id = last_update_id;
-            self.mutex.lock();
-            defer self.mutex.unlock();
-            try self.last_update_ids.put(symbol, last_update_id);
+
+            // Use consistent key management
+            const temp_symbol = try self.allocator.dupe(u8, symbol);
+            try self.last_update_ids.put(temp_symbol, last_update_id);
         } else {
             std.debug.print("Symbol {s} not found in symbol_map\n", .{symbol});
         }
