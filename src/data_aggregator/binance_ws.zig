@@ -21,6 +21,7 @@ pub const WSClient = struct {
     depth_handler: ?*DepthHandler = null,
     http_client: http.Client,
     metrics_collector: ?*metrics.MetricsCollector,
+    mutex: std.Thread.Mutex,
 
     pub fn init(allocator: std.mem.Allocator, metrics_collector: ?*metrics.MetricsCollector) !WSClient {
         return WSClient{
@@ -31,6 +32,7 @@ pub const WSClient = struct {
             .allocator = allocator,
             .http_client = http.Client{ .allocator = allocator },
             .metrics_collector = metrics_collector,
+            .mutex = std.Thread.Mutex{},
         };
     }
 
@@ -62,7 +64,6 @@ pub const WSClient = struct {
             .port = 443,
             .tls = true,
         });
-        // Use ws:// URI for non-encrypted connection
         try self.ticker_client.handshake("/ws", .{
             .timeout_ms = 5000,
             .headers = "Host: stream.binance.com:9443",

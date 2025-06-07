@@ -7,10 +7,11 @@ const ERR = @import("../errors.zig");
 const StatCalcError = @import("../errors.zig").StatCalcError;
 const DeviceInfo = types.DeviceInfo;
 const GPUOHLCDataBatch = types.GPUOHLCDataBatch;
-const GPURSIResultBatch = types.GPURSIResultBatch;
 const GPUOrderBookDataBatch = types.GPUOrderBookDataBatch;
+const GPURSIResultBatch = types.GPURSIResultBatch;
 const GPUOrderBookResultBatch = types.GPUOrderBookResultBatch;
 const MAX_SYMBOLS = types.MAX_SYMBOLS;
+const GPUBatchResult = types.GPUBatchResult;
 
 pub const KERNEL_SUCCESS = ERR.KernelError{ .code = 0, .message = "Success" };
 
@@ -126,11 +127,11 @@ pub const StatCalc = struct {
         self.d_orderbook_result = d_orderbook_result_ptr;
     }
 
-    pub fn calculateSymbolMapBatch(self: *StatCalc, symbol_map: *const SymbolMap, rsi_period: u32) !void {
+    pub fn calculateSymbolMapBatch(self: *StatCalc, symbol_map: *SymbolMap, rsi_period: u32) !GPUBatchResult {
         const symbol_count = symbol_map.count();
         if (symbol_count == 0) {
             std.log.warn("SymbolMap is empty, nothing to calculate", .{});
-            return;
+            return ERR.Dump.MarketDataEmpty;
         }
 
         var valid_symbol_count: usize = 0;
@@ -202,15 +203,19 @@ pub const StatCalc = struct {
 
         const orderbook_results = try self.calculateOrderBookPercentageBatch(symbols_slice[0..num_orderbook_symbols_to_process]);
 
-        for (0..num_rsi_symbols_to_process) |i| {
-            const name = rsi_symbol_names_temp[i];
-            std.log.info("Symbol '{s}': RSI={d:.4}", .{ name, rsi_results.rsi_values });
-            if (orderbook_results.bid_percentage[i] != 0.0 or orderbook_results.ask_percentage[i] != 0.0) {
-                std.log.info("Symbol '{s}': Bid%={d:.2}, Ask%={d:.2}, BidVol={d:.2}, AskVol={d:.2}", .{ name, orderbook_results.bid_percentage[i], orderbook_results.ask_percentage[i], orderbook_results.total_bid_volume[i], orderbook_results.total_ask_volume[i] });
-            }
-        }
+        // for (0..num_rsi_symbols_to_process) |i| {
+        //     const name = rsi_symbol_names_temp[i];
+        //     std.log.info("Symbol '{s}': RSI={d:.4}", .{ name, rsi_results.rsi_values });
+        //     if (orderbook_results.bid_percentage[i] != 0.0 or orderbook_results.ask_percentage[i] != 0.0) {
+        //         std.log.info("Symbol '{s}': Bid%={d:.2}, Ask%={d:.2}, BidVol={d:.2}, AskVol={d:.2}", .{ name, orderbook_results.bid_percentage[i], orderbook_results.ask_percentage[i], orderbook_results.total_bid_volume[i], orderbook_results.total_ask_volume[i] });
+        //     }
+        // }
 
         std.log.info("Batch processing completed. StochRSI: {} symbols, OrderBook: {} symbols", .{ num_rsi_symbols_to_process, num_orderbook_symbols_to_process });
+        return GPUBatchResult{
+            .rsi = rsi_results,
+            .orderbook = orderbook_results,
+        };
     }
 
     fn calculateRSIBatch(self: *StatCalc, symbols: []const Symbol, rsi_period_u32: u32) !GPURSIResultBatch {
@@ -385,7 +390,6 @@ pub const StatCalc = struct {
             self.d_ohlc_batch,
             self.d_orderbook_batch,
             self.d_rsi_result,
-            // self.d_rsi_result,
             self.d_orderbook_result,
         );
         if (kerr.code != 0) {
@@ -395,7 +399,6 @@ pub const StatCalc = struct {
         self.d_ohlc_batch = null;
         self.d_orderbook_batch = null;
         self.d_rsi_result = null;
-        //self.d_rsi_result = null;
         self.d_orderbook_result = null;
 
         const kerr_reset = cuda_wrapper_reset_device();
@@ -424,7 +427,7 @@ pub fn selectBestCUDADevice() !c_int {
     }
     if (kerr.code != 0) {
         std.log.err("Failed to select best CUDA device via wrapper: {} ({s})", .{ kerr.code, kerr.message });
-        return StatCalcError.CUDAGetDeviceCountFailed; // Or a more specific error
+        return StatCalcError.CUDAGetDeviceCountFailed;
     }
     return best_device;
 }

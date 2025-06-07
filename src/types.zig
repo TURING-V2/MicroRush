@@ -1,6 +1,28 @@
 const std = @import("std");
 
 //////////////////////////////////////////////////////////
+pub const SignalType = enum {
+    BUY,
+    SELL,
+    HOLD,
+};
+
+pub const TradingSignal = struct {
+    symbol_name: []const u8,
+    signal_type: SignalType,
+    rsi_value: f32,
+    orderbook_percentage: f32,
+    timestamp: i64,
+};
+
+pub const Position = struct {
+    symbol_name: []const u8,
+    is_open: bool,
+    entry_rsi: f32,
+    timestamp: i64,
+};
+
+//////////////////////////////////////////////////////////
 pub const MAX_SYMBOLS_CUDA = 402;
 pub const MAX_SYMBOLS = MAX_SYMBOLS_CUDA;
 pub const MAX_RSI_VALUES_PER_SYMBOL = 15;
@@ -36,6 +58,11 @@ pub const GPUOrderBookResultBatch = extern struct {
     ask_percentage: [MAX_SYMBOLS]f32,
     total_bid_volume: [MAX_SYMBOLS]f32,
     total_ask_volume: [MAX_SYMBOLS]f32,
+};
+
+pub const GPUBatchResult = struct {
+    rsi: GPURSIResultBatch,
+    orderbook: GPUOrderBookResultBatch,
 };
 
 /////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub const Error = error{
+pub const Dump = error{
     OutOfMemory,
     InvalidSymbol,
     InvalidOrder,

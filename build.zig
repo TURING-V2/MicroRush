@@ -20,6 +20,9 @@ pub fn build(b: *std.Build) void {
     exe.linkLibC();
     exe.linkSystemLibrary("cudart");
     exe.addObjectFile(b.path("kernel.o"));
+
+    exe.addObjectFile(b.path("simd.o"));
+
     b.installArtifact(exe);
 
     const run_cmd = b.addRunArtifact(exe);

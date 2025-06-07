@@ -8,4 +8,7 @@ Stat clac
     rsi up down trends
 
 Signal Engine
+    simd algo buy sell decision
     
+Trade Handler
+    send trades

@@ -13,6 +13,9 @@ CUDA_C_API_HEADER = $(PROJECT_CUDA_HEADER_DIR)/kernel.h
 
 CUDA_OBJECT_FILE = kernel.o
 
+SIMD_RSI_SOURCE = src/signal_engine/simd.c
+SIMD_RSI_OBJECT = simd.o
+
 ZIG = zig
 
 fmt:
@@ -24,17 +27,19 @@ $(CUDA_OBJECT_FILE): $(CUDA_SOURCE_DIR)/$(CUDA_SOURCE_FILE) $(CUDA_C_API_HEADER)
 		-I$(PROJECT_CUDA_HEADER_DIR) \
 		$(CUDA_SOURCE_DIR)/$(CUDA_SOURCE_FILE) -o $(CUDA_OBJECT_FILE)
 
+$(SIMD_RSI_OBJECT): $(SIMD_RSI_SOURCE)
+	gcc -c $(SIMD_RSI_SOURCE) -o $(SIMD_RSI_OBJECT) -mavx2
 
-build: $(CUDA_OBJECT_FILE)
+build: $(CUDA_OBJECT_FILE) $(SIMD_RSI_OBJECT)
 	clear && $(ZIG) build -Dtarget=native -Dcpu=native
 
-build-fast: $(CUDA_OBJECT_FILE)
+build-fast: $(CUDA_OBJECT_FILE) $(SIMD_RSI_OBJECT)
 	clear && $(ZIG) build -Doptimize=ReleaseFast -Dtarget=native -Dcpu=native
 
-build-safe: $(CUDA_OBJECT_FILE)
+build-safe: $(CUDA_OBJECT_FILE) $(SIMD_RSI_OBJECT)
 	clear && $(ZIG) build -Doptimize=ReleaseSafe -Dtarget=native -Dcpu=native
 
-build-small: $(CUDA_OBJECT_FILE)
+build-small: $(CUDA_OBJECT_FILE) $(SIMD_RSI_OBJECT)
 	clear && $(ZIG) build -Doptimize=ReleaseSmall -Dtarget=native -Dcpu=native
 
 run:
@@ -47,6 +52,6 @@ clean:
 	rm -rf zig-out
 	rm -rf .zig-cache
 	rm -f $(CUDA_OBJECT_FILE)
+	rm -f $(SIMD_RSI_OBJECT)
 
 .PHONY: fmt build run clean
-
