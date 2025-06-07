@@ -26,7 +26,7 @@ pub fn main() !void {
     var aggregator = try DataAggregator.init(enable_metrics, smp_allocator);
     defer aggregator.deinit();
 
-    var signal_engine = try SignalEngine.init(smp_allocator);
+    var signal_engine = try SignalEngine.init(smp_allocator, aggregator.symbol_map);
     defer signal_engine.deinit();
 
     try aggregator.connectToBinance();
@@ -50,10 +50,10 @@ pub fn main() !void {
             break;
         }
         if (now - start_time >= warm_up_duration_ns) {
-            try signal_engine.run(aggregator.symbol_map);
-        }
-        if (iter_count % 100 == 0) { // 5 sec
-            signal_engine.getSignalStats();
+            try signal_engine.run();
+            if (iter_count % 100 == 0) { // 5 sec
+                signal_engine.getSignalStats();
+            }
         }
 
         // mutex.lock();

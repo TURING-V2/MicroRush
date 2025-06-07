@@ -1,15 +1,8 @@
 const std = @import("std");
 const types = @import("types.zig");
+const Symbol = types.Symbol;
 
-pub const SymbolMap = types.SymbolMap;
-
-pub fn init(self: *SymbolMap, allocator: std.mem.Allocator) !SymbolMap {
-    return self.init(allocator);
-}
-
-pub fn deinit(self: *SymbolMap) void {
-    self.deinit();
-}
+pub const SymbolMap = std.StringHashMap(Symbol);
 
 pub fn dump(self: *const SymbolMap) void {
     var it = self.iterator();

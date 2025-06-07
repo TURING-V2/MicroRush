@@ -357,5 +357,3 @@ pub const Symbol = struct {
         }
     }
 };
-
-pub const SymbolMap = std.StringHashMap(Symbol);

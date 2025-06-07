@@ -1,7 +1,6 @@
 const binance = @import("binance.zig");
 const SymbolMap = @import("../symbol-map.zig").SymbolMap;
 const metrics = @import("../metrics.zig");
-
 const std = @import("std");
 
 pub const DataAggregator = struct {
@@ -21,13 +20,14 @@ pub const DataAggregator = struct {
         if (enable_metrics) {
             metrics_channel = try metrics.MetricsChannel.init(allocator);
             metrics_collector = metrics.MetricsCollector.init(metrics_channel.?);
-
             const thread = try allocator.create(std.Thread);
             thread.* = try std.Thread.spawn(.{}, metrics.metricsThread, .{metrics_channel.?});
             metrics_thread = thread;
         }
 
-        var sym_map = SymbolMap.init(allocator);
+        const sym_map = try allocator.create(SymbolMap);
+        sym_map.* = SymbolMap.init(allocator);
+
         const binance_client = try binance.Client.init(allocator, if (enable_metrics) &metrics_collector.? else null);
 
         return DataAggregator{
@@ -36,20 +36,24 @@ pub const DataAggregator = struct {
             .metrics_channel = metrics_channel,
             .metrics_thread = metrics_thread,
             .metrics_collector = metrics_collector,
-            .symbol_map = &sym_map,
+            .symbol_map = sym_map,
             .binance = binance_client,
         };
     }
 
     pub fn deinit(self: *DataAggregator) void {
         self.symbol_map.deinit();
+        self.allocator.destroy(self.symbol_map);
+
         self.binance.deinit();
+
         if (self.enable_metrics) {
             if (self.metrics_channel) |channel| {
                 channel.stop();
             }
             if (self.metrics_thread) |thread| {
                 thread.join();
+                self.allocator.destroy(thread);
             }
             if (self.metrics_channel) |channel| {
                 channel.deinit();

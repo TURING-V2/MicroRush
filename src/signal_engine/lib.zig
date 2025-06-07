@@ -15,6 +15,7 @@ extern "c" fn analyze_rsi_simd(rsi_values: [*]f32, len: c_int, buy_signals: [*]b
 
 pub const SignalEngine = struct {
     allocator: std.mem.Allocator,
+    symbol_map: *const SymbolMap,
     stat_calc: *StatCalc,
     signal_queue: std.ArrayList(TradingSignal),
     positions: std.StringHashMap(Position),
@@ -22,7 +23,7 @@ pub const SignalEngine = struct {
     should_stop: std.atomic.Value(bool),
     mutex: std.Thread.Mutex,
 
-    pub fn init(allocator: std.mem.Allocator) !SignalEngine {
+    pub fn init(allocator: std.mem.Allocator, symbol_map: *const SymbolMap) !SignalEngine {
         const device_id = try stat_calc_lib.selectBestCUDADevice();
         var stat_calc = try StatCalc.init(allocator, device_id);
         try stat_calc.getDeviceInfo();
@@ -30,6 +31,7 @@ pub const SignalEngine = struct {
 
         return SignalEngine{
             .allocator = allocator,
+            .symbol_map = symbol_map,
             .stat_calc = &stat_calc,
             .signal_queue = std.ArrayList(TradingSignal).init(allocator),
             .positions = std.StringHashMap(Position).init(allocator),
@@ -54,14 +56,14 @@ pub const SignalEngine = struct {
         analyze_rsi_simd(rsi_values.ptr, @intCast(rsi_values.len), buy_signals.ptr, sell_signals.ptr);
     }
 
-    pub fn run(self: *SignalEngine, symbol_map: *const SymbolMap) !void {
-        var batch_results = try self.stat_calc.calculateSymbolMapBatch(symbol_map, 6);
+    pub fn run(self: *SignalEngine) !void {
+        var batch_results = try self.stat_calc.calculateSymbolMapBatch(self.symbol_map, 6);
 
-        try self.processSignals(symbol_map, &batch_results.rsi, &batch_results.orderbook);
+        try self.processSignals(&batch_results.rsi, &batch_results.orderbook);
     }
 
-    fn processSignals(self: *SignalEngine, symbol_map: *const SymbolMap, rsi_results: *GPURSIResultBatch, orderbook_results: *GPUOrderBookResultBatch) !void {
-        const num_symbols = @min(symbol_map.count(), MAX_SYMBOLS);
+    fn processSignals(self: *SignalEngine, rsi_results: *GPURSIResultBatch, orderbook_results: *GPUOrderBookResultBatch) !void {
+        const num_symbols = @min(self.symbol_map.count(), MAX_SYMBOLS);
         if (num_symbols == 0) return;
 
         var current_rsi_values = try self.allocator.alloc(f32, num_symbols);
@@ -86,13 +88,13 @@ pub const SignalEngine = struct {
 
         var symbol_idx: usize = 0;
 
-        //self.mutex.lock();  no need for lock as it is locked from main.zig
-        var iterator = symbol_map.iterator();
+        self.mutex.lock();
+        var iterator = self.symbol_map.iterator();
         while (iterator.next()) |entry| {
             if (symbol_idx >= num_symbols) break;
 
             const symbol_name = entry.key_ptr.*;
-            //self.mutex.unlock();
+            self.mutex.unlock();
             const rsi_value = current_rsi_values[symbol_idx];
             const bid_percentage = orderbook_results.bid_percentage[symbol_idx];
             const ask_percentage = orderbook_results.ask_percentage[symbol_idx];
@@ -111,9 +113,9 @@ pub const SignalEngine = struct {
             }
 
             symbol_idx += 1;
-            //self.mutex.lock();
+            self.mutex.lock();
         }
-        //self.mutex.unlock();
+        self.mutex.unlock();
     }
 
     fn generateSignal(self: *SignalEngine, symbol_name: []const u8, signal_type: SignalType, rsi_value: f32, orderbook_percentage: f32) !void {
