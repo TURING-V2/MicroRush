@@ -54,13 +54,13 @@ pub const SignalEngine = struct {
         analyze_rsi_simd(rsi_values.ptr, @intCast(rsi_values.len), buy_signals.ptr, sell_signals.ptr);
     }
 
-    pub fn run(self: *SignalEngine, symbol_map: *SymbolMap) !void {
+    pub fn run(self: *SignalEngine, symbol_map: *const SymbolMap) !void {
         var batch_results = try self.stat_calc.calculateSymbolMapBatch(symbol_map, 6);
 
         try self.processSignals(symbol_map, &batch_results.rsi, &batch_results.orderbook);
     }
 
-    fn processSignals(self: *SignalEngine, symbol_map: *SymbolMap, rsi_results: *GPURSIResultBatch, orderbook_results: *GPUOrderBookResultBatch) !void {
+    fn processSignals(self: *SignalEngine, symbol_map: *const SymbolMap, rsi_results: *GPURSIResultBatch, orderbook_results: *GPUOrderBookResultBatch) !void {
         const num_symbols = @min(symbol_map.count(), MAX_SYMBOLS);
         if (num_symbols == 0) return;
 

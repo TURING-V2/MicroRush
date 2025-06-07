@@ -127,7 +127,7 @@ pub const StatCalc = struct {
         self.d_orderbook_result = d_orderbook_result_ptr;
     }
 
-    pub fn calculateSymbolMapBatch(self: *StatCalc, symbol_map: *SymbolMap, rsi_period: u32) !GPUBatchResult {
+    pub fn calculateSymbolMapBatch(self: *StatCalc, symbol_map: *const SymbolMap, rsi_period: u32) !GPUBatchResult {
         const symbol_count = symbol_map.count();
         if (symbol_count == 0) {
             std.log.warn("SymbolMap is empty, nothing to calculate", .{});
