@@ -152,7 +152,7 @@ pub const DepthHandler = struct {
     }
 
     fn initializeOrderBook(self: *DepthHandler, symbol: []const u8) DepthError!void {
-        std.debug.print("Initializing orderbook for symbol: {s}\n", .{symbol});
+        //std.debug.print("Initializing orderbook for symbol: {s}\n", .{symbol});
 
         // Step 3: Get depth snapshot
         const snapshot = self.getDepthSnapshot(symbol) catch |err| {
@@ -218,7 +218,7 @@ pub const DepthHandler = struct {
             try self.applySnapshot(symbol, snapshot);
         }
 
-        // Use consistent key management
+        // use consistent key management
         const temp_symbol = try self.allocator.dupe(u8, symbol);
         try self.orderbook_initialized.put(temp_symbol, true);
 
@@ -260,7 +260,7 @@ pub const DepthHandler = struct {
 
         for (bids_array.items, 0..) |bid, i| {
             if (bid != .array or bid.array.items.len < 2) return error.InvalidBidFormat;
-            // Duplicate the strings to ensure they outlive the parsed JSON
+            // duplicate the strings to ensure they outlive the parsed JSON
             const price = try self.allocator.dupe(u8, bid.array.items[0].string);
             const qty = try self.allocator.dupe(u8, bid.array.items[1].string);
             bids_data[i * 2] = price;
@@ -273,7 +273,7 @@ pub const DepthHandler = struct {
 
         for (asks_array.items, 0..) |ask, i| {
             if (ask != .array or ask.array.items.len < 2) return error.InvalidAskFormat;
-            // Duplicate the strings to ensure they outlive the parsed JSON
+            // duplicate the strings to ensure they outlive the parsed JSON
             const price = try self.allocator.dupe(u8, ask.array.items[0].string);
             const qty = try self.allocator.dupe(u8, ask.array.items[1].string);
             asks_data[i * 2] = price;

@@ -3,7 +3,7 @@ const SignalEngine = @import("signal_engine/lib.zig").SignalEngine;
 const symbol_map = @import("symbol-map.zig");
 const SymbolMap = symbol_map.SymbolMap;
 const std = @import("std");
-
+const Symbol = @import("types.zig").Symbol;
 var should_stop: bool = false;
 
 pub fn main() !void {

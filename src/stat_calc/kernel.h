@@ -69,26 +69,26 @@ extern "C" {
     KernelError cuda_wrapper_select_best_device(int* best_device_id);
     
     KernelError cuda_wrapper_allocate_memory(
-        struct GPUOHLCDataBatch_C** d_ohlc_batch,
-        struct GPUOrderBookDataBatch_C** d_orderbook_batch,
-        struct GPURSIResultBatch_C** d_rsi_result,
+        struct GPUOHLCDataBatch_C **d_ohlc_batch,
+        struct GPUOrderBookDataBatch_C **d_orderbook_batch,
+        struct GPURSIResultBatch_C **d_rsi_result,
         //struct GPUStochRSIResultBatch_C** d_stoch_result,
-        struct GPUOrderBookResultBatch_C** d_orderbook_result
+        struct GPUOrderBookResultBatch_C **d_orderbook_result
     );
     
     KernelError cuda_wrapper_free_memory(
-        struct GPUOHLCDataBatch_C* d_ohlc_batch,
-        struct GPUOrderBookDataBatch_C* d_orderbook_batch,
-        struct GPURSIResultBatch_C* d_rsi_result,
+        struct GPUOHLCDataBatch_C *d_ohlc_batch,
+        struct GPUOrderBookDataBatch_C *d_orderbook_batch,
+        struct GPURSIResultBatch_C *d_rsi_result,
         //struct GPUStochRSIResultBatch_C* d_stoch_result,
-        struct GPUOrderBookResultBatch_C* d_orderbook_result
+        struct GPUOrderBookResultBatch_C *d_orderbook_result
     );
     
     KernelError cuda_wrapper_run_rsi_batch(
-        struct GPUOHLCDataBatch_C* d_ohlc_batch_ptr,
-        struct GPURSIResultBatch_C* d_rsi_results_ptr,
-        const struct GPUOHLCDataBatch_C* h_ohlc_batch,
-        struct GPURSIResultBatch_C* h_rsi_results,
+        struct GPUOHLCDataBatch_C *d_ohlc_batch_ptr,
+        struct GPURSIResultBatch_C *d_rsi_results_ptr,
+        const struct GPUOHLCDataBatch_C *h_ohlc_batch,
+        struct GPURSIResultBatch_C *h_rsi_results,
         int num_symbols,
         int rsi_period
     );
@@ -103,10 +103,10 @@ extern "C" {
     // );
     
     KernelError cuda_wrapper_run_orderbook_batch(
-        struct GPUOrderBookDataBatch_C* d_orderbook_batch_ptr,
-        struct GPUOrderBookResultBatch_C* d_results_ptr,
-        const struct GPUOrderBookDataBatch_C* h_orderbook_batch,
-        struct GPUOrderBookResultBatch_C* h_results,
+        struct GPUOrderBookDataBatch_C *d_orderbook_batch_ptr,
+        struct GPUOrderBookResultBatch_C *d_results_ptr,
+        const struct GPUOrderBookDataBatch_C *h_orderbook_batch,
+        struct GPUOrderBookResultBatch_C *h_results,
         int num_symbols
     );
 }

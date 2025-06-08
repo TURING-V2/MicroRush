@@ -318,11 +318,11 @@ extern "C" {
     }
     
     KernelError cuda_wrapper_allocate_memory(
-        GPUOHLCDataBatch_C** d_ohlc_batch,
-        GPUOrderBookDataBatch_C** d_orderbook_batch,
-        GPURSIResultBatch_C** d_rsi_result,
+        GPUOHLCDataBatch_C **d_ohlc_batch,
+        GPUOrderBookDataBatch_C **d_orderbook_batch,
+        GPURSIResultBatch_C **d_rsi_result,
         //GPUStochRSIResultBatch_C** d_stoch_result,
-        GPUOrderBookResultBatch_C** d_orderbook_result
+        GPUOrderBookResultBatch_C **d_orderbook_result
     ) {
         cudaError_t err;
         
@@ -375,11 +375,11 @@ extern "C" {
     }
     
     KernelError cuda_wrapper_free_memory(
-        GPUOHLCDataBatch_C* d_ohlc_batch,
-        GPUOrderBookDataBatch_C* d_orderbook_batch,
-        GPURSIResultBatch_C* d_rsi_result,
+        GPUOHLCDataBatch_C *d_ohlc_batch,
+        GPUOrderBookDataBatch_C *d_orderbook_batch,
+        GPURSIResultBatch_C *d_rsi_result,
         //GPUStochRSIResultBatch_C* d_stoch_result,
-        GPUOrderBookResultBatch_C* d_orderbook_result
+        GPUOrderBookResultBatch_C *d_orderbook_result
     ) {
         KernelError last_err = KERNEL_SUCCESS;
         cudaError_t current_err;
@@ -423,10 +423,10 @@ extern "C" {
     }
     
     KernelError cuda_wrapper_run_rsi_batch(
-        GPUOHLCDataBatch_C* d_ohlc_batch_ptr,
-        GPURSIResultBatch_C* d_rsi_results_ptr,
-        const GPUOHLCDataBatch_C* h_ohlc_batch,
-        GPURSIResultBatch_C* h_rsi_results,
+        GPUOHLCDataBatch_C *d_ohlc_batch_ptr,
+        GPURSIResultBatch_C *d_rsi_results_ptr,
+        const GPUOHLCDataBatch_C *h_ohlc_batch,
+        GPURSIResultBatch_C *h_rsi_results,
         int num_symbols,
         int rsi_period
     ) {
@@ -493,10 +493,10 @@ extern "C" {
     // }
     
     KernelError cuda_wrapper_run_orderbook_batch(
-        GPUOrderBookDataBatch_C* d_orderbook_batch_ptr,
-        GPUOrderBookResultBatch_C* d_results_ptr,
-        const GPUOrderBookDataBatch_C* h_orderbook_batch,
-        GPUOrderBookResultBatch_C* h_results,
+        GPUOrderBookDataBatch_C *d_orderbook_batch_ptr,
+        GPUOrderBookResultBatch_C *d_results_ptr,
+        const GPUOrderBookDataBatch_C *h_orderbook_batch,
+        GPUOrderBookResultBatch_C *h_results,
         int num_symbols
     ) {
         if (num_symbols == 0) return KERNEL_SUCCESS;

@@ -16,7 +16,7 @@ extern "c" fn analyze_rsi_simd(rsi_values: [*]f32, len: c_int, buy_signals: [*]b
 pub const SignalEngine = struct {
     allocator: std.mem.Allocator,
     symbol_map: *const SymbolMap,
-    stat_calc: *StatCalc,
+    stat_calc: ?*StatCalc = null,
     signal_queue: std.ArrayList(TradingSignal),
     positions: std.StringHashMap(Position),
     signal_thread: ?std.Thread,
@@ -25,14 +25,15 @@ pub const SignalEngine = struct {
 
     pub fn init(allocator: std.mem.Allocator, symbol_map: *const SymbolMap) !SignalEngine {
         const device_id = try stat_calc_lib.selectBestCUDADevice();
-        var stat_calc = try StatCalc.init(allocator, device_id);
+        var stat_calc = try allocator.create(StatCalc);
+        stat_calc.* = try StatCalc.init(allocator, device_id);
         try stat_calc.getDeviceInfo();
         try stat_calc.warmUp();
 
         return SignalEngine{
             .allocator = allocator,
             .symbol_map = symbol_map,
-            .stat_calc = &stat_calc,
+            .stat_calc = stat_calc,
             .signal_queue = std.ArrayList(TradingSignal).init(allocator),
             .positions = std.StringHashMap(Position).init(allocator),
             .signal_thread = null,
@@ -48,7 +49,7 @@ pub const SignalEngine = struct {
         }
         self.signal_queue.deinit();
         self.positions.deinit();
-        self.stat_calc.deinit();
+        self.stat_calc.?.deinit();
     }
 
     // ZIG SIMD bitwise ops is still in works
@@ -57,7 +58,7 @@ pub const SignalEngine = struct {
     }
 
     pub fn run(self: *SignalEngine) !void {
-        var batch_results = try self.stat_calc.calculateSymbolMapBatch(self.symbol_map, 6);
+        var batch_results = try self.stat_calc.?.calculateSymbolMapBatch(self.symbol_map, 6);
 
         try self.processSignals(&batch_results.rsi, &batch_results.orderbook);
     }
