@@ -53,5 +53,6 @@ clean:
 	rm -rf .zig-cache
 	rm -f $(CUDA_OBJECT_FILE)
 	rm -f $(SIMD_RSI_OBJECT)
+	rm -f massif.*
 
 .PHONY: fmt build run clean

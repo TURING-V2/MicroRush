@@ -1,5 +1,7 @@
 const std = @import("std");
 
+pub const MAX_ORDERBOOK_SIZE = 10;
+
 //////////////////////////////////////////////////////////
 pub const SignalType = enum {
     BUY,
@@ -45,10 +47,10 @@ pub const GPURSIResultBatch = extern struct {
 };
 
 pub const GPUOrderBookDataBatch = extern struct {
-    bid_prices: [MAX_SYMBOLS][10]f32,
-    bid_quantities: [MAX_SYMBOLS][10]f32,
-    ask_prices: [MAX_SYMBOLS][10]f32,
-    ask_quantities: [MAX_SYMBOLS][10]f32,
+    bid_prices: [MAX_SYMBOLS][MAX_ORDERBOOK_SIZE]f32,
+    bid_quantities: [MAX_SYMBOLS][MAX_ORDERBOOK_SIZE]f32,
+    ask_prices: [MAX_SYMBOLS][MAX_ORDERBOOK_SIZE]f32,
+    ask_quantities: [MAX_SYMBOLS][MAX_ORDERBOOK_SIZE]f32,
     bid_counts: [MAX_SYMBOLS]u32,
     ask_counts: [MAX_SYMBOLS]u32,
 };
@@ -81,8 +83,8 @@ pub const PriceLevel = struct {
 };
 
 pub const OrderBook = struct {
-    bids: [10]PriceLevel,
-    asks: [10]PriceLevel,
+    bids: [MAX_ORDERBOOK_SIZE]PriceLevel,
+    asks: [MAX_ORDERBOOK_SIZE]PriceLevel,
     bid_head: usize,
     ask_head: usize,
     bid_count: usize,
@@ -91,8 +93,8 @@ pub const OrderBook = struct {
 
     pub fn init() OrderBook {
         return OrderBook{
-            .bids = [_]PriceLevel{PriceLevel{ .price = 0.0, .quantity = 0.0 }} ** 10,
-            .asks = [_]PriceLevel{PriceLevel{ .price = 0.0, .quantity = 0.0 }} ** 10,
+            .bids = [_]PriceLevel{PriceLevel{ .price = 0.0, .quantity = 0.0 }} ** MAX_ORDERBOOK_SIZE,
+            .asks = [_]PriceLevel{PriceLevel{ .price = 0.0, .quantity = 0.0 }} ** MAX_ORDERBOOK_SIZE,
             .bid_head = 0,
             .ask_head = 0,
             .bid_count = 0,
@@ -113,7 +115,7 @@ pub const OrderBook = struct {
         var existing_idx: ?usize = null;
         var i: usize = 0;
         while (i < self.bid_count) : (i += 1) {
-            const actual_idx = (self.bid_head + i) % 10;
+            const actual_idx = (self.bid_head + i) % MAX_ORDERBOOK_SIZE;
             if (self.bids[actual_idx].price == price) {
                 existing_idx = actual_idx;
                 break;
@@ -137,7 +139,7 @@ pub const OrderBook = struct {
         var existing_idx: ?usize = null;
         var i: usize = 0;
         while (i < self.ask_count) : (i += 1) {
-            const actual_idx = (self.ask_head + i) % 10;
+            const actual_idx = (self.ask_head + i) % MAX_ORDERBOOK_SIZE;
             if (self.asks[actual_idx].price == price) {
                 existing_idx = actual_idx;
                 break;
@@ -158,8 +160,8 @@ pub const OrderBook = struct {
     }
 
     fn addBidLevel(self: *OrderBook, price: f64, quantity: f64) void {
-        if (self.bid_count == 10) {
-            const worst_idx = (self.bid_head + 9) % 10;
+        if (self.bid_count == MAX_ORDERBOOK_SIZE) {
+            const worst_idx = (self.bid_head + 9) % MAX_ORDERBOOK_SIZE;
             if (price <= self.bids[worst_idx].price) {
                 return;
             }
@@ -169,7 +171,7 @@ pub const OrderBook = struct {
         var insert_pos: usize = 0;
         var i: usize = 0;
         while (i < self.bid_count) : (i += 1) {
-            const actual_idx = (self.bid_head + i) % 10;
+            const actual_idx = (self.bid_head + i) % MAX_ORDERBOOK_SIZE;
             if (self.bids[actual_idx].price < price) {
                 insert_pos = i;
                 break;
@@ -180,20 +182,20 @@ pub const OrderBook = struct {
         if (insert_pos < self.bid_count) {
             var shift_i = self.bid_count;
             while (shift_i > insert_pos) : (shift_i -= 1) {
-                const from_idx = (self.bid_head + shift_i - 1) % 10;
-                const to_idx = (self.bid_head + shift_i) % 10;
+                const from_idx = (self.bid_head + shift_i - 1) % MAX_ORDERBOOK_SIZE;
+                const to_idx = (self.bid_head + shift_i) % MAX_ORDERBOOK_SIZE;
                 self.bids[to_idx] = self.bids[from_idx];
             }
         }
 
-        const new_idx = (self.bid_head + insert_pos) % 10;
+        const new_idx = (self.bid_head + insert_pos) % MAX_ORDERBOOK_SIZE;
         self.bids[new_idx] = PriceLevel{ .price = price, .quantity = quantity };
         self.bid_count += 1;
     }
 
     fn addAskLevel(self: *OrderBook, price: f64, quantity: f64) void {
-        if (self.ask_count == 10) {
-            const worst_idx = (self.ask_head + 9) % 10;
+        if (self.ask_count == MAX_ORDERBOOK_SIZE) {
+            const worst_idx = (self.ask_head + 9) % MAX_ORDERBOOK_SIZE;
             if (price >= self.asks[worst_idx].price) {
                 return;
             }
@@ -203,7 +205,7 @@ pub const OrderBook = struct {
         var insert_pos: usize = 0;
         var i: usize = 0;
         while (i < self.ask_count) : (i += 1) {
-            const actual_idx = (self.ask_head + i) % 10;
+            const actual_idx = (self.ask_head + i) % MAX_ORDERBOOK_SIZE;
             if (self.asks[actual_idx].price > price) {
                 insert_pos = i;
                 break;
@@ -214,13 +216,13 @@ pub const OrderBook = struct {
         if (insert_pos < self.ask_count) {
             var shift_i = self.ask_count;
             while (shift_i > insert_pos) : (shift_i -= 1) {
-                const from_idx = (self.ask_head + shift_i - 1) % 10;
-                const to_idx = (self.ask_head + shift_i) % 10;
+                const from_idx = (self.ask_head + shift_i - 1) % MAX_ORDERBOOK_SIZE;
+                const to_idx = (self.ask_head + shift_i) % MAX_ORDERBOOK_SIZE;
                 self.asks[to_idx] = self.asks[from_idx];
             }
         }
 
-        const new_idx = (self.ask_head + insert_pos) % 10;
+        const new_idx = (self.ask_head + insert_pos) % MAX_ORDERBOOK_SIZE;
         self.asks[new_idx] = PriceLevel{ .price = price, .quantity = quantity };
         self.ask_count += 1;
     }
@@ -229,7 +231,7 @@ pub const OrderBook = struct {
         var pos: usize = 0;
         var i: usize = 0;
         while (i < self.bid_count) : (i += 1) {
-            const actual_idx = (self.bid_head + i) % 10;
+            const actual_idx = (self.bid_head + i) % MAX_ORDERBOOK_SIZE;
             if (actual_idx == target_idx) {
                 pos = i;
                 break;
@@ -237,8 +239,8 @@ pub const OrderBook = struct {
         }
 
         while (pos < self.bid_count - 1) : (pos += 1) {
-            const current_idx = (self.bid_head + pos) % 10;
-            const next_idx = (self.bid_head + pos + 1) % 10;
+            const current_idx = (self.bid_head + pos) % MAX_ORDERBOOK_SIZE;
+            const next_idx = (self.bid_head + pos + 1) % MAX_ORDERBOOK_SIZE;
             self.bids[current_idx] = self.bids[next_idx];
         }
         self.bid_count -= 1;
@@ -248,7 +250,7 @@ pub const OrderBook = struct {
         var pos: usize = 0;
         var i: usize = 0;
         while (i < self.ask_count) : (i += 1) {
-            const actual_idx = (self.ask_head + i) % 10;
+            const actual_idx = (self.ask_head + i) % MAX_ORDERBOOK_SIZE;
             if (actual_idx == target_idx) {
                 pos = i;
                 break;
@@ -256,8 +258,8 @@ pub const OrderBook = struct {
         }
 
         while (pos < self.ask_count - 1) : (pos += 1) {
-            const current_idx = (self.ask_head + pos) % 10;
-            const next_idx = (self.ask_head + pos + 1) % 10;
+            const current_idx = (self.ask_head + pos) % MAX_ORDERBOOK_SIZE;
+            const next_idx = (self.ask_head + pos + 1) % MAX_ORDERBOOK_SIZE;
             self.asks[current_idx] = self.asks[next_idx];
         }
         self.ask_count -= 1;
@@ -303,7 +305,7 @@ pub const OrderBook = struct {
         var i: usize = 0;
         // Display asks in reverse order so highest ask is at top (traditional order book view)
         while (i < self.ask_count) : (i += 1) {
-            const idx = (self.ask_head + self.ask_count - 1 - i) % 10;
+            const idx = (self.ask_head + self.ask_count - 1 - i) % MAX_ORDERBOOK_SIZE;
             const level = self.asks[idx];
             std.log.info(" {d:.4} @ {d:.4}", .{ level.quantity, level.price });
         }
@@ -311,7 +313,7 @@ pub const OrderBook = struct {
         std.log.info("BIDS (descending - highest first):", .{});
         i = 0;
         while (i < self.bid_count) : (i += 1) {
-            const idx = (self.bid_head + i) % 10;
+            const idx = (self.bid_head + i) % MAX_ORDERBOOK_SIZE;
             const level = self.bids[idx];
             std.log.info(" {d:.4} @ {d:.4}", .{ level.quantity, level.price });
         }
@@ -322,8 +324,8 @@ pub const OrderBook = struct {
     pub fn validate(self: *const OrderBook) bool {
         var i: usize = 1;
         while (i < self.bid_count) : (i += 1) {
-            const prev_idx = (self.bid_head + i - 1) % 10;
-            const curr_idx = (self.bid_head + i) % 10;
+            const prev_idx = (self.bid_head + i - 1) % MAX_ORDERBOOK_SIZE;
+            const curr_idx = (self.bid_head + i) % MAX_ORDERBOOK_SIZE;
             if (self.bids[prev_idx].price < self.bids[curr_idx].price) {
                 std.log.err("Bid order violation at index {}: {} < {}", .{ i, self.bids[prev_idx].price, self.bids[curr_idx].price });
                 return false;
@@ -332,8 +334,8 @@ pub const OrderBook = struct {
 
         i = 1;
         while (i < self.ask_count) : (i += 1) {
-            const prev_idx = (self.ask_head + i - 1) % 10;
-            const curr_idx = (self.ask_head + i) % 10;
+            const prev_idx = (self.ask_head + i - 1) % MAX_ORDERBOOK_SIZE;
+            const curr_idx = (self.ask_head + i) % MAX_ORDERBOOK_SIZE;
             if (self.asks[prev_idx].price > self.asks[curr_idx].price) {
                 std.log.err("Ask order violation at index {}: {} > {}", .{ i, self.asks[prev_idx].price, self.asks[curr_idx].price });
                 return false;

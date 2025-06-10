@@ -317,10 +317,10 @@ pub const StatCalc = struct {
         if (num_symbols == 0) return self.h_orderbook_result;
 
         var h_orderbook_batch_zig = GPUOrderBookDataBatch{
-            .bid_prices = [_][10]f32{[_]f32{0.0} ** 10} ** MAX_SYMBOLS,
-            .bid_quantities = [_][10]f32{[_]f32{0.0} ** 10} ** MAX_SYMBOLS,
-            .ask_prices = [_][10]f32{[_]f32{0.0} ** 10} ** MAX_SYMBOLS,
-            .ask_quantities = [_][10]f32{[_]f32{0.0} ** 10} ** MAX_SYMBOLS,
+            .bid_prices = [_][types.MAX_ORDERBOOK_SIZE]f32{[_]f32{0.0} ** types.MAX_ORDERBOOK_SIZE} ** MAX_SYMBOLS,
+            .bid_quantities = [_][types.MAX_ORDERBOOK_SIZE]f32{[_]f32{0.0} ** types.MAX_ORDERBOOK_SIZE} ** MAX_SYMBOLS,
+            .ask_prices = [_][types.MAX_ORDERBOOK_SIZE]f32{[_]f32{0.0} ** types.MAX_ORDERBOOK_SIZE} ** MAX_SYMBOLS,
+            .ask_quantities = [_][types.MAX_ORDERBOOK_SIZE]f32{[_]f32{0.0} ** types.MAX_ORDERBOOK_SIZE} ** MAX_SYMBOLS,
             .bid_counts = [_]u32{0} ** MAX_SYMBOLS,
             .ask_counts = [_]u32{0} ** MAX_SYMBOLS,
         };
@@ -332,10 +332,10 @@ pub const StatCalc = struct {
 
             var data_idx_bid: usize = 0;
             var circ_idx_bid = orderbook.bid_head;
-            if (orderbook.bid_count < 10) circ_idx_bid = 0;
+            if (orderbook.bid_count < types.MAX_ORDERBOOK_SIZE) circ_idx_bid = 0;
             for (0..orderbook.bid_count) |j| {
-                if (data_idx_bid >= 10) break;
-                const current_bid_idx = (circ_idx_bid + j) % 10;
+                if (data_idx_bid >= types.MAX_ORDERBOOK_SIZE) break;
+                const current_bid_idx = (circ_idx_bid + j) % types.MAX_ORDERBOOK_SIZE;
                 h_orderbook_batch_zig.bid_prices[i][data_idx_bid] = @floatCast(orderbook.bids[current_bid_idx].price);
                 h_orderbook_batch_zig.bid_quantities[i][data_idx_bid] = @floatCast(orderbook.bids[current_bid_idx].quantity);
                 data_idx_bid += 1;
@@ -343,10 +343,10 @@ pub const StatCalc = struct {
 
             var data_idx_ask: usize = 0;
             var circ_idx_ask = orderbook.ask_head;
-            if (orderbook.ask_count < 10) circ_idx_ask = 0;
+            if (orderbook.ask_count < types.MAX_ORDERBOOK_SIZE) circ_idx_ask = 0;
             for (0..orderbook.ask_count) |j| {
-                if (data_idx_ask >= 10) break;
-                const current_ask_idx = (circ_idx_ask + j) % 10;
+                if (data_idx_ask >= types.MAX_ORDERBOOK_SIZE) break;
+                const current_ask_idx = (circ_idx_ask + j) % types.MAX_ORDERBOOK_SIZE;
                 h_orderbook_batch_zig.ask_prices[i][data_idx_ask] = @floatCast(orderbook.asks[current_ask_idx].price);
                 h_orderbook_batch_zig.ask_quantities[i][data_idx_ask] = @floatCast(orderbook.asks[current_ask_idx].quantity);
                 data_idx_ask += 1;
@@ -396,8 +396,8 @@ pub const StatCalc = struct {
         std.debug.assert(dummy_symbol.count == 15);
 
         for (0..5) |i| {
-            dummy_symbol.orderbook.updateLevel(102.5 - @as(f64, @floatFromInt(i)) * 0.1, 100.0 + @as(f64, @floatFromInt(i)) * 10.0, true);
-            dummy_symbol.orderbook.updateLevel(103.0 + @as(f64, @floatFromInt(i)) * 0.1, 120.0 + @as(f64, @floatFromInt(i)) * 10.0, false);
+            dummy_symbol.orderbook.updateLevel(102.5 - @as(f64, @floatFromInt(i)) * 0.1, 100.0 + @as(f64, @floatFromInt(i)) * types.MAX_ORDERBOOK_SIZE, true);
+            dummy_symbol.orderbook.updateLevel(103.0 + @as(f64, @floatFromInt(i)) * 0.1, 120.0 + @as(f64, @floatFromInt(i)) * types.MAX_ORDERBOOK_SIZE, false);
         }
 
         var symbols_slice = [_]Symbol{dummy_symbol};

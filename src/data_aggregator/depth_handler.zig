@@ -5,12 +5,13 @@ const http = std.http;
 
 const SymbolMap = @import("../symbol-map.zig").SymbolMap;
 const OHLC = @import("../types.zig").OHLC;
-const Symbol = @import("../types.zig").Symbol;
+const types = @import("../types.zig");
+const Symbol = types.Symbol;
 const OrderBook = @import("../types.zig").OrderBook;
 const DepthError = @import("../errors.zig").DepthError;
 const metrics = @import("../metrics.zig");
 
-const DEPTH_API = "https://api.binance.com/api/v3/depth?symbol={s}&limit=10";
+const DEPTH_API = "https://api.binance.com/api/v3/depth?symbol={s}&limit=5";
 
 const DepthEvent = struct {
     // event type
@@ -307,7 +308,7 @@ pub const DepthHandler = struct {
             sym.orderbook = OrderBook.init();
 
             var bid_i: usize = 0;
-            while (bid_i < snapshot.bids.len and bid_i < 10) : (bid_i += 1) {
+            while (bid_i < snapshot.bids.len and bid_i < types.MAX_ORDERBOOK_SIZE) : (bid_i += 1) {
                 const price = std.fmt.parseFloat(f64, snapshot.bids[bid_i][0]) catch {
                     std.debug.print("Failed to parse snapshot bid price\n", .{});
                     continue;
@@ -321,7 +322,7 @@ pub const DepthHandler = struct {
             sym.orderbook.bid_count = bid_i;
 
             var ask_i: usize = 0;
-            while (ask_i < snapshot.asks.len and ask_i < 10) : (ask_i += 1) {
+            while (ask_i < snapshot.asks.len and ask_i < types.MAX_ORDERBOOK_SIZE) : (ask_i += 1) {
                 const price = std.fmt.parseFloat(f64, snapshot.asks[ask_i][0]) catch {
                     std.debug.print("Failed to parse snapshot ask price\n", .{});
                     continue;

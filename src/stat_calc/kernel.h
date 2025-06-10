@@ -2,6 +2,7 @@
 #define KERNEL_H
 
 #define MAX_SYMBOLS_CUDA 402
+#define MAX_ORDERBOOK_SIZE 5
 
 typedef struct {
     int code;
@@ -34,10 +35,10 @@ struct GPUOHLCDataBatch_C {
 };
 
 struct GPUOrderBookDataBatch_C {
-    float bid_prices[MAX_SYMBOLS_CUDA][10];
-    float bid_quantities[MAX_SYMBOLS_CUDA][10];
-    float ask_prices[MAX_SYMBOLS_CUDA][10];
-    float ask_quantities[MAX_SYMBOLS_CUDA][10];
+    float bid_prices[MAX_SYMBOLS_CUDA][MAX_ORDERBOOK_SIZE];
+    float bid_quantities[MAX_SYMBOLS_CUDA][MAX_ORDERBOOK_SIZE];
+    float ask_prices[MAX_SYMBOLS_CUDA][MAX_ORDERBOOK_SIZE];
+    float ask_quantities[MAX_SYMBOLS_CUDA][MAX_ORDERBOOK_SIZE];
     unsigned int bid_counts[MAX_SYMBOLS_CUDA];
     unsigned int ask_counts[MAX_SYMBOLS_CUDA];
 };

@@ -151,7 +151,7 @@ __global__ void orderbook_kernel_batch(const GPUOrderBookDataBatch_C *orderbook_
     int bid_count = orderbook_batch->bid_counts[symbol_idx];
     int ask_count = orderbook_batch->ask_counts[symbol_idx];
 
-    if (idx < 10) {
+    if (idx < MAX_ORDERBOOK_SIZE) {
         if (idx < bid_count) {
             partial_bid_sums[idx] = orderbook_batch->bid_quantities[symbol_idx][idx];
         } else {
