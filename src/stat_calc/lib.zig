@@ -198,7 +198,7 @@ pub const StatCalc = struct {
         const max_rsi_symbols_to_process = @min(valid_symbol_count, MAX_SYMBOLS);
 
         //std.log.info("Processing up to {} symbols for RSI and up to {} for OrderBook in batch mode...", .{ max_rsi_symbols_to_process, max_symbols_to_process });
-        
+
         var symbols_slice = try self.allocator.alloc(Symbol, max_symbols_to_process);
         defer self.allocator.free(symbols_slice);
         var symbol_names = try self.allocator.alloc([]const u8, max_symbols_to_process);

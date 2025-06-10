@@ -3,7 +3,8 @@ const SignalEngine = @import("signal_engine/lib.zig").SignalEngine;
 const symbol_map = @import("symbol-map.zig");
 const SymbolMap = symbol_map.SymbolMap;
 const std = @import("std");
-const Symbol = @import("types.zig").Symbol;
+const types = @import("types.zig");
+const Symbol = types.Symbol;
 var should_stop: bool = false;
 
 pub fn main() !void {
@@ -55,10 +56,11 @@ pub fn main() !void {
                 signal_engine.getSignalStats();
             }
         }
-
-        // mutex.lock();
-        // symbol_map.dump(&aggregator.symbol_map);
-        // mutex.unlock();
+        // if ((iter_count % 100 == 0) and (now - start_time >= warm_up_duration_ns)) {
+        //     //mutex.lock();
+        //     symbol_map.dump(aggregator.symbol_map);
+        //     //mutex.unlock();
+        // }
 
         iter_count += 1;
         std.time.sleep(sleep_ns);

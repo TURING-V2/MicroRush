@@ -8,7 +8,6 @@ typedef struct {
     const char* message;
 } KernelError;
 
-// Predefined error values
 static const KernelError KERNEL_SUCCESS = {0, "Success"};
 static const KernelError KERNEL_ERROR_INVALID_DEVICE = {1, "Invalid device ID"};
 static const KernelError KERNEL_ERROR_NO_DEVICE = {2, "No CUDA devices found"};
@@ -56,9 +55,10 @@ struct GPURSIResultBatch_C {
 
 struct GPUOrderBookResultBatch_C {
     float bid_percentage[MAX_SYMBOLS_CUDA];
-    float ask_percentage[MAX_SYMBOLS_CUDA];
+    float ask_percentage[MAX_SYMBOLS_CUDA]; 
     float total_bid_volume[MAX_SYMBOLS_CUDA];
     float total_ask_volume[MAX_SYMBOLS_CUDA];
+    float spread_percentage[MAX_SYMBOLS_CUDA];
 };
 
 extern "C" {

@@ -11,7 +11,25 @@ const SignalType = types.SignalType;
 const TradingSignal = types.TradingSignal;
 const Position = types.Position;
 
-extern "c" fn analyze_rsi_simd(rsi_values: [*]f32, len: c_int, buy_signals: [*]bool, sell_signals: [*]bool) void;
+extern fn analyze_trading_signals_simd(
+    rsi_values: [*]f32,
+    bid_percentages: [*]f32,
+    ask_percentages: [*]f32,
+    spread_percentages: [*]f32,
+    has_positions: [*]bool,
+    len: c_int,
+    decisions: [*]TradingDecision,
+) void;
+
+extern fn check_bid_percentages_simd(bid_percentages: [*]f32, len: c_int, strong_bids: [*]bool) void;
+extern fn check_spread_validity_simd(spread_percentages: [*]f32, len: c_int, valid_spreads: [*]bool) void;
+
+const TradingDecision = extern struct {
+    should_generate_buy: bool,
+    should_generate_sell: bool,
+    has_open_position: bool,
+    spread_valid: bool,
+};
 
 pub const SignalEngine = struct {
     allocator: std.mem.Allocator,
@@ -52,17 +70,13 @@ pub const SignalEngine = struct {
         self.stat_calc.?.deinit();
     }
 
-    // ZIG SIMD bitwise ops is still in works
-    fn analyzeRSIWithSIMD(_: *SignalEngine, rsi_values: []f32, buy_signals: []bool, sell_signals: []bool) void {
-        analyze_rsi_simd(rsi_values.ptr, @intCast(rsi_values.len), buy_signals.ptr, sell_signals.ptr);
-    }
-
     pub fn run(self: *SignalEngine) !void {
         var batch_results = try self.stat_calc.?.calculateSymbolMapBatch(self.symbol_map, 6);
 
         try self.processSignals(&batch_results.rsi, &batch_results.orderbook);
     }
 
+    // ZIG SIMD bitwise ops is still in works
     fn processSignals(self: *SignalEngine, rsi_results: *GPURSIResultBatch, orderbook_results: *GPUOrderBookResultBatch) !void {
         const num_symbols = @min(self.symbol_map.count(), MAX_SYMBOLS);
         if (num_symbols == 0) return;
@@ -70,53 +84,74 @@ pub const SignalEngine = struct {
         var current_rsi_values = try self.allocator.alloc(f32, num_symbols);
         defer self.allocator.free(current_rsi_values);
 
-        const buy_signals = try self.allocator.alloc(bool, num_symbols);
-        defer self.allocator.free(buy_signals);
+        var bid_percentages = try self.allocator.alloc(f32, num_symbols);
+        defer self.allocator.free(bid_percentages);
 
-        const sell_signals = try self.allocator.alloc(bool, num_symbols);
-        defer self.allocator.free(sell_signals);
+        var ask_percentages = try self.allocator.alloc(f32, num_symbols);
+        defer self.allocator.free(ask_percentages);
 
-        for (0..num_symbols) |i| {
-            const valid_count = @max(0, rsi_results.valid_rsi_count[i]);
-            if (valid_count > 0) {
-                current_rsi_values[i] = rsi_results.rsi_values[i][@intCast(valid_count - 1)];
-            } else {
-                current_rsi_values[i] = -1.0; // invalid marker
-            }
-        }
+        var spread_percentages = try self.allocator.alloc(f32, num_symbols);
+        defer self.allocator.free(spread_percentages);
 
-        self.analyzeRSIWithSIMD(current_rsi_values, buy_signals, sell_signals);
+        var has_positions = try self.allocator.alloc(bool, num_symbols);
+        defer self.allocator.free(has_positions);
+
+        const decisions = try self.allocator.alloc(TradingDecision, num_symbols);
+        defer self.allocator.free(decisions);
+
+        var symbol_names = try self.allocator.alloc([]const u8, num_symbols);
+        defer self.allocator.free(symbol_names);
 
         var symbol_idx: usize = 0;
-
         self.mutex.lock();
         var iterator = self.symbol_map.iterator();
         while (iterator.next()) |entry| {
             if (symbol_idx >= num_symbols) break;
+            symbol_names[symbol_idx] = entry.key_ptr.*;
 
-            const symbol_name = entry.key_ptr.*;
-            self.mutex.unlock();
-            const rsi_value = current_rsi_values[symbol_idx];
-            const bid_percentage = orderbook_results.bid_percentage[symbol_idx];
-            const ask_percentage = orderbook_results.ask_percentage[symbol_idx];
-
-            if (buy_signals[symbol_idx] and bid_percentage > 60.0) {
-                if (!self.hasOpenPosition(symbol_name)) {
-                    try self.generateSignal(symbol_name, .BUY, rsi_value, bid_percentage);
-                }
+            const valid_count = @max(0, rsi_results.valid_rsi_count[symbol_idx]);
+            if (valid_count > 0) {
+                current_rsi_values[symbol_idx] = rsi_results.rsi_values[symbol_idx][@intCast(valid_count - 1)];
+            } else {
+                current_rsi_values[symbol_idx] = -1.0;
             }
 
-            if (self.hasOpenPosition(symbol_name)) {
-                const should_sell = sell_signals[symbol_idx] or ask_percentage > 50.0;
-                if (should_sell) {
-                    try self.generateSignal(symbol_name, .SELL, rsi_value, ask_percentage);
-                }
-            }
+            bid_percentages[symbol_idx] = orderbook_results.bid_percentage[symbol_idx];
+            ask_percentages[symbol_idx] = orderbook_results.ask_percentage[symbol_idx];
+            spread_percentages[symbol_idx] = orderbook_results.spread_percentage[symbol_idx];
+
+            has_positions[symbol_idx] = self.hasOpenPosition(symbol_names[symbol_idx]);
 
             symbol_idx += 1;
-            self.mutex.lock();
         }
         self.mutex.unlock();
+
+        analyze_trading_signals_simd(
+            current_rsi_values.ptr,
+            bid_percentages.ptr,
+            ask_percentages.ptr,
+            spread_percentages.ptr,
+            has_positions.ptr,
+            @intCast(num_symbols),
+            decisions.ptr,
+        );
+
+        for (0..num_symbols) |i| {
+            const decision = decisions[i];
+
+            if (!decision.spread_valid) continue;
+
+            const symbol_name = symbol_names[i];
+            const rsi_value = current_rsi_values[i];
+
+            if (decision.should_generate_buy) {
+                try self.generateSignal(symbol_name, .BUY, rsi_value, bid_percentages[i]);
+            }
+
+            if (decision.should_generate_sell) {
+                try self.generateSignal(symbol_name, .SELL, rsi_value, ask_percentages[i]);
+            }
+        }
     }
 
     fn generateSignal(self: *SignalEngine, symbol_name: []const u8, signal_type: SignalType, rsi_value: f32, orderbook_percentage: f32) !void {

@@ -193,6 +193,21 @@ __global__ void orderbook_kernel_batch(const GPUOrderBookDataBatch_C *orderbook_
             results->bid_percentage[symbol_idx] = 50.0f;
             results->ask_percentage[symbol_idx] = 50.0f;
         }
+
+        if (bid_count > 0 && ask_count > 0) {
+            float best_bid = orderbook_batch->bid_prices[symbol_idx][0];
+            float best_ask = orderbook_batch->ask_prices[symbol_idx][0];
+            if (best_bid > 0.000001f && best_ask > 0.000001f && best_ask > best_bid) {
+                float mid_price = (best_bid + best_ask) / 2.0f;
+                float spread = best_ask - best_bid;
+                results->spread_percentage[symbol_idx] = (spread / mid_price) * 100.0f;
+            } else {
+                // Invalid prices or negative spread
+                results->spread_percentage[symbol_idx] = 0.0f;
+            }
+        } else {
+            results->spread_percentage[symbol_idx] = 0.0f;
+        }
     }
 }
 

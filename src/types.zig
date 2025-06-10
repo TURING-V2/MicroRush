@@ -58,6 +58,7 @@ pub const GPUOrderBookResultBatch = extern struct {
     ask_percentage: [MAX_SYMBOLS]f32,
     total_bid_volume: [MAX_SYMBOLS]f32,
     total_ask_volume: [MAX_SYMBOLS]f32,
+    spread_percentage: [MAX_SYMBOLS]f32,
 };
 
 pub const GPUBatchResult = struct {
@@ -276,16 +277,27 @@ pub const OrderBook = struct {
         return null;
     }
 
-    pub fn getSpread(self: *const OrderBook) ?f64 {
+    pub fn getSpreadPercentage(self: *const OrderBook) ?f64 {
         const best_bid = self.getBestBid();
         const best_ask = self.getBestAsk();
         if (best_bid != null and best_ask != null) {
-            return best_ask.? - best_bid.?;
+            const mid_price = (best_bid.? + best_ask.?) / 2.0;
+            const spread = best_ask.? - best_bid.?;
+            return (spread / mid_price) * 100.0;
         }
         return null;
     }
 
+    pub fn hasSignificantSpread(self: *const OrderBook, threshold: f64) bool {
+        const spread_pct = self.getSpreadPercentage();
+        return spread_pct != null and spread_pct.? >= threshold;
+    }
+
     pub fn dump(self: *const OrderBook) void {
+        const spread_pct = self.getSpreadPercentage();
+        if (spread_pct == null) {
+            return;
+        }
         std.log.info("=== Order Book (Update ID: {}) ===", .{self.last_update_id});
         std.log.info("ASKS (ascending - lowest first):", .{});
         var i: usize = 0;
@@ -293,20 +305,18 @@ pub const OrderBook = struct {
         while (i < self.ask_count) : (i += 1) {
             const idx = (self.ask_head + self.ask_count - 1 - i) % 10;
             const level = self.asks[idx];
-            std.log.info("  {d:.8} @ {d:.8}", .{ level.quantity, level.price });
+            std.log.info(" {d:.4} @ {d:.4}", .{ level.quantity, level.price });
         }
-        if (self.getSpread()) |spread| {
-            std.log.info("--- SPREAD: {d:.8} ---", .{spread});
-        }
+        std.log.info("--- SPREAD: {d:.4}% ---", .{spread_pct.?});
         std.log.info("BIDS (descending - highest first):", .{});
         i = 0;
         while (i < self.bid_count) : (i += 1) {
             const idx = (self.bid_head + i) % 10;
             const level = self.bids[idx];
-            std.log.info("  {d:.8} @ {d:.8}", .{ level.quantity, level.price });
+            std.log.info(" {d:.4} @ {d:.4}", .{ level.quantity, level.price });
         }
         std.log.info("================================", .{});
-        //_ = self.validate();
+        _ = self.validate();
     }
 
     pub fn validate(self: *const OrderBook) bool {
