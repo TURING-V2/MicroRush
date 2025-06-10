@@ -38,7 +38,7 @@ pub fn main() !void {
     std.debug.print("WebSockets flowing, starting continuous Signal Engine and Trading...\n", .{});
 
     const sleep_ns = 50_000_000; // 50 ms
-    const max_duration_ns = 30 * 60 * 1_000_000_000; // 30 min
+    const max_duration_ns = 180 * 60 * 1_000_000_000; // 180 min
     const warm_up_duration_ns = 5 * 60 * 1_000_000_000; // 5 min
     const start_time = std.time.nanoTimestamp();
 
@@ -48,7 +48,7 @@ pub fn main() !void {
         const now = std.time.nanoTimestamp();
 
         if (now - start_time >= max_duration_ns) {
-            std.log.info("Reached 10-minute limit, stopping loop.", .{});
+            std.log.info("Reached 180-minute limit, stopping loop.", .{});
             // TODO: SELL ALL TRADES
             break;
         }
