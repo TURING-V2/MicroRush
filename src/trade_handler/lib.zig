@@ -61,8 +61,6 @@ pub const TradeHandler = struct {
     }
 
     pub fn hasOpenPosition(self: *TradeHandler, symbol_name: []const u8) bool {
-        self.mutex.lock();
-        defer self.mutex.unlock();
         if (self.positions.get(symbol_name)) |position| {
             return position.is_open;
         }
@@ -70,8 +68,6 @@ pub const TradeHandler = struct {
     }
 
     pub fn getOpenPositionsCount(self: *TradeHandler) usize {
-        self.mutex.lock();
-        defer self.mutex.unlock();
         var count: usize = 0;
         var iterator = self.positions.iterator();
         while (iterator.next()) |entry| {

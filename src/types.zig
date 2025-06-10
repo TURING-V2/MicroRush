@@ -366,4 +366,11 @@ pub const Symbol = struct {
             self.count += 1;
         }
     }
+
+    pub fn getTicker(self: *const Symbol, idx: usize) ?OHLC {
+        if (idx >= self.count) return null;
+        const offset = @as(i64, @intCast(self.head)) - @as(i64, @intCast(idx)) - 1;
+        const real_idx = @as(usize, @intCast((offset % @as(i64, 15) + @as(i64, 15)) % @as(i64, 15)));
+        return self.ticker_queue[real_idx];
+    }
 };

@@ -1,0 +1,2838 @@
+desc: --stacks=yes
+cmd: make run
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=42775
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=5832
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=104242
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=1320
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=166085
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=1864
+heap_tree=detailed
+n0: 0 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+#-----------
+snapshot=4
+#-----------
+time=234425
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=1960
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=287495
+mem_heap_B=2620
+mem_heap_extra_B=84
+mem_stacks_B=5768
+heap_tree=detailed
+n2: 2620 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n2: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n1: 1257 0x400C608: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1257 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1257 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1257 0x491CE6B: ??? (in /lib64/libc.so.6)
+          n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1257 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1257 0x491C949: ??? (in /lib64/libc.so.6)
+             n1: 1257 0x491CF30: dlopen (in /lib64/libc.so.6)
+              n1: 1257 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 1257 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 1257 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 1257 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 1257 0x1: ???
+                   n1: 1257 0x1FFEFFF712: ???
+                    n0: 1257 0x1FFEFFF717: ???
+    n1: 1255 0x4003734: openaux (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1255 0x4003BB3: _dl_map_object_deps (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1255 0x400C66A: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1255 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+          n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1255 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1255 0x491CE6B: ??? (in /lib64/libc.so.6)
+             n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+              n1: 1255 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+               n1: 1255 0x491C949: ??? (in /lib64/libc.so.6)
+                n1: 1255 0x491CF30: dlopen (in /lib64/libc.so.6)
+                 n1: 1255 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+                  n1: 1255 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                   n1: 1255 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                    n1: 1255 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                     n1: 1255 0x1: ???
+                      n1: 1255 0x1FFEFFF712: ???
+                       n0: 1255 0x1FFEFFF717: ???
+ n0: 108 in 2 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=6
+#-----------
+time=345404
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2696
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=414207
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2360
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=456389
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2360
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=501687
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2600
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=536832
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2360
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=589756
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2904
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=659340
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2696
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=718405
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2904
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=762380
+mem_heap_B=3380
+mem_heap_extra_B=140
+mem_stacks_B=2904
+heap_tree=detailed
+n4: 3380 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n2: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n1: 1257 0x400C608: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1257 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1257 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1257 0x491CE6B: ??? (in /lib64/libc.so.6)
+          n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1257 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1257 0x491C949: ??? (in /lib64/libc.so.6)
+             n1: 1257 0x491CF30: dlopen (in /lib64/libc.so.6)
+              n1: 1257 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 1257 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 1257 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 1257 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 1257 0x1: ???
+                   n1: 1257 0x1FFEFFF712: ???
+                    n0: 1257 0x1FFEFFF717: ???
+    n1: 1255 0x4003734: openaux (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1255 0x4003BB3: _dl_map_object_deps (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1255 0x400C66A: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1255 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+          n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1255 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1255 0x491CE6B: ??? (in /lib64/libc.so.6)
+             n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+              n1: 1255 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+               n1: 1255 0x491C949: ??? (in /lib64/libc.so.6)
+                n1: 1255 0x491CF30: dlopen (in /lib64/libc.so.6)
+                 n1: 1255 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+                  n1: 1255 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                   n1: 1255 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                    n1: 1255 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                     n1: 1255 0x1: ???
+                      n1: 1255 0x1FFEFFF712: ???
+                       n0: 1255 0x1FFEFFF717: ???
+ n1: 648 0x4013BC2: _dl_check_map_versions (in /lib64/ld-linux-x86-64.so.2)
+  n1: 648 0x400C6B2: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 648 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 648 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 648 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 648 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 648 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 648 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 648 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 648 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 648 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 648 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 648 0x1: ???
+                 n1: 648 0x1FFEFFF712: ???
+                  n0: 648 0x1FFEFFF717: ???
+ n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n1: 72 0x4003EE0: _dl_map_object_deps (in /lib64/ld-linux-x86-64.so.2)
+  n1: 72 0x400C66A: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 72 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 72 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 72 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 72 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 72 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 72 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 72 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 72 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 72 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 72 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 72 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 72 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 72 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 72 0x1: ???
+                 n1: 72 0x1FFEFFF712: ???
+                  n0: 72 0x1FFEFFF717: ???
+#-----------
+snapshot=15
+#-----------
+time=825698
+mem_heap_B=8692
+mem_heap_extra_B=892
+mem_stacks_B=5240
+heap_tree=detailed
+n11: 8692 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n2: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n1: 1257 0x400C608: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1257 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1257 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1257 0x491CE6B: ??? (in /lib64/libc.so.6)
+          n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1257 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1257 0x491C949: ??? (in /lib64/libc.so.6)
+             n1: 1257 0x491CF30: dlopen (in /lib64/libc.so.6)
+              n1: 1257 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 1257 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 1257 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 1257 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 1257 0x1: ???
+                   n1: 1257 0x1FFEFFF712: ???
+                    n0: 1257 0x1FFEFFF717: ???
+    n1: 1255 0x4003734: openaux (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1255 0x4003BB3: _dl_map_object_deps (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1255 0x400C66A: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1255 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+          n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1255 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1255 0x491CE6B: ??? (in /lib64/libc.so.6)
+             n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+              n1: 1255 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+               n1: 1255 0x491C949: ??? (in /lib64/libc.so.6)
+                n1: 1255 0x491CF30: dlopen (in /lib64/libc.so.6)
+                 n1: 1255 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+                  n1: 1255 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                   n1: 1255 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                    n1: 1255 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                     n1: 1255 0x1: ???
+                      n1: 1255 0x1FFEFFF712: ???
+                       n0: 1255 0x1FFEFFF717: ???
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n0: 1091 in 19 places, all below massif's threshold (1.00%)
+ n1: 648 0x4013BC2: _dl_check_map_versions (in /lib64/ld-linux-x86-64.so.2)
+  n1: 648 0x400C6B2: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 648 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 648 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 648 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 648 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 648 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 648 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 648 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 648 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 648 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 648 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 648 0x1: ???
+                 n1: 648 0x1FFEFFF712: ???
+                  n0: 648 0x1FFEFFF717: ???
+ n1: 528 0x4EBD124: _dbus_mem_pool_alloc (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 528 0x4EBB6A2: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 528 0x4EBB75F: _dbus_list_prepend (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 528 0x4EBB7DC: _dbus_list_append (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 528 0x4E9C2B8: dbus_parse_address (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 528 0x4EA2D99: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 528 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 528 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+         n1: 528 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+          n1: 528 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+           n1: 528 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+            n1: 528 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+             n1: 528 0x1: ???
+              n1: 528 0x1FFEFFF712: ???
+               n0: 528 0x1FFEFFF717: ???
+ n1: 520 0x4EC0A75: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 520 0x4EB5F54: dbus_threads_init (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 520 0x4EB60AC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 520 0x4E9F900: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 520 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+      n1: 520 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+       n1: 520 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+        n1: 520 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+         n1: 520 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+          n1: 520 0x1: ???
+           n1: 520 0x1FFEFFF712: ???
+            n0: 520 0x1FFEFFF717: ???
+ n1: 240 0x4E9E877: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 240 0x4E9EC38: _dbus_auth_client_new (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 240 0x4EB7FD4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 240 0x4EB76E4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 240 0x4EB7B94: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 240 0x4EB7D16: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 240 0x4EB813C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 240 0x4EA2DE4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 240 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 240 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+           n1: 240 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+            n1: 240 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+             n1: 240 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 240 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+               n1: 240 0x1: ???
+                n1: 240 0x1FFEFFF712: ???
+                 n0: 240 0x1FFEFFF717: ???
+ n1: 240 0x4EA4AF1: _dbus_credentials_new (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 240 in 3 places, all below massif's threshold (1.00%)
+ n1: 232 0x4EB7625: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 232 0x4EB7B94: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 232 0x4EB7D16: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 232 0x4EB813C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 232 0x4EA2DE4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 232 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 232 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+        n1: 232 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+         n1: 232 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+          n1: 232 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+           n1: 232 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+            n1: 232 0x1: ???
+             n1: 232 0x1FFEFFF712: ???
+              n0: 232 0x1FFEFFF717: ???
+ n1: 209 0x4EBAF12: _dbus_strdup (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 209 in 4 places, all below massif's threshold (1.00%)
+ n1: 168 0x4EBE12C: _dbus_string_append_byte (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 168 in 2 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=16
+#-----------
+time=877503
+mem_heap_B=12124
+mem_heap_extra_B=1204
+mem_stacks_B=1848
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=920038
+mem_heap_B=16996
+mem_heap_extra_B=1300
+mem_stacks_B=3424
+heap_tree=detailed
+n15: 16996 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n4: 4463 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 320 0x4EBDAA3: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n0: 320 in 2 places, all below massif's threshold (1.00%)
+  n0: 31 in 2 places, all below massif's threshold (1.00%)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n2: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n1: 1257 0x400C608: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1257 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1257 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1257 0x491CE6B: ??? (in /lib64/libc.so.6)
+          n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1257 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1257 0x491C949: ??? (in /lib64/libc.so.6)
+             n1: 1257 0x491CF30: dlopen (in /lib64/libc.so.6)
+              n1: 1257 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 1257 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 1257 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 1257 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 1257 0x1: ???
+                   n1: 1257 0x1FFEFFF712: ???
+                    n0: 1257 0x1FFEFFF717: ???
+    n1: 1255 0x4003734: openaux (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1255 0x4003BB3: _dl_map_object_deps (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1255 0x400C66A: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1255 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+          n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1255 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1255 0x491CE6B: ??? (in /lib64/libc.so.6)
+             n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+              n1: 1255 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+               n1: 1255 0x491C949: ??? (in /lib64/libc.so.6)
+                n1: 1255 0x491CF30: dlopen (in /lib64/libc.so.6)
+                 n1: 1255 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+                  n1: 1255 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                   n1: 1255 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                    n1: 1255 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                     n1: 1255 0x1: ???
+                      n1: 1255 0x1FFEFFF712: ???
+                       n0: 1255 0x1FFEFFF717: ???
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n0: 1635 in 33 places, all below massif's threshold (1.00%)
+ n3: 1584 0x4EBD124: _dbus_mem_pool_alloc (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 528 0x4EBA722: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 528 0x4EBA88B: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 528 0x4EBA336: _dbus_hash_table_insert_int (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 528 0x4EA2989: dbus_connection_send_with_reply (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 528 0x4EA2B44: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 528 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 528 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 528 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+          n1: 528 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+           n1: 528 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+            n1: 528 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+             n1: 528 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+              n1: 528 0x1: ???
+               n1: 528 0x1FFEFFF712: ???
+                n0: 528 0x1FFEFFF717: ???
+  n1: 528 0x4EBA935: _dbus_hash_table_insert_string (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 528 0x4EA30F6: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 528 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 528 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+      n1: 528 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+       n1: 528 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+        n1: 528 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+         n1: 528 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+          n1: 528 0x1: ???
+           n1: 528 0x1FFEFFF712: ???
+            n0: 528 0x1FFEFFF717: ???
+  n1: 528 0x4EBB6A2: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 528 0x4EBB75F: _dbus_list_prepend (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 528 0x4EBB7DC: _dbus_list_append (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 528 0x4E9C2B8: dbus_parse_address (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 528 0x4EA2D99: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 528 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 528 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+         n1: 528 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+          n1: 528 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+           n1: 528 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+            n1: 528 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+             n1: 528 0x1: ???
+              n1: 528 0x1FFEFFF712: ???
+               n0: 528 0x1FFEFFF717: ???
+ n2: 880 0x4EAB9BE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 528 in 3 places, all below massif's threshold (1.00%)
+  n1: 352 0x4EAED6A: _dbus_message_loader_queue_messages (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 352 0x4EB8A3F: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 352 0x4EB8B81: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 352 0x4EB6C62: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 352 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 352 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 352 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 352 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 352 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 352 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+            n1: 352 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+             n1: 352 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+              n1: 352 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 352 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 352 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 352 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 352 0x1: ???
+                   n1: 352 0x1FFEFFF712: ???
+                    n0: 352 0x1FFEFFF717: ???
+ n2: 735 0x4EBD29E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n3: 639 0x4EBE4EF: _dbus_string_copy_len (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 383 0x4EBC028: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 383 0x4EBC54C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n2: 383 0x4EA9A09: _dbus_type_writer_write_basic (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 223 0x4EAD37F: dbus_message_iter_append_basic (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 223 0x4EAE454: dbus_message_new_error (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 223 0x4EB1403: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 223 0x4EA293F: dbus_connection_send_with_reply (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 223 0x4EA2B44: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 223 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+            n1: 223 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+             n1: 223 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+              n1: 223 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 223 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 223 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 223 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 223 0x1: ???
+                   n1: 223 0x1FFEFFF712: ???
+                    n0: 223 0x1FFEFFF717: ???
+      n0: 160 in 1 place, below massif's threshold (1.00%)
+   n1: 256 0x4EA7ECA: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 256 0x4EAEDB4: _dbus_message_loader_queue_messages (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 256 0x4EB8A3F: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 256 0x4EB8B81: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 256 0x4EB6C62: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 256 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 256 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 256 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 256 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+            n1: 256 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+             n1: 256 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+              n1: 256 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+               n1: 256 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+                n1: 256 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+                 n1: 256 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 256 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                   n1: 256 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                    n1: 256 0x1: ???
+                     n1: 256 0x1FFEFFF712: ???
+                      n0: 256 0x1FFEFFF717: ???
+   n0: 0 in 3 places, all below massif's threshold (1.00%)
+  n0: 96 in 2 places, all below massif's threshold (1.00%)
+ n2: 680 0x4EC0A75: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 520 0x4EB5F54: dbus_threads_init (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 520 0x4EB60AC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 520 0x4E9F900: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 520 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+      n1: 520 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+       n1: 520 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+        n1: 520 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+         n1: 520 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+          n1: 520 0x1: ???
+           n1: 520 0x1FFEFFF712: ???
+            n0: 520 0x1FFEFFF717: ???
+  n0: 160 in 1 place, below massif's threshold (1.00%)
+ n1: 648 0x4013BC2: _dl_check_map_versions (in /lib64/ld-linux-x86-64.so.2)
+  n1: 648 0x400C6B2: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 648 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 648 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 648 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 648 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 648 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 648 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 648 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 648 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 648 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 648 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 648 0x1: ???
+                 n1: 648 0x1FFEFFF712: ???
+                  n0: 648 0x1FFEFFF717: ???
+ n1: 320 0x4EA4AF1: _dbus_credentials_new (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 320 in 4 places, all below massif's threshold (1.00%)
+ n1: 275 0x4EBAF12: _dbus_strdup (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 275 in 6 places, all below massif's threshold (1.00%)
+ n1: 264 0x4EA0F68: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 264 0x4EA2DFA: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 264 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 264 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+     n1: 264 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+      n1: 264 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+       n1: 264 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+        n1: 264 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+         n1: 264 0x1: ???
+          n1: 264 0x1FFEFFF712: ???
+           n0: 264 0x1FFEFFF717: ???
+ n1: 240 0x4E9E877: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 240 0x4E9EC38: _dbus_auth_client_new (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 240 0x4EB7FD4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 240 0x4EB76E4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 240 0x4EB7B94: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 240 0x4EB7D16: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 240 0x4EB813C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 240 0x4EA2DE4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 240 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 240 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+           n1: 240 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+            n1: 240 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+             n1: 240 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 240 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+               n1: 240 0x1: ???
+                n1: 240 0x1FFEFFF712: ???
+                 n0: 240 0x1FFEFFF717: ???
+ n1: 232 0x4EB7625: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 232 0x4EB7B94: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 232 0x4EB7D16: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 232 0x4EB813C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 232 0x4EA2DE4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 232 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 232 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+        n1: 232 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+         n1: 232 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+          n1: 232 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+           n1: 232 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+            n1: 232 0x1: ???
+             n1: 232 0x1FFEFFF712: ???
+              n0: 232 0x1FFEFFF717: ???
+ n1: 224 0x4EB9DA5: _dbus_hash_table_new (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 224 in 2 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=18
+#-----------
+time=979719
+mem_heap_B=17104
+mem_heap_extra_B=1320
+mem_stacks_B=1672
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=1052259
+mem_heap_B=17399
+mem_heap_extra_B=1345
+mem_stacks_B=3232
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=1089730
+mem_heap_B=21038
+mem_heap_extra_B=1442
+mem_stacks_B=7744
+heap_tree=detailed
+n12: 21038 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n4: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n2: 480 0x4EBDAA3: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 480 0x4EA961B: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 480 0x4EA97CC: _dbus_type_writer_recurse (in /usr/lib64/libdbus-1.so.3.38.3)
+     n2: 480 0x4EA7344: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 320 0x4EA79E4: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 320 0x4EAC414: dbus_message_new_method_call (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 320 0x4E85922: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+         n1: 320 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+          n1: 320 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+           n1: 320 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+            n1: 320 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+             n1: 320 0x1: ???
+              n1: 320 0x1FFEFFF712: ???
+               n0: 320 0x1FFEFFF717: ???
+      n0: 160 in 3 places, all below massif's threshold (1.00%)
+   n0: 0 in 1 place, below massif's threshold (1.00%)
+  n0: 31 in 3 places, all below massif's threshold (1.00%)
+ n0: 3057 in 45 places, all below massif's threshold (1.00%)
+ n1: 2680 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2680 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2680 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2680 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2680 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n2: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n1: 1257 0x400C608: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1257 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1257 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1257 0x491CE6B: ??? (in /lib64/libc.so.6)
+          n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1257 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1257 0x491C949: ??? (in /lib64/libc.so.6)
+             n1: 1257 0x491CF30: dlopen (in /lib64/libc.so.6)
+              n1: 1257 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 1257 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 1257 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 1257 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 1257 0x1: ???
+                   n1: 1257 0x1FFEFFF712: ???
+                    n0: 1257 0x1FFEFFF717: ???
+    n1: 1255 0x4003734: openaux (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1255 0x4003BB3: _dl_map_object_deps (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1255 0x400C66A: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1255 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+          n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1255 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1255 0x491CE6B: ??? (in /lib64/libc.so.6)
+             n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+              n1: 1255 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+               n1: 1255 0x491C949: ??? (in /lib64/libc.so.6)
+                n1: 1255 0x491CF30: dlopen (in /lib64/libc.so.6)
+                 n1: 1255 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+                  n1: 1255 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                   n1: 1255 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                    n1: 1255 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                     n1: 1255 0x1: ???
+                      n1: 1255 0x1FFEFFF712: ???
+                       n0: 1255 0x1FFEFFF717: ???
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n3: 1584 0x4EBD124: _dbus_mem_pool_alloc (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 528 0x4EBA722: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 528 0x4EBA88B: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 528 0x4EBA336: _dbus_hash_table_insert_int (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 528 0x4EA2989: dbus_connection_send_with_reply (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 528 0x4EA2B44: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 528 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 528 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 528 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+          n1: 528 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+           n1: 528 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+            n1: 528 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+             n1: 528 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+              n1: 528 0x1: ???
+               n1: 528 0x1FFEFFF712: ???
+                n0: 528 0x1FFEFFF717: ???
+  n1: 528 0x4EBA935: _dbus_hash_table_insert_string (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 528 0x4EA30F6: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 528 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 528 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+      n1: 528 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+       n1: 528 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+        n1: 528 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+         n1: 528 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+          n1: 528 0x1: ???
+           n1: 528 0x1FFEFFF712: ???
+            n0: 528 0x1FFEFFF717: ???
+  n1: 528 0x4EBB6A2: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 528 0x4EBB75F: _dbus_list_prepend (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 528 0x4EBB7DC: _dbus_list_append (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 528 0x4E9C2B8: dbus_parse_address (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 528 0x4EA2D99: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 528 0x4E9FA9E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 528 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+         n1: 528 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+          n1: 528 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+           n1: 528 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+            n1: 528 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+             n1: 528 0x1: ???
+              n1: 528 0x1FFEFFF712: ???
+               n0: 528 0x1FFEFFF717: ???
+ n2: 958 0x4EBD29E: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n2: 862 0x4EBE4EF: _dbus_string_copy_len (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 606 0x4EBC028: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 606 0x4EBC54C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n2: 606 0x4EA9A09: _dbus_type_writer_write_basic (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 446 0x4EAD37F: dbus_message_iter_append_basic (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 446 0x4EAE454: dbus_message_new_error (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 446 0x4EB1403: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 446 0x4EA293F: dbus_connection_send_with_reply (in /usr/lib64/libdbus-1.so.3.38.3)
+          n0: 446 in 2 places, all below massif's threshold (1.00%)
+      n0: 160 in 1 place, below massif's threshold (1.00%)
+   n0: 256 in 4 places, all below massif's threshold (1.00%)
+  n0: 96 in 2 places, all below massif's threshold (1.00%)
+ n2: 880 0x4EAB9BE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 528 in 3 places, all below massif's threshold (1.00%)
+  n1: 352 0x4EAED6A: _dbus_message_loader_queue_messages (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 352 0x4EB8A3F: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 352 0x4EB8B81: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 352 0x4EB6C62: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 352 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 352 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 352 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 352 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 352 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 352 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+            n1: 352 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+             n1: 352 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+              n1: 352 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 352 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 352 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 352 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 352 0x1: ???
+                   n1: 352 0x1FFEFFF712: ???
+                    n0: 352 0x1FFEFFF717: ???
+ n1: 792 0x48C03C0: ??? (in /lib64/libc.so.6)
+  n1: 792 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 792 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 792 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 792 0x11029A: main (in /usr/bin/gmake)
+ n2: 680 0x4EC0A75: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 520 0x4EB5F54: dbus_threads_init (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 520 0x4EB60AC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 520 0x4E9F900: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 520 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+      n1: 520 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+       n1: 520 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+        n1: 520 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+         n1: 520 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+          n1: 520 0x1: ???
+           n1: 520 0x1FFEFFF712: ???
+            n0: 520 0x1FFEFFF717: ???
+  n0: 160 in 1 place, below massif's threshold (1.00%)
+ n1: 648 0x4013BC2: _dl_check_map_versions (in /lib64/ld-linux-x86-64.so.2)
+  n1: 648 0x400C6B2: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 648 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 648 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 648 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 648 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 648 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 648 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 648 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 648 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 648 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 648 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 648 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 648 0x1: ???
+                 n1: 648 0x1FFEFFF712: ???
+                  n0: 648 0x1FFEFFF717: ???
+ n1: 320 0x4EA4AF1: _dbus_credentials_new (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 320 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=21
+#-----------
+time=1138449
+mem_heap_B=110100
+mem_heap_extra_B=2412
+mem_stacks_B=7224
+heap_tree=detailed
+n7: 110100 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 87856 0x12779D: xcalloc (in /usr/bin/gmake)
+  n6: 87040 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n1: 2048 0x11618D: hash_init_directories (in /usr/bin/gmake)
+    n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n0: 1024 in 1 place, below massif's threshold (1.00%)
+  n0: 816 in 1 place, below massif's threshold (1.00%)
+ n0: 8357 in 54 places, all below massif's threshold (1.00%)
+ n3: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n0: 511 in 4 places, all below massif's threshold (1.00%)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n2: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n1: 1257 0x400C608: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1257 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1257 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1257 0x491CE6B: ??? (in /lib64/libc.so.6)
+          n1: 1257 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1257 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1257 0x491C949: ??? (in /lib64/libc.so.6)
+             n1: 1257 0x491CF30: dlopen (in /lib64/libc.so.6)
+              n1: 1257 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+               n1: 1257 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                n1: 1257 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                 n1: 1257 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                  n1: 1257 0x1: ???
+                   n1: 1257 0x1FFEFFF712: ???
+                    n0: 1257 0x1FFEFFF717: ???
+    n1: 1255 0x4003734: openaux (in /lib64/ld-linux-x86-64.so.2)
+     n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 1255 0x4003BB3: _dl_map_object_deps (in /lib64/ld-linux-x86-64.so.2)
+       n1: 1255 0x400C66A: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+        n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 1255 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+          n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+           n1: 1255 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+            n1: 1255 0x491CE6B: ??? (in /lib64/libc.so.6)
+             n1: 1255 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+              n1: 1255 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+               n1: 1255 0x491C949: ??? (in /lib64/libc.so.6)
+                n1: 1255 0x491CF30: dlopen (in /lib64/libc.so.6)
+                 n1: 1255 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+                  n1: 1255 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+                   n1: 1255 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+                    n1: 1255 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                     n1: 1255 0x1: ???
+                      n1: 1255 0x1FFEFFF712: ???
+                       n0: 1255 0x1FFEFFF717: ???
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 1584 0x4EBD124: _dbus_mem_pool_alloc (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 1584 in 3 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=22
+#-----------
+time=1172598
+mem_heap_B=118143
+mem_heap_extra_B=4329
+mem_stacks_B=7240
+heap_tree=detailed
+n8: 118143 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 90064 0x12779D: xcalloc (in /usr/bin/gmake)
+  n6: 87040 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n1: 2048 0x11618D: hash_init_directories (in /usr/bin/gmake)
+    n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n0: 1024 in 1 place, below massif's threshold (1.00%)
+  n2: 3024 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 240 in 5 places, all below massif's threshold (1.00%)
+ n0: 8050 in 53 places, all below massif's threshold (1.00%)
+ n2: 6142 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 5994 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 5935 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5712 0x110608: main (in /usr/bin/gmake)
+    n0: 223 in 5 places, all below massif's threshold (1.00%)
+   n0: 59 in 4 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n3: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n0: 511 in 4 places, all below massif's threshold (1.00%)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 1584 0x4EBD124: _dbus_mem_pool_alloc (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 1584 in 3 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=23
+#-----------
+time=1231968
+mem_heap_B=138497
+mem_heap_extra_B=5263
+mem_stacks_B=8552
+heap_tree=detailed
+n10: 138497 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n5: 97528 0x12779D: xcalloc (in /usr/bin/gmake)
+  n6: 87040 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n1: 2048 0x11618D: hash_init_directories (in /usr/bin/gmake)
+    n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n0: 1024 in 1 place, below massif's threshold (1.00%)
+  n2: 5328 0x117759: enter_file (in /usr/bin/gmake)
+   n1: 5040 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+   n0: 288 in 2 places, all below massif's threshold (1.00%)
+  n2: 3408 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 624 in 13 places, all below massif's threshold (1.00%)
+  n1: 1680 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n1: 1680 0x114DD9: set_default_suffixes (in /usr/bin/gmake)
+    n0: 1680 0x110FE9: main (in /usr/bin/gmake)
+  n0: 72 in 1 place, below massif's threshold (1.00%)
+ n2: 8408 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n0: 232 in 4 places, all below massif's threshold (1.00%)
+ n0: 8212 in 54 places, all below massif's threshold (1.00%)
+ n2: 6366 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 6218 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 6159 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5712 0x110608: main (in /usr/bin/gmake)
+    n0: 447 in 13 places, all below massif's threshold (1.00%)
+   n0: 59 in 5 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n3: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n0: 511 in 4 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 1584 0x4EBD124: _dbus_mem_pool_alloc (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 1584 in 3 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=24
+#-----------
+time=1285661
+mem_heap_B=178094
+mem_heap_extra_B=8794
+mem_stacks_B=7552
+heap_tree=detailed
+n10: 178094 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n4: 101872 0x12779D: xcalloc (in /usr/bin/gmake)
+  n6: 87040 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n1: 2048 0x11618D: hash_init_directories (in /usr/bin/gmake)
+    n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n0: 1024 in 1 place, below massif's threshold (1.00%)
+  n3: 7488 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 1680 in 35 places, all below massif's threshold (1.00%)
+  n2: 5472 0x117759: enter_file (in /usr/bin/gmake)
+   n1: 5040 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+   n0: 432 in 3 places, all below massif's threshold (1.00%)
+  n0: 1872 in 3 places, all below massif's threshold (1.00%)
+ n1: 32816 0x496D354: ??? (in /lib64/libc.so.6)
+  n1: 32816 0x496D3CE: ??? (in /lib64/libc.so.6)
+   n1: 32816 0x115633: ??? (in /usr/bin/gmake)
+    n1: 32816 0x115983: file_exists_p (in /usr/bin/gmake)
+     n1: 32816 0x12E4D9: read_all_makefiles (in /usr/bin/gmake)
+      n0: 32816 0x111316: main (in /usr/bin/gmake)
+ n0: 10407 in 55 places, all below massif's threshold (1.00%)
+ n2: 8432 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n0: 256 in 5 places, all below massif's threshold (1.00%)
+ n2: 8168 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 8020 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 7953 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2251 in 36 places, all below massif's threshold (1.00%)
+   n0: 67 in 6 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n3: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n0: 511 in 4 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+#-----------
+snapshot=25
+#-----------
+time=1343330
+mem_heap_B=152816
+mem_heap_extra_B=9560
+mem_stacks_B=7472
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=1386206
+mem_heap_B=152816
+mem_heap_extra_B=9560
+mem_stacks_B=7472
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=1443378
+mem_heap_B=154003
+mem_heap_extra_B=9749
+mem_stacks_B=7888
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=1500576
+mem_heap_B=155691
+mem_heap_extra_B=9973
+mem_stacks_B=7648
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=1548324
+mem_heap_B=152754
+mem_heap_extra_B=10406
+mem_stacks_B=6904
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=1586588
+mem_heap_B=161081
+mem_heap_extra_B=12007
+mem_stacks_B=7128
+heap_tree=detailed
+n10: 161081 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n5: 111272 0x12779D: xcalloc (in /usr/bin/gmake)
+  n6: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 2048 in 2 places, all below massif's threshold (1.00%)
+   n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n1: 2048 0x11618D: hash_init_directories (in /usr/bin/gmake)
+    n0: 2048 0x11042B: main (in /usr/bin/gmake)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 2400 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 2400 in 3 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n3: 12180 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+  n0: 1260 in 14 places, all below massif's threshold (1.00%)
+ n2: 10007 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 9859 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1721 in 7 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n0: 9023 in 57 places, all below massif's threshold (1.00%)
+ n3: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n0: 511 in 4 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 2200 0x4938E0E: strndup (in /lib64/libc.so.6)
+  n1: 2200 0x12781C: xstrndup (in /usr/bin/gmake)
+   n0: 2200 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=31
+#-----------
+time=1624852
+mem_heap_B=161681
+mem_heap_extra_B=12383
+mem_stacks_B=6872
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=1663168
+mem_heap_B=162641
+mem_heap_extra_B=12911
+mem_stacks_B=6872
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=1701424
+mem_heap_B=163337
+mem_heap_extra_B=13303
+mem_stacks_B=6864
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=1739703
+mem_heap_B=164165
+mem_heap_extra_B=13763
+mem_stacks_B=7232
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=1778004
+mem_heap_B=164861
+mem_heap_extra_B=14155
+mem_stacks_B=7160
+heap_tree=detailed
+n10: 164861 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n5: 112280 0x12779D: xcalloc (in /usr/bin/gmake)
+  n6: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 2048 in 2 places, all below massif's threshold (1.00%)
+   n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n1: 2048 0x11618D: hash_init_directories (in /usr/bin/gmake)
+    n0: 2048 0x11042B: main (in /usr/bin/gmake)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 2400 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 2400 in 3 places, all below massif's threshold (1.00%)
+  n0: 1272 in 4 places, all below massif's threshold (1.00%)
+ n4: 14952 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+  n1: 2176 0x131FA4: ??? (in /usr/bin/gmake)
+   n0: 2176 in 3 places, all below massif's threshold (1.00%)
+  n0: 1856 in 13 places, all below massif's threshold (1.00%)
+ n2: 10007 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 9859 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1721 in 7 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n0: 9023 in 57 places, all below massif's threshold (1.00%)
+ n3: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n0: 511 in 4 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 2200 0x4938E0E: strndup (in /lib64/libc.so.6)
+  n1: 2200 0x12781C: xstrndup (in /usr/bin/gmake)
+   n0: 2200 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=36
+#-----------
+time=1835394
+mem_heap_B=165821
+mem_heap_extra_B=14699
+mem_stacks_B=7160
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=1873679
+mem_heap_B=166121
+mem_heap_extra_B=14887
+mem_stacks_B=7048
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=1912001
+mem_heap_B=166685
+mem_heap_extra_B=15211
+mem_stacks_B=7152
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=1950286
+mem_heap_B=167297
+mem_heap_extra_B=15543
+mem_stacks_B=7152
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=2026791
+mem_heap_B=167765
+mem_heap_extra_B=15851
+mem_stacks_B=6872
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=2065057
+mem_heap_B=168065
+mem_heap_extra_B=16039
+mem_stacks_B=7232
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=2103333
+mem_heap_B=168497
+mem_heap_extra_B=16295
+mem_stacks_B=7192
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=2141646
+mem_heap_B=168977
+mem_heap_extra_B=16559
+mem_stacks_B=7176
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=2179903
+mem_heap_B=169341
+mem_heap_extra_B=16787
+mem_stacks_B=7024
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=2218209
+mem_heap_B=169757
+mem_heap_extra_B=17011
+mem_stacks_B=7152
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=2256465
+mem_heap_B=170105
+mem_heap_extra_B=17207
+mem_stacks_B=7232
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=2330729
+mem_heap_B=171330
+mem_heap_extra_B=17814
+mem_stacks_B=7320
+heap_tree=detailed
+n10: 171330 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 113912 0x12779D: xcalloc (in /usr/bin/gmake)
+  n6: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 2048 in 2 places, all below massif's threshold (1.00%)
+   n0: 2048 0x11042B: main (in /usr/bin/gmake)
+   n1: 2048 0x11618D: hash_init_directories (in /usr/bin/gmake)
+    n0: 2048 0x11042B: main (in /usr/bin/gmake)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 2736 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 2736 in 4 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n4: 19712 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n3: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n1: 2240 0x13279E: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2240 0x111471: main (in /usr/bin/gmake)
+   n1: 2176 0x1328E8: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2176 0x111471: main (in /usr/bin/gmake)
+   n0: 896 in 1 place, below massif's threshold (1.00%)
+  n0: 3480 in 18 places, all below massif's threshold (1.00%)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n2: 10084 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 9936 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1798 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n0: 9023 in 57 places, all below massif's threshold (1.00%)
+ n3: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n1: 2056 0x4EC114D: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB6D95: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB74AE: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA25BF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n1: 2056 0x4EC1807: _dbus_read (in /usr/lib64/libdbus-1.so.3.38.3)
+   n1: 2056 0x4EB705C: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+    n1: 2056 0x4EB7470: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+     n1: 2056 0x4EB88EF: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+      n1: 2056 0x4EA1FBC: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+       n1: 2056 0x4EA2533: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+        n1: 2056 0x4EA2B56: dbus_connection_send_with_reply_and_block (in /usr/lib64/libdbus-1.so.3.38.3)
+         n1: 2056 0x4E9F7C7: dbus_bus_register (in /usr/lib64/libdbus-1.so.3.38.3)
+          n1: 2056 0x4E9F9F7: ??? (in /usr/lib64/libdbus-1.so.3.38.3)
+           n1: 2056 0x4E85820: ??? (in /usr/lib64/libgamemode.so.0.0.0)
+            n1: 2056 0x48889A0: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2056 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2056 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2056 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2056 0x1: ???
+                 n1: 2056 0x1FFEFFF712: ???
+                  n0: 2056 0x1FFEFFF717: ???
+  n0: 511 in 4 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 2200 0x4938E0E: strndup (in /lib64/libc.so.6)
+  n1: 2200 0x12781C: xstrndup (in /usr/bin/gmake)
+   n0: 2200 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=48
+#-----------
+time=2388296
+mem_heap_B=172312
+mem_heap_extra_B=18256
+mem_stacks_B=15464
+heap_tree=detailed
+n10: 172312 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 114104 0x12779D: xcalloc (in /usr/bin/gmake)
+  n4: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 6144 in 4 places, all below massif's threshold (1.00%)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 2928 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 2928 in 4 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n4: 20376 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n3: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n1: 2240 0x13279E: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2240 0x111471: main (in /usr/bin/gmake)
+   n1: 2176 0x1328E8: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2176 0x111471: main (in /usr/bin/gmake)
+   n0: 896 in 1 place, below massif's threshold (1.00%)
+  n0: 4144 in 18 places, all below massif's threshold (1.00%)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n2: 10210 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 10062 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1924 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n0: 9023 in 58 places, all below massif's threshold (1.00%)
+ n1: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 4623 in 6 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 2200 0x4938E0E: strndup (in /lib64/libc.so.6)
+  n1: 2200 0x12781C: xstrndup (in /usr/bin/gmake)
+   n0: 2200 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=49
+#-----------
+time=2452671
+mem_heap_B=175416
+mem_heap_extra_B=18288
+mem_stacks_B=16200
+heap_tree=detailed
+n10: 175416 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 114152 0x12779D: xcalloc (in /usr/bin/gmake)
+  n4: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 6144 in 4 places, all below massif's threshold (1.00%)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 2976 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 2976 in 5 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n5: 23384 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n3: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n1: 2240 0x13279E: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2240 0x111471: main (in /usr/bin/gmake)
+   n1: 2176 0x1328E8: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2176 0x111471: main (in /usr/bin/gmake)
+   n0: 896 in 1 place, below massif's threshold (1.00%)
+  n0: 4208 in 19 places, all below massif's threshold (1.00%)
+  n1: 2944 0x11E9C1: ??? (in /usr/bin/gmake)
+   n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+    n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+     n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+      n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n2: 10210 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 10062 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1924 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n0: 9071 in 59 places, all below massif's threshold (1.00%)
+ n1: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 4623 in 6 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 2200 0x4938E0E: strndup (in /lib64/libc.so.6)
+  n1: 2200 0x12781C: xstrndup (in /usr/bin/gmake)
+   n0: 2200 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=50
+#-----------
+time=2452786
+mem_heap_B=178424
+mem_heap_extra_B=18304
+mem_stacks_B=16352
+heap_tree=detailed
+n10: 178424 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 114152 0x12779D: xcalloc (in /usr/bin/gmake)
+  n4: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 6144 in 4 places, all below massif's threshold (1.00%)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 2976 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 2976 in 5 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n5: 26392 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n2: 5888 0x11E9C1: ??? (in /usr/bin/gmake)
+   n1: 2944 0x11F9EB: ??? (in /usr/bin/gmake)
+    n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+     n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+      n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+       n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+   n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+    n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+     n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+      n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+  n3: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n1: 2240 0x13279E: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2240 0x111471: main (in /usr/bin/gmake)
+   n1: 2176 0x1328E8: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2176 0x111471: main (in /usr/bin/gmake)
+   n0: 896 in 1 place, below massif's threshold (1.00%)
+  n0: 4272 in 19 places, all below massif's threshold (1.00%)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n2: 10210 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 10062 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1924 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n0: 9071 in 59 places, all below massif's threshold (1.00%)
+ n1: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 4623 in 6 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 2200 0x4938E0E: strndup (in /lib64/libc.so.6)
+  n1: 2200 0x12781C: xstrndup (in /usr/bin/gmake)
+   n0: 2200 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=51
+#-----------
+time=2486942
+mem_heap_B=178472
+mem_heap_extra_B=18312
+mem_stacks_B=16648
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=2509794
+mem_heap_B=178472
+mem_heap_extra_B=18312
+mem_stacks_B=20840
+heap_tree=detailed
+n10: 178472 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 114200 0x12779D: xcalloc (in /usr/bin/gmake)
+  n4: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 6144 in 4 places, all below massif's threshold (1.00%)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 3024 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 3024 in 5 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n5: 26392 0x127768: xmalloc (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n2: 5888 0x11E9C1: ??? (in /usr/bin/gmake)
+   n1: 2944 0x11F9EB: ??? (in /usr/bin/gmake)
+    n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+     n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+      n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+       n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+   n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+    n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+     n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+      n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+  n3: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n1: 2240 0x13279E: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2240 0x111471: main (in /usr/bin/gmake)
+   n1: 2176 0x1328E8: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2176 0x111471: main (in /usr/bin/gmake)
+   n0: 896 in 1 place, below massif's threshold (1.00%)
+  n0: 4272 in 19 places, all below massif's threshold (1.00%)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n2: 10210 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 10062 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1924 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n0: 9071 in 59 places, all below massif's threshold (1.00%)
+ n1: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 4623 in 6 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+ n1: 2200 0x4938E0E: strndup (in /lib64/libc.so.6)
+  n1: 2200 0x12781C: xstrndup (in /usr/bin/gmake)
+   n0: 2200 in 4 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=53
+#-----------
+time=2509909
+mem_heap_B=181480
+mem_heap_extra_B=18328
+mem_stacks_B=20992
+heap_tree=detailed
+n9: 181480 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 114200 0x12779D: xcalloc (in /usr/bin/gmake)
+  n4: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 6144 in 4 places, all below massif's threshold (1.00%)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 3024 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 3024 in 5 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n5: 29400 0x127768: xmalloc (in /usr/bin/gmake)
+  n2: 8832 0x11E9C1: ??? (in /usr/bin/gmake)
+   n2: 5888 0x11F9EB: ??? (in /usr/bin/gmake)
+    n1: 2944 0x11F9EB: ??? (in /usr/bin/gmake)
+     n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+      n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+       n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+        n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+    n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+     n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+      n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+       n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+   n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+    n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+     n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+      n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n2: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n0: 3072 in 2 places, all below massif's threshold (1.00%)
+   n1: 2240 0x13279E: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2240 0x111471: main (in /usr/bin/gmake)
+  n0: 4336 in 19 places, all below massif's threshold (1.00%)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n0: 11271 in 60 places, all below massif's threshold (1.00%)
+ n2: 10210 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 10062 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1924 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n1: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 4623 in 6 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+#-----------
+snapshot=54
+#-----------
+time=2543363
+mem_heap_B=181528
+mem_heap_extra_B=18336
+mem_stacks_B=25480
+heap_tree=detailed
+n9: 181528 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 114248 0x12779D: xcalloc (in /usr/bin/gmake)
+  n4: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 6144 in 4 places, all below massif's threshold (1.00%)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 3072 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 3072 in 5 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n5: 29400 0x127768: xmalloc (in /usr/bin/gmake)
+  n2: 8832 0x11E9C1: ??? (in /usr/bin/gmake)
+   n2: 5888 0x11F9EB: ??? (in /usr/bin/gmake)
+    n1: 2944 0x11F9EB: ??? (in /usr/bin/gmake)
+     n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+      n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+       n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+        n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+    n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+     n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+      n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+       n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+   n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+    n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+     n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+      n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n1: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n0: 5312 in 3 places, all below massif's threshold (1.00%)
+  n0: 4336 in 19 places, all below massif's threshold (1.00%)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n0: 11271 in 60 places, all below massif's threshold (1.00%)
+ n2: 10210 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 10062 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1924 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n1: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 4623 in 6 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+#-----------
+snapshot=55
+#-----------
+time=2543478
+mem_heap_B=184536
+mem_heap_extra_B=18352
+mem_stacks_B=25632
+heap_tree=peak
+n9: 184536 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 114248 0x12779D: xcalloc (in /usr/bin/gmake)
+  n4: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 6144 in 4 places, all below massif's threshold (1.00%)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 3072 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 3072 in 5 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n5: 32408 0x127768: xmalloc (in /usr/bin/gmake)
+  n2: 11776 0x11E9C1: ??? (in /usr/bin/gmake)
+   n2: 8832 0x11F9EB: ??? (in /usr/bin/gmake)
+    n2: 5888 0x11F9EB: ??? (in /usr/bin/gmake)
+     n1: 2944 0x11F9EB: ??? (in /usr/bin/gmake)
+      n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+       n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+        n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+         n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+     n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+      n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+       n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+        n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+    n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+     n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+      n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+       n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+   n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+    n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+     n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+      n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n1: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n0: 5312 in 3 places, all below massif's threshold (1.00%)
+  n0: 4400 in 19 places, all below massif's threshold (1.00%)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n0: 11271 in 60 places, all below massif's threshold (1.00%)
+ n2: 10210 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 10062 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1924 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n1: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 4623 in 6 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+#-----------
+snapshot=56
+#-----------
+time=2577628
+mem_heap_B=184608
+mem_heap_extra_B=18376
+mem_stacks_B=26136
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=2611806
+mem_heap_B=178544
+mem_heap_extra_B=18360
+mem_stacks_B=16480
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=2645971
+mem_heap_B=181648
+mem_heap_extra_B=18416
+mem_stacks_B=21152
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=2680125
+mem_heap_B=181672
+mem_heap_extra_B=18432
+mem_stacks_B=21000
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=2714324
+mem_heap_B=184704
+mem_heap_extra_B=18464
+mem_stacks_B=25544
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=2748501
+mem_heap_B=181744
+mem_heap_extra_B=18496
+mem_stacks_B=21288
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=2782664
+mem_heap_B=181768
+mem_heap_extra_B=18512
+mem_stacks_B=21424
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=2817107
+mem_heap_B=181768
+mem_heap_extra_B=18552
+mem_stacks_B=20888
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=2851267
+mem_heap_B=184872
+mem_heap_extra_B=18584
+mem_stacks_B=25928
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=2885435
+mem_heap_B=181864
+mem_heap_extra_B=18608
+mem_stacks_B=21368
+heap_tree=detailed
+n9: 181864 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n6: 114248 0x12779D: xcalloc (in /usr/bin/gmake)
+  n4: 88064 0x11DC29: hash_init (in /usr/bin/gmake)
+   n0: 65536 0x110421: main (in /usr/bin/gmake)
+   n0: 8192 0x11041C: main (in /usr/bin/gmake)
+   n0: 8192 0x110426: main (in /usr/bin/gmake)
+   n0: 6144 in 4 places, all below massif's threshold (1.00%)
+  n3: 12528 0x117759: enter_file (in /usr/bin/gmake)
+   n2: 5472 0x118279: enter_prereqs (in /usr/bin/gmake)
+    n1: 5040 0x114DEA: set_default_suffixes (in /usr/bin/gmake)
+     n0: 5040 0x110FE9: main (in /usr/bin/gmake)
+    n0: 432 in 1 place, below massif's threshold (1.00%)
+   n1: 5040 0x114E99: install_default_suffix_rules (in /usr/bin/gmake)
+    n0: 5040 0x11146C: main (in /usr/bin/gmake)
+   n0: 2016 in 5 places, all below massif's threshold (1.00%)
+  n3: 8016 0x134491: define_variable_in_set (in /usr/bin/gmake)
+   n1: 3024 0x114FD3: define_default_variables (in /usr/bin/gmake)
+    n0: 3024 0x11100A: main (in /usr/bin/gmake)
+   n0: 2784 0x110608: main (in /usr/bin/gmake)
+   n0: 2208 in 35 places, all below massif's threshold (1.00%)
+  n1: 3072 0x12B878: parse_file_seq (in /usr/bin/gmake)
+   n0: 3072 in 5 places, all below massif's threshold (1.00%)
+  n1: 2304 0x131F86: ??? (in /usr/bin/gmake)
+   n0: 2304 in 2 places, all below massif's threshold (1.00%)
+  n0: 264 in 3 places, all below massif's threshold (1.00%)
+ n5: 29736 0x127768: xmalloc (in /usr/bin/gmake)
+  n2: 8832 0x11E9C1: ??? (in /usr/bin/gmake)
+   n2: 5888 0x11F9EB: ??? (in /usr/bin/gmake)
+    n2: 2944 0x11F9EB: ??? (in /usr/bin/gmake)
+     n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+      n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+       n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+        n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+     n0: 0 in 1 place, below massif's threshold (1.00%)
+    n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+     n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+      n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+       n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+   n1: 2944 0x120A82: try_implicit_rule (in /usr/bin/gmake)
+    n1: 2944 0x130538: ??? (in /usr/bin/gmake)
+     n1: 2944 0x1316F4: update_goal_chain (in /usr/bin/gmake)
+      n0: 2944 0x111AD0: main (in /usr/bin/gmake)
+  n1: 8176 0x1336A4: ??? (in /usr/bin/gmake)
+   n1: 8176 0x124F19: ??? (in /usr/bin/gmake)
+    n1: 8176 0x12519C: ??? (in /usr/bin/gmake)
+     n1: 8176 0x126554: ??? (in /usr/bin/gmake)
+      n0: 8176 0x110728: main (in /usr/bin/gmake)
+  n2: 5312 0x131FA4: ??? (in /usr/bin/gmake)
+   n0: 3072 in 2 places, all below massif's threshold (1.00%)
+   n1: 2240 0x13279E: convert_to_pattern (in /usr/bin/gmake)
+    n0: 2240 0x111471: main (in /usr/bin/gmake)
+  n0: 4672 in 20 places, all below massif's threshold (1.00%)
+  n1: 2744 0x114EB1: install_default_suffix_rules (in /usr/bin/gmake)
+   n0: 2744 0x11146C: main (in /usr/bin/gmake)
+ n0: 11271 in 60 places, all below massif's threshold (1.00%)
+ n2: 10210 0x493802D: strdup (in /lib64/libc.so.6)
+  n2: 10062 0x1277FC: xstrdup (in /usr/bin/gmake)
+   n2: 8138 0x1344D0: define_variable_in_set (in /usr/bin/gmake)
+    n0: 5702 0x110608: main (in /usr/bin/gmake)
+    n0: 2436 in 36 places, all below massif's threshold (1.00%)
+   n0: 1924 in 8 places, all below massif's threshold (1.00%)
+  n0: 148 in 3 places, all below massif's threshold (1.00%)
+ n1: 4623 0x4EBD84B: _dbus_string_lengthen (in /usr/lib64/libdbus-1.so.3.38.3)
+  n0: 4623 in 6 places, all below massif's threshold (1.00%)
+ n1: 4096 0x4996619: ttyname (in /lib64/libc.so.6)
+  n0: 4096 0x111201: main (in /usr/bin/gmake)
+ n1: 2864 0x48C02CC: ??? (in /lib64/libc.so.6)
+  n1: 2864 0x48BFE82: ??? (in /lib64/libc.so.6)
+   n1: 2864 0x48BF2FC: ??? (in /lib64/libc.so.6)
+    n1: 2864 0x48C1EB5: setlocale (in /lib64/libc.so.6)
+     n0: 2864 0x11029A: main (in /usr/bin/gmake)
+ n1: 2512 0x400B87F: _dl_new_object (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2512 0x4007260: _dl_map_object_from_fd (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2512 0x4008A95: _dl_map_object (in /lib64/ld-linux-x86-64.so.2)
+    n0: 2512 in 2 places, all below massif's threshold (1.00%)
+ n1: 2304 0x4023822: _dl_find_object_update (in /lib64/ld-linux-x86-64.so.2)
+  n1: 2304 0x400C9E7: dl_open_worker_begin (in /lib64/ld-linux-x86-64.so.2)
+   n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+    n1: 2304 0x400BDA8: dl_open_worker (in /lib64/ld-linux-x86-64.so.2)
+     n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+      n1: 2304 0x400C1D8: _dl_open (in /lib64/ld-linux-x86-64.so.2)
+       n1: 2304 0x491CE6B: ??? (in /lib64/libc.so.6)
+        n1: 2304 0x40023C0: _dl_catch_exception (in /lib64/ld-linux-x86-64.so.2)
+         n1: 2304 0x40024F2: _dl_catch_error (in /lib64/ld-linux-x86-64.so.2)
+          n1: 2304 0x491C949: ??? (in /lib64/libc.so.6)
+           n1: 2304 0x491CF30: dlopen (in /lib64/libc.so.6)
+            n1: 2304 0x4888CF8: gamemode_request_start (in /usr/lib64/libgamemodeauto.so.0.0.0)
+             n1: 2304 0x400514D: call_init (in /lib64/ld-linux-x86-64.so.2)
+              n1: 2304 0x400521B: _dl_init (in /lib64/ld-linux-x86-64.so.2)
+               n1: 2304 0x401D31F: ??? (in /lib64/ld-linux-x86-64.so.2)
+                n1: 2304 0x1: ???
+                 n1: 2304 0x1FFEFFF712: ???
+                  n0: 2304 0x1FFEFFF717: ???
+#-----------
+snapshot=66
+#-----------
+time=2919596
+mem_heap_B=181864
+mem_heap_extra_B=18648
+mem_stacks_B=21152
+heap_tree=empty
+#-----------
+snapshot=67
+#-----------
+time=2953754
+mem_heap_B=175848
+mem_heap_extra_B=18624
+mem_stacks_B=12144
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=2987918
+mem_heap_B=173511
+mem_heap_extra_B=19041
+mem_stacks_B=7552
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=3022109
+mem_heap_B=183506
+mem_heap_extra_B=19310
+mem_stacks_B=7840
+heap_tree=empty
+#-----------
+snapshot=70
+#-----------
+time=3056275
+mem_heap_B=192166
+mem_heap_extra_B=19994
+mem_stacks_B=7904
+heap_tree=empty
+#-----------
+snapshot=71
+#-----------
+time=3090427
+mem_heap_B=191519
+mem_heap_extra_B=20369
+mem_stacks_B=12936
+heap_tree=empty
+#-----------
+snapshot=72
+#-----------
+time=3124583
+mem_heap_B=188356
+mem_heap_extra_B=20428
+mem_stacks_B=11672
+heap_tree=empty
