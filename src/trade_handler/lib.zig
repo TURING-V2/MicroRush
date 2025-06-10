@@ -106,17 +106,6 @@ pub const TradeHandler = struct {
 
     fn executeSignal(self: *TradeHandler, signal: TradingSignal) !void {
         try self.portfolio_manager.processSignal(signal);
-
-        // default execution (mock)
-        switch (signal.signal_type) {
-            .BUY => {
-                std.debug.print("EXECUTING BUY: {s} at RSI {d:.2}\n", .{ signal.symbol_name, signal.rsi_value });
-            },
-            .SELL => {
-                std.debug.print("EXECUTING SELL: {s} at RSI {d:.2}\n", .{ signal.symbol_name, signal.rsi_value });
-            },
-            .HOLD => {},
-        }
     }
 
     pub fn getStats(self: *TradeHandler) struct { open_positions: usize, pending_signals: usize } {

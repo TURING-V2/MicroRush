@@ -5,3 +5,5 @@ kernel.o
 simd.o
 
 .vscode
+
+massif.*
