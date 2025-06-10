@@ -111,13 +111,9 @@ pub const PortfolioManager = struct {
             return;
         }
 
-        // The position size is the total USDT spent.
-        // position_size_usdt = (amount * price) + fee
-        // fee = (amount * price) * fee_rate
-        // So, position_size_usdt = (amount * price) * (1 + fee_rate)
-        const value_of_asset = self.position_size_usdt / (1.0 + self.fee_rate);
-        const fee = self.position_size_usdt - value_of_asset;
-        const amount = value_of_asset / price;
+        const amount = self.position_size_usdt / (price * (1.0 + self.fee_rate));
+        const trade_volume = amount * price;
+        const fee = trade_volume * self.fee_rate;
 
         // trade record
         const trade = Trade{
@@ -173,9 +169,9 @@ pub const PortfolioManager = struct {
                 return;
             }
 
-            const gross_proceeds = position.amount * price;
-            const fee = gross_proceeds * self.fee_rate;
-            const net_proceeds = gross_proceeds - fee;
+            const trade_volume = position.amount * price;
+            const fee = trade_volume * self.fee_rate;
+            const net_proceeds = trade_volume - fee;
 
             const pnl = net_proceeds - self.position_size_usdt; // P&L is based on net proceeds vs initial cost
             const pnl_percentage = (pnl / self.position_size_usdt) * 100.0;
