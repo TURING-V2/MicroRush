@@ -64,3 +64,8 @@ pub const KERNEL_ERROR_KERNEL_EXECUTION = KernelError{ .code = 8, .message = "Ke
 pub const KERNEL_ERROR_DEVICE_RESET = KernelError{ .code = 9, .message = "Device reset failed" };
 pub const KERNEL_ERROR_GET_PROPERTIES = KernelError{ .code = 10, .message = "Failed to get device properties" };
 pub const KERNEL_ERROR_GET_DEVICE_COUNT = KernelError{ .code = 11, .message = "Failed to get device count" };
+
+pub const GetPriceError = error{
+    SymbolNotFound,
+    NoPriceDataAvailable,
+};

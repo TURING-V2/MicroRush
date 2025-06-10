@@ -9,7 +9,8 @@ const GPUOrderBookResultBatch = types.GPUOrderBookResultBatch;
 const MAX_SYMBOLS = types.MAX_SYMBOLS;
 const SignalType = types.SignalType;
 const TradingSignal = types.TradingSignal;
-const Position = types.Position;
+const TradeHandler = @import("../trade_handler/lib.zig").TradeHandler;
+const PortfolioManager = @import("../trade_handler/portfolio_manager.zig").PortfolioManager;
 
 extern fn analyze_trading_signals_simd(
     rsi_values: [*]f32,
@@ -35,11 +36,19 @@ pub const SignalEngine = struct {
     allocator: std.mem.Allocator,
     symbol_map: *const SymbolMap,
     stat_calc: ?*StatCalc = null,
-    signal_queue: std.ArrayList(TradingSignal),
-    positions: std.StringHashMap(Position),
-    signal_thread: ?std.Thread,
+
+    trade_handler: TradeHandler,
+
+    // GPU batch processing
+    processing_thread: ?std.Thread,
+    batch_thread: ?std.Thread,
     should_stop: std.atomic.Value(bool),
     mutex: std.Thread.Mutex,
+
+    // Batch result queue for processing
+    batch_result_queue: std.ArrayList(GPUBatchResult),
+    batch_queue_mutex: std.Thread.Mutex,
+    batch_condition: std.Thread.Condition,
 
     pub fn init(allocator: std.mem.Allocator, symbol_map: *const SymbolMap) !SignalEngine {
         const device_id = try stat_calc_lib.selectBestCUDADevice();
@@ -48,32 +57,100 @@ pub const SignalEngine = struct {
         try stat_calc.getDeviceInfo();
         try stat_calc.warmUp();
 
+        const trade_handler = TradeHandler.init(allocator, symbol_map);
+
         return SignalEngine{
             .allocator = allocator,
             .symbol_map = symbol_map,
             .stat_calc = stat_calc,
-            .signal_queue = std.ArrayList(TradingSignal).init(allocator),
-            .positions = std.StringHashMap(Position).init(allocator),
-            .signal_thread = null,
+            .trade_handler = trade_handler,
+            .processing_thread = null,
+            .batch_thread = null,
             .should_stop = std.atomic.Value(bool).init(false),
             .mutex = std.Thread.Mutex{},
+            .batch_result_queue = std.ArrayList(GPUBatchResult).init(allocator),
+            .batch_queue_mutex = std.Thread.Mutex{},
+            .batch_condition = std.Thread.Condition{},
         };
     }
 
     pub fn deinit(self: *SignalEngine) void {
         self.should_stop.store(true, .seq_cst);
-        if (self.signal_thread) |thread| {
+        self.batch_condition.signal();
+
+        if (self.processing_thread) |thread| {
             thread.join();
         }
-        self.signal_queue.deinit();
-        self.positions.deinit();
+        if (self.batch_thread) |thread| {
+            thread.join();
+        }
+
+        self.trade_handler.deinit();
+        self.batch_result_queue.deinit();
         self.stat_calc.?.deinit();
     }
 
     pub fn run(self: *SignalEngine) !void {
-        var batch_results = try self.stat_calc.?.calculateSymbolMapBatch(self.symbol_map, 6);
+        try self.startProcessingThread();
+        try self.trade_handler.start();
+        try self.startBatchThread();
+    }
 
-        try self.processSignals(&batch_results.rsi, &batch_results.orderbook);
+    pub fn startBatchThread(self: *SignalEngine) !void {
+        self.batch_thread = try std.Thread.spawn(.{}, batchThreadFunction, .{self});
+    }
+
+    fn batchThreadFunction(self: *SignalEngine) void {
+        std.log.info("Batch processing thread started", .{});
+
+        while (!self.should_stop.load(.seq_cst)) {
+            const batch_results = self.stat_calc.?.calculateSymbolMapBatch(self.symbol_map, 6) catch |err| {
+                std.log.err("Error calculating batch: {}", .{err});
+                std.time.sleep(1_000_000_000);
+                continue;
+            };
+
+            self.batch_queue_mutex.lock();
+            self.batch_result_queue.append(batch_results) catch |err| {
+                std.log.err("Error queuing batch result: {}", .{err});
+            };
+            self.batch_queue_mutex.unlock();
+
+            self.batch_condition.signal();
+            std.time.sleep(1_000_000); // 1ms
+        }
+
+        std.log.info("Batch processing thread stopped", .{});
+    }
+
+    pub fn startProcessingThread(self: *SignalEngine) !void {
+        self.processing_thread = try std.Thread.spawn(.{}, processingThreadFunction, .{self});
+    }
+
+    fn processingThreadFunction(self: *SignalEngine) void {
+        std.log.info("Signal processing thread started", .{});
+
+        while (!self.should_stop.load(.seq_cst)) {
+            self.batch_queue_mutex.lock();
+            while (self.batch_result_queue.items.len == 0 and !self.should_stop.load(.seq_cst)) {
+                self.batch_condition.wait(&self.batch_queue_mutex);
+            }
+            if (self.should_stop.load(.seq_cst)) {
+                self.batch_queue_mutex.unlock();
+                break;
+            }
+            while (self.batch_result_queue.items.len > 0) {
+                var batch_result = self.batch_result_queue.orderedRemove(0);
+                self.batch_queue_mutex.unlock();
+                self.processSignals(&batch_result.rsi, &batch_result.orderbook) catch |err| {
+                    std.log.err("Error processing signals: {}", .{err});
+                };
+                self.batch_queue_mutex.lock();
+            }
+            self.batch_queue_mutex.unlock();
+        }
+
+        std.log.info("Signal processing thread stopped", .{});
     }
 
     // ZIG SIMD bitwise ops is still in works
@@ -120,7 +197,7 @@ pub const SignalEngine = struct {
             ask_percentages[symbol_idx] = orderbook_results.ask_percentage[symbol_idx];
             spread_percentages[symbol_idx] = orderbook_results.spread_percentage[symbol_idx];
 
-            has_positions[symbol_idx] = self.hasOpenPosition(symbol_names[symbol_idx]);
+            has_positions[symbol_idx] = self.trade_handler.hasOpenPosition(symbol_names[symbol_idx]);
 
             symbol_idx += 1;
         }
@@ -138,16 +215,12 @@ pub const SignalEngine = struct {
 
         for (0..num_symbols) |i| {
             const decision = decisions[i];
-
             if (!decision.spread_valid) continue;
-
             const symbol_name = symbol_names[i];
             const rsi_value = current_rsi_values[i];
-
             if (decision.should_generate_buy) {
                 try self.generateSignal(symbol_name, .BUY, rsi_value, bid_percentages[i]);
             }
-
             if (decision.should_generate_sell) {
                 try self.generateSignal(symbol_name, .SELL, rsi_value, ask_percentages[i]);
             }
@@ -162,78 +235,6 @@ pub const SignalEngine = struct {
             .orderbook_percentage = orderbook_percentage,
             .timestamp = @intCast(std.time.nanoTimestamp()),
         };
-
-        try self.signal_queue.append(signal);
-
-        // update position tracking
-        if (signal_type == .BUY) {
-            try self.positions.put(symbol_name, Position{
-                .symbol_name = symbol_name,
-                .is_open = true,
-                .entry_rsi = rsi_value,
-                .timestamp = signal.timestamp,
-            });
-            std.log.info("SIGNAL: {s} BUY - RSI: {d:.2}, Orderbook: {d:.2}%", .{ symbol_name, rsi_value, orderbook_percentage });
-        } else if (signal_type == .SELL) {
-            if (self.positions.getPtr(symbol_name)) |position| {
-                position.is_open = false;
-            }
-            std.log.info("SIGNAL: {s} SELL - RSI: {d:.2}, Orderbook: {d:.2}%", .{ symbol_name, rsi_value, orderbook_percentage });
-        }
-    }
-
-    fn hasOpenPosition(self: *SignalEngine, symbol_name: []const u8) bool {
-        if (self.positions.get(symbol_name)) |position| {
-            return position.is_open;
-        }
-        return false;
-    }
-
-    // MOCK CODE TESTING
-    pub fn startSignalThread(self: *SignalEngine) !void {
-        self.signal_thread = try std.Thread.spawn(.{}, signalThreadFunction, .{self});
-    }
-
-    fn signalThreadFunction(self: *SignalEngine) void {
-        while (!self.should_stop.load(.seq_cst)) {
-            self.mutex.lock();
-
-            // process all pending signals
-            while (self.signal_queue.items.len > 0) {
-                const signal = self.signal_queue.orderedRemove(0);
-                self.executeSignal(signal);
-            }
-
-            self.mutex.unlock();
-
-            // allow other threads to work
-            std.time.sleep(10_000_000); // 10ms
-        }
-    }
-
-    fn executeSignal(_: *SignalEngine, signal: TradingSignal) void {
-        switch (signal.signal_type) {
-            .BUY => {
-                std.debug.print("EXECUTING BUY: {s} at RSI {d:.2}\n", .{ signal.symbol_name, signal.rsi_value });
-            },
-            .SELL => {
-                std.debug.print("EXECUTING SELL: {s} at RSI {d:.2}\n", .{ signal.symbol_name, signal.rsi_value });
-            },
-            .HOLD => {},
-        }
-    }
-
-    pub fn getSignalStats(self: *SignalEngine) void {
-        self.mutex.lock();
-        defer self.mutex.unlock();
-
-        var open_positions: usize = 0;
-        var position_iterator = self.positions.iterator();
-        while (position_iterator.next()) |entry| {
-            if (entry.value_ptr.is_open) {
-                open_positions += 1;
-            }
-        }
-        std.log.info("Signal Engine Stats - Open Positions: {}, Pending Signals: {}", .{ open_positions, self.signal_queue.items.len });
+        try self.trade_handler.addSignal(signal);
     }
 };

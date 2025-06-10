@@ -5,14 +5,17 @@ const SymbolMap = symbol_map.SymbolMap;
 const std = @import("std");
 const types = @import("types.zig");
 const Symbol = types.Symbol;
+
 var should_stop: bool = false;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
+
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
+
     var enable_metrics = false;
     for (args) |arg| {
         if (std.mem.eql(u8, arg, "--metrics"[0..]) or std.mem.eql(u8, arg, "metrics"[0..])) {
@@ -22,7 +25,6 @@ pub fn main() !void {
     }
 
     const smp_allocator = std.heap.smp_allocator;
-    //var mutex = std.Thread.Mutex{};
 
     var aggregator = try DataAggregator.init(enable_metrics, smp_allocator);
     defer aggregator.deinit();
@@ -35,34 +37,28 @@ pub fn main() !void {
 
     std.debug.print("WebSockets flowing, starting continuous Signal Engine and Trading...\n", .{});
 
-    const sleep_ns = 50_000_000; //50 ms
-    const max_duration_ns = 10 * 60 * 1_000_000_000; //10 min
-    const warm_up_duration_ns = 5 * 60 * 1_000_000_000; //5 min
+    const sleep_ns = 50_000_000; // 50 ms
+    const max_duration_ns = 30 * 60 * 1_000_000_000; // 30 min
+    const warm_up_duration_ns = 5 * 60 * 1_000_000_000; // 5 min
     const start_time = std.time.nanoTimestamp();
-    var iter_count: u64 = 0;
 
-    try signal_engine.startSignalThread();
+    var signal_engine_started = false;
 
     while (!should_stop) {
         const now = std.time.nanoTimestamp();
+
         if (now - start_time >= max_duration_ns) {
             std.log.info("Reached 10-minute limit, stopping loop.", .{});
             // TODO: SELL ALL TRADES
             break;
         }
-        if (now - start_time >= warm_up_duration_ns) {
-            try signal_engine.run();
-            if (iter_count % 100 == 0) { // 5 sec
-                signal_engine.getSignalStats();
-            }
-        }
-        // if ((iter_count % 100 == 0) and (now - start_time >= warm_up_duration_ns)) {
-        //     //mutex.lock();
-        //     symbol_map.dump(aggregator.symbol_map);
-        //     //mutex.unlock();
-        // }
 
-        iter_count += 1;
+        if (now - start_time >= warm_up_duration_ns and !signal_engine_started) {
+            std.log.info("Warm-up complete, starting signal engine...", .{});
+            try signal_engine.run();
+            signal_engine_started = true;
+        }
+
         std.time.sleep(sleep_ns);
     }
 
