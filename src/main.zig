@@ -6,8 +6,6 @@ const std = @import("std");
 const types = @import("types.zig");
 const Symbol = types.Symbol;
 
-var should_stop: bool = false;
-
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -25,7 +23,6 @@ pub fn main() !void {
     }
 
     const smp_allocator = std.heap.smp_allocator;
-
     var aggregator = try DataAggregator.init(enable_metrics, smp_allocator);
     defer aggregator.deinit();
 
@@ -37,30 +34,18 @@ pub fn main() !void {
 
     std.debug.print("WebSockets flowing, starting continuous Signal Engine and Trading...\n", .{});
 
-    const sleep_ns = 50_000_000; // 50 ms
     const max_duration_ns = 180 * 60 * 1_000_000_000; // 180 min
     const warm_up_duration_ns = 5 * 60 * 1_000_000_000; // 5 min
-    const start_time = std.time.nanoTimestamp();
 
-    var signal_engine_started = false;
+    std.time.sleep(warm_up_duration_ns);
+    std.log.info("Warm-up complete, starting signal engine...", .{});
+    try signal_engine.run();
 
-    while (!should_stop) {
-        const now = std.time.nanoTimestamp();
+    const remaining_time = max_duration_ns - warm_up_duration_ns;
+    std.time.sleep(remaining_time);
 
-        if (now - start_time >= max_duration_ns) {
-            std.log.info("Reached 180-minute limit, stopping loop.", .{});
-            // TODO: SELL ALL TRADES
-            break;
-        }
-
-        if (now - start_time >= warm_up_duration_ns and !signal_engine_started) {
-            std.log.info("Warm-up complete, starting signal engine...", .{});
-            try signal_engine.run();
-            signal_engine_started = true;
-        }
-
-        std.time.sleep(sleep_ns);
-    }
+    std.log.info("Reached 180-minute limit, stopping...", .{});
+    // TODO: SELL ALL TRADES
 
     std.log.info("Stopping aggregator...", .{});
     try aggregator.stop();

@@ -43,19 +43,9 @@ pub const TradeHandler = struct {
         defer self.mutex.unlock();
         try self.signal_queue.append(signal);
         // if (signal.signal_type == .BUY) {
-        //     // try self.positions.put(signal.symbol_name, Position{
-        //     //     .symbol_name = signal.symbol_name,
-        //     //     .is_open = true,
-        //     //     .entry_rsi = signal.rsi_value,
-        //     //     .timestamp = signal.timestamp,
-        //     //     .signal_strength = signal.signal_strength,
-        //     // });
-        //     //std.log.info("SIGNAL QUEUED: {s} BUY - RSI: {d:.2}, Orderbook: {d:.2}%", .{ signal.symbol_name, signal.rsi_value, signal.orderbook_percentage });
+        //     std.log.info("SIGNAL QUEUED: {s} BUY - RSI: {d:.2}, Orderbook: {d:.2}%", .{ signal.symbol_name, signal.rsi_value, signal.orderbook_percentage });
         // } else if (signal.signal_type == .SELL) {
-        //     // if (self.positions.getPtr(signal.symbol_name)) |position| {
-        //     //     position.is_open = false;
-        //     // }
-        //     //std.log.info("SIGNAL QUEUED: {s} SELL - RSI: {d:.2}, Orderbook: {d:.2}%", .{ signal.symbol_name, signal.rsi_value, signal.orderbook_percentage });
+        //     std.log.info("SIGNAL QUEUED: {s} SELL - RSI: {d:.2}, Orderbook: {d:.2}%", .{ signal.symbol_name, signal.rsi_value, signal.orderbook_percentage });
         // }
     }
 

@@ -30,7 +30,7 @@ const TradingDecision = extern struct {
     signal_strength: f32,
 };
 
-// Work item for parallel processing
+// work item for parallel processing
 const ProcessingTask = struct {
     rsi_values: []f32,
     bid_percentages: []f32,
@@ -228,7 +228,7 @@ pub const SignalEngine = struct {
             _ = self.tasks_completed.fetchAdd(1, .seq_cst);
             _ = self.total_processing_time.fetchAdd(@as(u64, @intCast(end_time - start_time)), .seq_cst);
 
-            // Signal to the main processing thread that this task is complete
+            // signal to the main processing thread that this task is complete
             self.tasks_finished_sem.post();
         }
 
@@ -371,7 +371,7 @@ pub const SignalEngine = struct {
         self.task_condition.broadcast();
 
         // --- 3. Wait for All Tasks to Complete ---
-        // This is an efficient blocking wait, consuming no CPU.
+        // consuming no CPU.
         for (0..num_chunks) |_| {
             self.tasks_finished_sem.wait();
         }
@@ -386,9 +386,9 @@ pub const SignalEngine = struct {
             try self.trade_handler.addSignal(signal);
         }
 
-        if (collected_signals.items.len > 0) {
-            std.log.debug("Processed {} symbols, generated {} signals across {} chunks", .{ num_symbols, collected_signals.items.len, num_chunks });
-        }
+        // if (collected_signals.items.len > 0) {
+        //     std.log.debug("Processed {} symbols, generated {} signals across {} chunks", .{ num_symbols, collected_signals.items.len, num_chunks });
+        // }
     }
 
     fn processTaskChunk(_: *SignalEngine, task: ProcessingTask, out_signals: *std.ArrayList(TradingSignal)) !void {
