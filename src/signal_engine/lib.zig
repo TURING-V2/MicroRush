@@ -30,23 +30,76 @@ const TradingDecision = extern struct {
     signal_strength: f32,
 };
 
+// Work item for parallel processing
+const ProcessingTask = struct {
+    rsi_values: []f32,
+    bid_percentages: []f32,
+    ask_percentages: []f32,
+    spread_percentages: []f32,
+    has_positions: []bool,
+    decisions: []TradingDecision,
+    symbol_names: [][]const u8,
+    start_idx: usize,
+    end_idx: usize,
+    task_id: u32,
+};
+
+// Thread-safe signal queue
+const SignalQueue = struct {
+    signals: std.ArrayList(TradingSignal),
+    mutex: std.Thread.Mutex,
+
+    pub fn init(allocator: std.mem.Allocator) SignalQueue {
+        return SignalQueue{
+            .signals = std.ArrayList(TradingSignal).init(allocator),
+            .mutex = std.Thread.Mutex{},
+        };
+    }
+
+    pub fn deinit(self: *SignalQueue) void {
+        self.signals.deinit();
+    }
+
+    pub fn add(self: *SignalQueue, signal: TradingSignal) !void {
+        self.mutex.lock();
+        defer self.mutex.unlock();
+        try self.signals.append(signal);
+    }
+
+    pub fn drainAll(self: *SignalQueue, out_signals: *std.ArrayList(TradingSignal)) !void {
+        self.mutex.lock();
+        defer self.mutex.unlock();
+
+        try out_signals.appendSlice(self.signals.items);
+        self.signals.clearRetainingCapacity();
+    }
+};
+
 pub const SignalEngine = struct {
     allocator: std.mem.Allocator,
     symbol_map: *const SymbolMap,
     stat_calc: ?*StatCalc = null,
-
     trade_handler: TradeHandler,
 
-    // GPU batch processing
     processing_thread: ?std.Thread,
     batch_thread: ?std.Thread,
+    worker_threads: []std.Thread,
+    num_worker_threads: u32,
     should_stop: std.atomic.Value(bool),
     mutex: std.Thread.Mutex,
 
-    // Batch result queue for processing
     batch_result_queue: std.ArrayList(GPUBatchResult),
     batch_queue_mutex: std.Thread.Mutex,
     batch_condition: std.Thread.Condition,
+
+    task_queue: std.ArrayList(ProcessingTask),
+    task_queue_mutex: std.Thread.Mutex,
+    task_condition: std.Thread.Condition,
+
+    signal_queue: SignalQueue,
+
+    tasks_completed: std.atomic.Value(u64),
+    total_processing_time: std.atomic.Value(u64),
 
     pub fn init(allocator: std.mem.Allocator, symbol_map: *const SymbolMap) !SignalEngine {
         const device_id = try stat_calc_lib.selectBestCUDADevice();
@@ -57,6 +110,12 @@ pub const SignalEngine = struct {
 
         const trade_handler = TradeHandler.init(allocator, symbol_map);
 
+        // determine optimal number of worker threads (leave 2 cores for GPU/IO)
+        const cpu_count = std.Thread.getCpuCount() catch 8;
+        const num_workers = @max(2, cpu_count - 2);
+
+        const worker_threads = try allocator.alloc(std.Thread, num_workers);
+
         return SignalEngine{
             .allocator = allocator,
             .symbol_map = symbol_map,
@@ -64,17 +123,26 @@ pub const SignalEngine = struct {
             .trade_handler = trade_handler,
             .processing_thread = null,
             .batch_thread = null,
+            .worker_threads = worker_threads,
+            .num_worker_threads = @intCast(num_workers),
             .should_stop = std.atomic.Value(bool).init(false),
             .mutex = std.Thread.Mutex{},
             .batch_result_queue = std.ArrayList(GPUBatchResult).init(allocator),
             .batch_queue_mutex = std.Thread.Mutex{},
             .batch_condition = std.Thread.Condition{},
+            .task_queue = std.ArrayList(ProcessingTask).init(allocator),
+            .task_queue_mutex = std.Thread.Mutex{},
+            .task_condition = std.Thread.Condition{},
+            .signal_queue = SignalQueue.init(allocator),
+            .tasks_completed = std.atomic.Value(u64).init(0),
+            .total_processing_time = std.atomic.Value(u64).init(0),
         };
     }
 
     pub fn deinit(self: *SignalEngine) void {
         self.should_stop.store(true, .seq_cst);
         self.batch_condition.signal();
+        self.task_condition.broadcast();
 
         if (self.processing_thread) |thread| {
             thread.join();
@@ -83,15 +151,78 @@ pub const SignalEngine = struct {
             thread.join();
         }
 
+        for (self.worker_threads) |thread| {
+            thread.join();
+        }
+
         self.trade_handler.deinit();
         self.batch_result_queue.deinit();
-        self.stat_calc.?.deinit();
+        self.task_queue.deinit();
+        self.signal_queue.deinit();
+        self.allocator.free(self.worker_threads);
+
+        if (self.stat_calc) |stat_calc| {
+            stat_calc.deinit();
+            self.allocator.destroy(stat_calc);
+        }
+
+        // Print performance stats
+        const completed = self.tasks_completed.load(.seq_cst);
+        const total_time = self.total_processing_time.load(.seq_cst);
+        if (completed > 0) {
+            const avg_time = total_time / completed;
+            std.log.info("Performance: {} tasks completed, avg time: {}ns", .{ completed, avg_time });
+        }
     }
 
     pub fn run(self: *SignalEngine) !void {
+        try self.startWorkerThreads();
         try self.startProcessingThread();
         try self.trade_handler.start();
         try self.startBatchThread();
+    }
+
+    fn startWorkerThreads(self: *SignalEngine) !void {
+        for (0..self.num_worker_threads) |i| {
+            self.worker_threads[i] = try std.Thread.spawn(.{}, workerThreadFunction, .{ self, i });
+        }
+        std.log.info("Started {} worker threads", .{self.num_worker_threads});
+    }
+
+    fn workerThreadFunction(self: *SignalEngine, worker_id: usize) void {
+        std.log.info("Worker thread {} started", .{worker_id});
+
+        while (!self.should_stop.load(.seq_cst)) {
+            self.task_queue_mutex.lock();
+
+            while (self.task_queue.items.len == 0 and !self.should_stop.load(.seq_cst)) {
+                self.task_condition.wait(&self.task_queue_mutex);
+            }
+
+            if (self.should_stop.load(.seq_cst)) {
+                self.task_queue_mutex.unlock();
+                break;
+            }
+
+            var task: ?ProcessingTask = null;
+            if (self.task_queue.items.len > 0) {
+                task = self.task_queue.orderedRemove(0);
+            }
+            self.task_queue_mutex.unlock();
+
+            if (task) |t| {
+                const start_time = std.time.nanoTimestamp();
+                self.processTaskChunk(t) catch |err| {
+                    std.log.err("Worker {} error processing task {}: {}", .{ worker_id, t.task_id, err });
+                };
+                const end_time = std.time.nanoTimestamp();
+
+                _ = self.tasks_completed.fetchAdd(1, .seq_cst);
+                _ = self.total_processing_time.fetchAdd(@intCast(end_time - start_time), .seq_cst);
+            }
+        }
+
+        std.log.info("Worker thread {} stopped", .{worker_id});
     }
 
     pub fn startBatchThread(self: *SignalEngine) !void {
@@ -115,7 +246,7 @@ pub const SignalEngine = struct {
             self.batch_queue_mutex.unlock();
 
             self.batch_condition.signal();
-            std.time.sleep(1_000_000); // 1ms
+            std.time.sleep(500_000); // 0.5ms - more aggressive for HFT
         }
 
         std.log.info("Batch processing thread stopped", .{});
@@ -137,12 +268,15 @@ pub const SignalEngine = struct {
                 self.batch_queue_mutex.unlock();
                 break;
             }
+
             while (self.batch_result_queue.items.len > 0) {
                 var batch_result = self.batch_result_queue.orderedRemove(0);
                 self.batch_queue_mutex.unlock();
-                self.processSignals(&batch_result.rsi, &batch_result.orderbook) catch |err| {
+
+                self.processSignalsParallel(&batch_result.rsi, &batch_result.orderbook) catch |err| {
                     std.log.err("Error processing signals: {}", .{err});
                 };
+
                 self.batch_queue_mutex.lock();
             }
             self.batch_queue_mutex.unlock();
@@ -151,32 +285,32 @@ pub const SignalEngine = struct {
         std.log.info("Signal processing thread stopped", .{});
     }
 
-    // ZIG SIMD bitwise ops is still in works
-    fn processSignals(self: *SignalEngine, rsi_results: *GPURSIResultBatch, orderbook_results: *GPUOrderBookResultBatch) !void {
+    fn processSignalsParallel(self: *SignalEngine, rsi_results: *GPURSIResultBatch, orderbook_results: *GPUOrderBookResultBatch) !void {
         const num_symbols = @min(self.symbol_map.count(), MAX_SYMBOLS);
         if (num_symbols == 0) return;
 
-        var current_rsi_values = try self.allocator.alloc(f32, num_symbols);
+        const current_rsi_values = try self.allocator.alloc(f32, num_symbols);
         defer self.allocator.free(current_rsi_values);
 
-        var bid_percentages = try self.allocator.alloc(f32, num_symbols);
+        const bid_percentages = try self.allocator.alloc(f32, num_symbols);
         defer self.allocator.free(bid_percentages);
 
-        var ask_percentages = try self.allocator.alloc(f32, num_symbols);
+        const ask_percentages = try self.allocator.alloc(f32, num_symbols);
         defer self.allocator.free(ask_percentages);
 
-        var spread_percentages = try self.allocator.alloc(f32, num_symbols);
+        const spread_percentages = try self.allocator.alloc(f32, num_symbols);
         defer self.allocator.free(spread_percentages);
 
-        var has_positions = try self.allocator.alloc(bool, num_symbols);
+        const has_positions = try self.allocator.alloc(bool, num_symbols);
         defer self.allocator.free(has_positions);
 
         const decisions = try self.allocator.alloc(TradingDecision, num_symbols);
         defer self.allocator.free(decisions);
 
-        var symbol_names = try self.allocator.alloc([]const u8, num_symbols);
+        const symbol_names = try self.allocator.alloc([]const u8, num_symbols);
         defer self.allocator.free(symbol_names);
 
+        // populate data (single-threaded for data consistency)
         var symbol_idx: usize = 0;
         self.mutex.lock();
         var iterator = self.symbol_map.iterator();
@@ -194,46 +328,117 @@ pub const SignalEngine = struct {
             bid_percentages[symbol_idx] = orderbook_results.bid_percentage[symbol_idx];
             ask_percentages[symbol_idx] = orderbook_results.ask_percentage[symbol_idx];
             spread_percentages[symbol_idx] = orderbook_results.spread_percentage[symbol_idx];
-
             has_positions[symbol_idx] = self.trade_handler.hasOpenPosition(symbol_names[symbol_idx]);
 
             symbol_idx += 1;
         }
         self.mutex.unlock();
 
-        analyze_trading_signals_simd(
-            current_rsi_values.ptr,
-            bid_percentages.ptr,
-            ask_percentages.ptr,
-            spread_percentages.ptr,
-            has_positions.ptr,
-            @intCast(num_symbols),
-            decisions.ptr,
-        );
+        // each chunk should be multiple of 8 for SIMD efficiency
+        const min_chunk_size = 64; // min symbols per thread
+        const simd_alignment = 8;
 
-        for (0..num_symbols) |i| {
-            const decision = decisions[i];
-            if (!decision.spread_valid) continue;
-            const symbol_name = symbol_names[i];
-            const rsi_value = current_rsi_values[i];
-            if (decision.should_generate_buy) {
-                try self.generateSignal(symbol_name, .BUY, rsi_value, bid_percentages[i], decision.signal_strength);
-            }
-            if (decision.should_generate_sell) {
-                try self.generateSignal(symbol_name, .SELL, rsi_value, ask_percentages[i], decision.signal_strength);
-            }
+        var chunk_size = @max(min_chunk_size, (num_symbols + self.num_worker_threads - 1) / self.num_worker_threads);
+        chunk_size = ((chunk_size + simd_alignment - 1) / simd_alignment) * simd_alignment;
+
+        const num_chunks = (num_symbols + chunk_size - 1) / chunk_size;
+
+        self.task_queue_mutex.lock();
+        defer self.task_queue_mutex.unlock();
+
+        for (0..num_chunks) |chunk_idx| {
+            const start_idx = chunk_idx * chunk_size;
+            const end_idx = @min(start_idx + chunk_size, num_symbols);
+
+            if (start_idx >= end_idx) break;
+
+            const task = ProcessingTask{
+                .rsi_values = current_rsi_values,
+                .bid_percentages = bid_percentages,
+                .ask_percentages = ask_percentages,
+                .spread_percentages = spread_percentages,
+                .has_positions = has_positions,
+                .decisions = decisions,
+                .symbol_names = symbol_names,
+                .start_idx = start_idx,
+                .end_idx = end_idx,
+                .task_id = @intCast(chunk_idx),
+            };
+
+            try self.task_queue.append(task);
+        }
+
+        // waky waky
+        self.task_condition.broadcast();
+
+        while (true) {
+            self.task_queue_mutex.lock();
+            const queue_empty = self.task_queue.items.len == 0;
+            self.task_queue_mutex.unlock();
+
+            if (queue_empty) break;
+            std.time.sleep(100_000); // 0.1ms
+        }
+
+        var collected_signals = std.ArrayList(TradingSignal).init(self.allocator);
+        defer collected_signals.deinit();
+
+        try self.signal_queue.drainAll(&collected_signals);
+
+        for (collected_signals.items) |signal| {
+            try self.trade_handler.addSignal(signal);
+        }
+
+        if (collected_signals.items.len > 0) {
+            std.log.debug("Processed {} symbols, generated {} signals across {} chunks", .{ num_symbols, collected_signals.items.len, num_chunks });
         }
     }
 
-    fn generateSignal(self: *SignalEngine, symbol_name: []const u8, signal_type: SignalType, rsi_value: f32, orderbook_percentage: f32, signal_strength: f32) !void {
-        const signal = TradingSignal{
-            .symbol_name = symbol_name,
-            .signal_type = signal_type,
-            .rsi_value = rsi_value,
-            .orderbook_percentage = orderbook_percentage,
-            .timestamp = @intCast(std.time.nanoTimestamp()),
-            .signal_strength = signal_strength,
-        };
-        try self.trade_handler.addSignal(signal);
+    fn processTaskChunk(self: *SignalEngine, task: ProcessingTask) !void {
+        const chunk_len = task.end_idx - task.start_idx;
+
+        // call SIMD function on this chunk
+        analyze_trading_signals_simd(
+            task.rsi_values[task.start_idx..].ptr,
+            task.bid_percentages[task.start_idx..].ptr,
+            task.ask_percentages[task.start_idx..].ptr,
+            task.spread_percentages[task.start_idx..].ptr,
+            task.has_positions[task.start_idx..].ptr,
+            @intCast(chunk_len),
+            task.decisions[task.start_idx..].ptr,
+        );
+
+        // process results and generate signals
+        for (task.start_idx..task.end_idx) |i| {
+            const decision = task.decisions[i];
+            if (!decision.spread_valid) continue;
+
+            const symbol_name = task.symbol_names[i];
+            const rsi_value = task.rsi_values[i];
+
+            if (decision.should_generate_buy) {
+                const signal = TradingSignal{
+                    .symbol_name = symbol_name,
+                    .signal_type = .BUY,
+                    .rsi_value = rsi_value,
+                    .orderbook_percentage = task.bid_percentages[i],
+                    .timestamp = @intCast(std.time.nanoTimestamp()),
+                    .signal_strength = decision.signal_strength,
+                };
+                try self.signal_queue.add(signal);
+            }
+
+            if (decision.should_generate_sell) {
+                const signal = TradingSignal{
+                    .symbol_name = symbol_name,
+                    .signal_type = .SELL,
+                    .rsi_value = rsi_value,
+                    .orderbook_percentage = task.ask_percentages[i],
+                    .timestamp = @intCast(std.time.nanoTimestamp()),
+                    .signal_strength = decision.signal_strength,
+                };
+                try self.signal_queue.add(signal);
+            }
+        }
     }
 };
