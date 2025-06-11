@@ -183,7 +183,7 @@ pub const SignalEngine = struct {
 
     fn startWorkerThreads(self: *SignalEngine) !void {
         for (0..self.num_worker_threads) |i| {
-            self.worker_threads[i] = try std.Thread.spawn(.{}, workerThreadFunction, .{ self, i });
+            self.worker_threads[i] = try std.Thread.spawn(.{ .allocator = self.allocator }, workerThreadFunction, .{ self, i });
         }
         std.log.info("Started {} worker threads", .{self.num_worker_threads});
     }
@@ -225,7 +225,7 @@ pub const SignalEngine = struct {
     }
 
     pub fn startBatchThread(self: *SignalEngine) !void {
-        self.batch_thread = try std.Thread.spawn(.{}, batchThreadFunction, .{self});
+        self.batch_thread = try std.Thread.spawn(.{ .allocator = self.allocator }, batchThreadFunction, .{self});
     }
 
     fn batchThreadFunction(self: *SignalEngine) void {
@@ -252,7 +252,7 @@ pub const SignalEngine = struct {
     }
 
     pub fn startProcessingThread(self: *SignalEngine) !void {
-        self.processing_thread = try std.Thread.spawn(.{}, processingThreadFunction, .{self});
+        self.processing_thread = try std.Thread.spawn(.{ .allocator = self.allocator }, processingThreadFunction, .{self});
     }
 
     fn processingThreadFunction(self: *SignalEngine) void {
