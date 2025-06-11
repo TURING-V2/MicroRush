@@ -1,7 +1,7 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-#define MAX_SYMBOLS_CUDA 402
+#define MAX_SYMBOLS_CUDA 403
 #define MAX_ORDERBOOK_SIZE 5
 
 typedef struct {

@@ -111,7 +111,7 @@ pub const SignalEngine = struct {
         const trade_handler = TradeHandler.init(allocator, symbol_map);
 
         // determine optimal number of worker threads (leave 2 cores for GPU/IO)
-        const cpu_count = std.Thread.getCpuCount() catch 8;
+        const cpu_count = (std.Thread.getCpuCount() catch 8) / 2; // hyperthreading 16 on amd64 aarch64 wont
         const num_workers = @max(2, cpu_count - 2);
 
         const worker_threads = try allocator.alloc(std.Thread, num_workers);
@@ -166,7 +166,6 @@ pub const SignalEngine = struct {
             self.allocator.destroy(stat_calc);
         }
 
-        // Print performance stats
         const completed = self.tasks_completed.load(.seq_cst);
         const total_time = self.total_processing_time.load(.seq_cst);
         if (completed > 0) {

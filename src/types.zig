@@ -27,7 +27,7 @@ pub const Position = struct {
 };
 
 //////////////////////////////////////////////////////////
-pub const MAX_SYMBOLS_CUDA = 402;
+pub const MAX_SYMBOLS_CUDA = 403;
 pub const MAX_SYMBOLS = MAX_SYMBOLS_CUDA;
 pub const MAX_RSI_VALUES_PER_SYMBOL = 15;
 
