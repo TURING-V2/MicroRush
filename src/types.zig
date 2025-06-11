@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub const MAX_ORDERBOOK_SIZE = 10;
+pub const MAX_ORDERBOOK_SIZE = 5;
 
 //////////////////////////////////////////////////////////
 pub const SignalType = enum {

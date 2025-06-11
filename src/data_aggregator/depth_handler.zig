@@ -11,7 +11,7 @@ const OrderBook = @import("../types.zig").OrderBook;
 const DepthError = @import("../errors.zig").DepthError;
 const metrics = @import("../metrics.zig");
 
-const DEPTH_API = "https://api.binance.com/api/v3/depth?symbol={s}&limit=5";
+const DEPTH_API = "https://api.binance.com/api/v3/depth?symbol={s}&limit={d}";
 
 const DepthEvent = struct {
     // event type
@@ -229,7 +229,7 @@ pub const DepthHandler = struct {
     fn getDepthSnapshot(self: *DepthHandler, symbol: []const u8) !DepthSnapshot {
         const symbol_upper = try std.ascii.allocUpperString(self.allocator, symbol);
         defer self.allocator.free(symbol_upper);
-        const url = try std.fmt.allocPrint(self.allocator, DEPTH_API, .{symbol});
+        const url = try std.fmt.allocPrint(self.allocator, DEPTH_API, .{ symbol, types.MAX_ORDERBOOK_SIZE });
         defer self.allocator.free(url);
 
         const uri = try std.Uri.parse(url);

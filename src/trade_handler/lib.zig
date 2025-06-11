@@ -31,7 +31,7 @@ pub const TradeHandler = struct {
             .mutex = std.Thread.Mutex{},
             .portfolio_manager = PortfolioManager.init(allocator, symbol_map),
             .recent_signals = std.ArrayList(RecentSignal).init(allocator),
-            .signal_cooldown_ns = 50_000_000, // 50 ms
+            .signal_cooldown_ns = 1_000_000_000, // 1 second
         };
     }
 
@@ -80,12 +80,12 @@ pub const TradeHandler = struct {
         self.mutex.lock();
         defer self.mutex.unlock();
 
-        self.cleanupRecentSignals();
+        //self.cleanupRecentSignals();
 
-        if (self.isDuplicateSignal(signal)) {
-            std.log.debug("DUPLICATE SIGNAL IGNORED: {s} {s}", .{ signal.symbol_name, @tagName(signal.signal_type) });
-            return;
-        }
+        // if (self.isDuplicateSignal(signal)) {
+        //     std.log.debug("DUPLICATE SIGNAL IGNORED: {s} {s}", .{ signal.symbol_name, @tagName(signal.signal_type) });
+        //     return;
+        // }
 
         switch (signal.signal_type) {
             .BUY => {
@@ -111,12 +111,12 @@ pub const TradeHandler = struct {
             .timestamp = signal.timestamp,
         });
 
-        std.log.debug("SIGNAL QUEUED: {s} {s} - RSI: {d:.2}, Strength: {d:.2}", .{ signal.symbol_name, @tagName(signal.signal_type), signal.rsi_value, signal.signal_strength });
+        //std.log.debug("SIGNAL QUEUED: {s} {s} - RSI: {d:.2}, Strength: {d:.2}", .{ signal.symbol_name, @tagName(signal.signal_type), signal.rsi_value, signal.signal_strength });
     }
 
     pub fn hasOpenPosition(self: *TradeHandler, symbol_name: []const u8) bool {
-        self.mutex.lock();
-        defer self.mutex.unlock();
+        // self.mutex.lock();
+        // defer self.mutex.unlock();
         if (self.portfolio_manager.positions.get(symbol_name)) |position| {
             return position.is_open;
         }
