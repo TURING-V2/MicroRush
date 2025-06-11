@@ -22,14 +22,12 @@ extern fn analyze_trading_signals_simd(
     decisions: [*]TradingDecision,
 ) void;
 
-extern fn check_bid_percentages_simd(bid_percentages: [*]f32, len: c_int, strong_bids: [*]bool) void;
-extern fn check_spread_validity_simd(spread_percentages: [*]f32, len: c_int, valid_spreads: [*]bool) void;
-
 const TradingDecision = extern struct {
     should_generate_buy: bool,
     should_generate_sell: bool,
     has_open_position: bool,
     spread_valid: bool,
+    signal_strength: f32,
 };
 
 pub const SignalEngine = struct {
@@ -219,21 +217,22 @@ pub const SignalEngine = struct {
             const symbol_name = symbol_names[i];
             const rsi_value = current_rsi_values[i];
             if (decision.should_generate_buy) {
-                try self.generateSignal(symbol_name, .BUY, rsi_value, bid_percentages[i]);
+                try self.generateSignal(symbol_name, .BUY, rsi_value, bid_percentages[i], decision.signal_strength);
             }
             if (decision.should_generate_sell) {
-                try self.generateSignal(symbol_name, .SELL, rsi_value, ask_percentages[i]);
+                try self.generateSignal(symbol_name, .SELL, rsi_value, ask_percentages[i], decision.signal_strength);
             }
         }
     }
 
-    fn generateSignal(self: *SignalEngine, symbol_name: []const u8, signal_type: SignalType, rsi_value: f32, orderbook_percentage: f32) !void {
+    fn generateSignal(self: *SignalEngine, symbol_name: []const u8, signal_type: SignalType, rsi_value: f32, orderbook_percentage: f32, signal_strength: f32) !void {
         const signal = TradingSignal{
             .symbol_name = symbol_name,
             .signal_type = signal_type,
             .rsi_value = rsi_value,
             .orderbook_percentage = orderbook_percentage,
             .timestamp = @intCast(std.time.nanoTimestamp()),
+            .signal_strength = signal_strength,
         };
         try self.trade_handler.addSignal(signal);
     }

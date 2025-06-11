@@ -15,6 +15,7 @@ pub const TradingSignal = struct {
     rsi_value: f32,
     orderbook_percentage: f32,
     timestamp: i64,
+    signal_strength: f32,
 };
 
 pub const Position = struct {
@@ -22,6 +23,7 @@ pub const Position = struct {
     is_open: bool,
     entry_rsi: f32,
     timestamp: i64,
+    signal_strength: f32,
 };
 
 //////////////////////////////////////////////////////////
