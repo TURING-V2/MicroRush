@@ -44,7 +44,7 @@ const ProcessingTask = struct {
     task_id: u32,
 };
 
-// Thread-safe signal queue
+// thread-safe signal queue with batched appends to reduce lock contention
 const SignalQueue = struct {
     signals: std.ArrayList(TradingSignal),
     mutex: std.Thread.Mutex,
@@ -60,10 +60,12 @@ const SignalQueue = struct {
         self.signals.deinit();
     }
 
-    pub fn add(self: *SignalQueue, signal: TradingSignal) !void {
+    // add a whole slice of signals under a single lock
+    pub fn addSlice(self: *SignalQueue, new_signals: []const TradingSignal) !void {
+        if (new_signals.len == 0) return;
         self.mutex.lock();
         defer self.mutex.unlock();
-        try self.signals.append(signal);
+        try self.signals.appendSlice(new_signals);
     }
 
     pub fn drainAll(self: *SignalQueue, out_signals: *std.ArrayList(TradingSignal)) !void {
@@ -95,6 +97,7 @@ pub const SignalEngine = struct {
     task_queue: std.ArrayList(ProcessingTask),
     task_queue_mutex: std.Thread.Mutex,
     task_condition: std.Thread.Condition,
+    tasks_finished_sem: std.Thread.Semaphore,
 
     signal_queue: SignalQueue,
 
@@ -110,8 +113,7 @@ pub const SignalEngine = struct {
 
         const trade_handler = TradeHandler.init(allocator, symbol_map);
 
-        // determine optimal number of worker threads (leave 2 cores for GPU/IO)
-        const cpu_count = (std.Thread.getCpuCount() catch 8) / 2; // hyperthreading 16 on amd64 aarch64 wont
+        const cpu_count = (std.Thread.getCpuCount() catch 8) / 2; // hyper threading cores wont count
         const num_workers = @max(2, cpu_count - 2);
 
         const worker_threads = try allocator.alloc(std.Thread, num_workers);
@@ -133,6 +135,7 @@ pub const SignalEngine = struct {
             .task_queue = std.ArrayList(ProcessingTask).init(allocator),
             .task_queue_mutex = std.Thread.Mutex{},
             .task_condition = std.Thread.Condition{},
+            .tasks_finished_sem = std.Thread.Semaphore{},
             .signal_queue = SignalQueue.init(allocator),
             .tasks_completed = std.atomic.Value(u64).init(0),
             .total_processing_time = std.atomic.Value(u64).init(0),
@@ -169,8 +172,8 @@ pub const SignalEngine = struct {
         const completed = self.tasks_completed.load(.seq_cst);
         const total_time = self.total_processing_time.load(.seq_cst);
         if (completed > 0) {
-            const avg_time = total_time / completed;
-            std.log.info("Performance: {} tasks completed, avg time: {}ns", .{ completed, avg_time });
+            const avg_time_ns = total_time / completed;
+            std.log.info("Performance: {} tasks completed, avg time: {d:.3}us", .{ completed, @as(f64, @floatFromInt(avg_time_ns)) / 1000.0 });
         }
     }
 
@@ -188,8 +191,11 @@ pub const SignalEngine = struct {
         std.log.info("Started {} worker threads", .{self.num_worker_threads});
     }
 
-    fn workerThreadFunction(self: *SignalEngine, worker_id: usize) void {
+    fn workerThreadFunction(self: *SignalEngine, worker_id: usize) !void {
         std.log.info("Worker thread {} started", .{worker_id});
+
+        var local_signals = std.ArrayList(TradingSignal).init(self.allocator);
+        defer local_signals.deinit();
 
         while (!self.should_stop.load(.seq_cst)) {
             self.task_queue_mutex.lock();
@@ -203,22 +209,27 @@ pub const SignalEngine = struct {
                 break;
             }
 
-            var task: ?ProcessingTask = null;
-            if (self.task_queue.items.len > 0) {
-                task = self.task_queue.orderedRemove(0);
-            }
+            const task = self.task_queue.orderedRemove(0);
             self.task_queue_mutex.unlock();
 
-            if (task) |t| {
-                const start_time = std.time.nanoTimestamp();
-                self.processTaskChunk(t) catch |err| {
-                    std.log.err("Worker {} error processing task {}: {}", .{ worker_id, t.task_id, err });
-                };
-                const end_time = std.time.nanoTimestamp();
+            const start_time = std.time.nanoTimestamp();
+            local_signals.clearRetainingCapacity();
 
-                _ = self.tasks_completed.fetchAdd(1, .seq_cst);
-                _ = self.total_processing_time.fetchAdd(@intCast(end_time - start_time), .seq_cst);
-            }
+            self.processTaskChunk(task, &local_signals) catch |err| {
+                std.log.err("Worker {} error processing task {}: {}", .{ worker_id, task.task_id, err });
+            };
+
+            // add all collected signals to the shared queue in one atomic operation
+            self.signal_queue.addSlice(local_signals.items) catch |err| {
+                std.log.err("Worker {} failed to add signals to queue: {}", .{ worker_id, err });
+            };
+
+            const end_time = std.time.nanoTimestamp();
+            _ = self.tasks_completed.fetchAdd(1, .seq_cst);
+            _ = self.total_processing_time.fetchAdd(@as(u64, @intCast(end_time - start_time)), .seq_cst);
+
+            // Signal to the main processing thread that this task is complete
+            self.tasks_finished_sem.post();
         }
 
         std.log.info("Worker thread {} stopped", .{worker_id});
@@ -234,7 +245,7 @@ pub const SignalEngine = struct {
         while (!self.should_stop.load(.seq_cst)) {
             const batch_results = self.stat_calc.?.calculateSymbolMapBatch(self.symbol_map, 6) catch |err| {
                 std.log.err("Error calculating batch: {}", .{err});
-                std.time.sleep(1_000_000_000);
+                std.time.sleep(1_000_000_000); // 1s
                 continue;
             };
 
@@ -245,7 +256,7 @@ pub const SignalEngine = struct {
             self.batch_queue_mutex.unlock();
 
             self.batch_condition.signal();
-            std.time.sleep(500_000); // 0.5ms - more aggressive for HFT
+            std.time.sleep(500_000); // 0.5ms
         }
 
         std.log.info("Batch processing thread stopped", .{});
@@ -268,17 +279,12 @@ pub const SignalEngine = struct {
                 break;
             }
 
-            while (self.batch_result_queue.items.len > 0) {
-                var batch_result = self.batch_result_queue.orderedRemove(0);
-                self.batch_queue_mutex.unlock();
-
-                self.processSignalsParallel(&batch_result.rsi, &batch_result.orderbook) catch |err| {
-                    std.log.err("Error processing signals: {}", .{err});
-                };
-
-                self.batch_queue_mutex.lock();
-            }
+            var batch_result = self.batch_result_queue.orderedRemove(0);
             self.batch_queue_mutex.unlock();
+
+            self.processSignalsParallel(&batch_result.rsi, &batch_result.orderbook) catch |err| {
+                std.log.err("Error processing signals: {}", .{err});
+            };
         }
 
         std.log.info("Signal processing thread stopped", .{});
@@ -288,6 +294,7 @@ pub const SignalEngine = struct {
         const num_symbols = @min(self.symbol_map.count(), MAX_SYMBOLS);
         if (num_symbols == 0) return;
 
+        // --- 1. Prepare Data ---
         const current_rsi_values = try self.allocator.alloc(f32, num_symbols);
         defer self.allocator.free(current_rsi_values);
 
@@ -309,76 +316,67 @@ pub const SignalEngine = struct {
         const symbol_names = try self.allocator.alloc([]const u8, num_symbols);
         defer self.allocator.free(symbol_names);
 
-        // populate data (single-threaded for data consistency)
-        var symbol_idx: usize = 0;
+        // brief lock is to ensure a consistent snapshot of the symbol map and positions.
         self.mutex.lock();
+        var symbol_idx: usize = 0;
         var iterator = self.symbol_map.iterator();
         while (iterator.next()) |entry| {
             if (symbol_idx >= num_symbols) break;
             symbol_names[symbol_idx] = entry.key_ptr.*;
 
-            const valid_count = @max(0, rsi_results.valid_rsi_count[symbol_idx]);
-            if (valid_count > 0) {
-                current_rsi_values[symbol_idx] = rsi_results.rsi_values[symbol_idx][@intCast(valid_count - 1)];
-            } else {
-                current_rsi_values[symbol_idx] = -1.0;
-            }
+            const valid_count = rsi_results.valid_rsi_count[symbol_idx];
+            current_rsi_values[symbol_idx] = if (valid_count > 0)
+                rsi_results.rsi_values[symbol_idx][@intCast(valid_count - 1)]
+            else
+                -1.0;
 
             bid_percentages[symbol_idx] = orderbook_results.bid_percentage[symbol_idx];
             ask_percentages[symbol_idx] = orderbook_results.ask_percentage[symbol_idx];
             spread_percentages[symbol_idx] = orderbook_results.spread_percentage[symbol_idx];
             has_positions[symbol_idx] = self.trade_handler.hasOpenPosition(symbol_names[symbol_idx]);
-
             symbol_idx += 1;
         }
         self.mutex.unlock();
 
-        // each chunk should be multiple of 8 for SIMD efficiency
-        const min_chunk_size = 64; // min symbols per thread
+        // --- 2. Create and Dispatch Tasks ---
+        const min_chunk_size = 64;
         const simd_alignment = 8;
-
         var chunk_size = @max(min_chunk_size, (num_symbols + self.num_worker_threads - 1) / self.num_worker_threads);
         chunk_size = ((chunk_size + simd_alignment - 1) / simd_alignment) * simd_alignment;
-
         const num_chunks = (num_symbols + chunk_size - 1) / chunk_size;
+        if (num_chunks == 0) return;
 
-        self.task_queue_mutex.lock();
-        defer self.task_queue_mutex.unlock();
+        {
+            self.task_queue_mutex.lock();
+            defer self.task_queue_mutex.unlock();
+            for (0..num_chunks) |chunk_idx| {
+                const start_idx = chunk_idx * chunk_size;
+                const end_idx = @min(start_idx + chunk_size, num_symbols);
+                if (start_idx >= end_idx) continue;
 
-        for (0..num_chunks) |chunk_idx| {
-            const start_idx = chunk_idx * chunk_size;
-            const end_idx = @min(start_idx + chunk_size, num_symbols);
-
-            if (start_idx >= end_idx) break;
-
-            const task = ProcessingTask{
-                .rsi_values = current_rsi_values,
-                .bid_percentages = bid_percentages,
-                .ask_percentages = ask_percentages,
-                .spread_percentages = spread_percentages,
-                .has_positions = has_positions,
-                .decisions = decisions,
-                .symbol_names = symbol_names,
-                .start_idx = start_idx,
-                .end_idx = end_idx,
-                .task_id = @intCast(chunk_idx),
-            };
-
-            try self.task_queue.append(task);
+                try self.task_queue.append(ProcessingTask{
+                    .rsi_values = current_rsi_values,
+                    .bid_percentages = bid_percentages,
+                    .ask_percentages = ask_percentages,
+                    .spread_percentages = spread_percentages,
+                    .has_positions = has_positions,
+                    .decisions = decisions,
+                    .symbol_names = symbol_names,
+                    .start_idx = start_idx,
+                    .end_idx = end_idx,
+                    .task_id = @intCast(chunk_idx),
+                });
+            }
         }
-
-        // waky waky
         self.task_condition.broadcast();
 
-        while (true) {
-            self.task_queue_mutex.lock();
-            const queue_empty = self.task_queue.items.len == 0;
-            self.task_queue_mutex.unlock();
-
-            if (queue_empty) break;
-            std.time.sleep(100_000); // 0.1ms
+        // --- 3. Wait for All Tasks to Complete ---
+        // This is an efficient blocking wait, consuming no CPU.
+        for (0..num_chunks) |_| {
+            self.tasks_finished_sem.wait();
         }
 
+        // --- 4. Collect and Process Results ---
         var collected_signals = std.ArrayList(TradingSignal).init(self.allocator);
         defer collected_signals.deinit();
 
@@ -393,10 +391,9 @@ pub const SignalEngine = struct {
         }
     }
 
-    fn processTaskChunk(self: *SignalEngine, task: ProcessingTask) !void {
+    fn processTaskChunk(_: *SignalEngine, task: ProcessingTask, out_signals: *std.ArrayList(TradingSignal)) !void {
         const chunk_len = task.end_idx - task.start_idx;
 
-        // call SIMD function on this chunk
         analyze_trading_signals_simd(
             task.rsi_values[task.start_idx..].ptr,
             task.bid_percentages[task.start_idx..].ptr,
@@ -407,7 +404,6 @@ pub const SignalEngine = struct {
             task.decisions[task.start_idx..].ptr,
         );
 
-        // process results and generate signals
         for (task.start_idx..task.end_idx) |i| {
             const decision = task.decisions[i];
             if (!decision.spread_valid) continue;
@@ -416,27 +412,25 @@ pub const SignalEngine = struct {
             const rsi_value = task.rsi_values[i];
 
             if (decision.should_generate_buy) {
-                const signal = TradingSignal{
+                try out_signals.append(.{
                     .symbol_name = symbol_name,
                     .signal_type = .BUY,
                     .rsi_value = rsi_value,
                     .orderbook_percentage = task.bid_percentages[i],
-                    .timestamp = @intCast(std.time.nanoTimestamp()),
+                    .timestamp = @as(i64, @intCast(std.time.nanoTimestamp())),
                     .signal_strength = decision.signal_strength,
-                };
-                try self.signal_queue.add(signal);
+                });
             }
 
             if (decision.should_generate_sell) {
-                const signal = TradingSignal{
+                try out_signals.append(.{
                     .symbol_name = symbol_name,
                     .signal_type = .SELL,
                     .rsi_value = rsi_value,
                     .orderbook_percentage = task.ask_percentages[i],
-                    .timestamp = @intCast(std.time.nanoTimestamp()),
+                    .timestamp = @as(i64, @intCast(std.time.nanoTimestamp())),
                     .signal_strength = decision.signal_strength,
-                };
-                try self.signal_queue.add(signal);
+                });
             }
         }
     }
