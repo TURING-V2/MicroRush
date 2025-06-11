@@ -42,6 +42,11 @@ pub const DataAggregator = struct {
     }
 
     pub fn deinit(self: *DataAggregator) void {
+        std.debug.print("WebSocket listener stopped\n", .{});
+        self.binance.ws_client.stopListener() catch |err| {
+            std.debug.print("Error stopping WebSocket listener: {}\n", .{err});
+        };
+
         self.symbol_map.deinit();
         self.allocator.destroy(self.symbol_map);
 
@@ -69,10 +74,5 @@ pub const DataAggregator = struct {
     pub fn run(self: *DataAggregator) !void {
         try self.binance.ws_client.startListener(self.symbol_map);
         std.debug.print("WebSocket listener started\n", .{});
-    }
-
-    pub fn stop(self: *DataAggregator) !void {
-        try self.binance.ws_client.stopListener();
-        std.debug.print("WebSocket listener stopped\n", .{});
     }
 };

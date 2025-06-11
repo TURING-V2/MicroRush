@@ -46,7 +46,4 @@ pub fn main() !void {
 
     std.log.info("Reached 180-minute limit, stopping...", .{});
     // TODO: SELL ALL TRADES
-
-    std.log.info("Stopping aggregator...", .{});
-    try aggregator.stop();
 }
