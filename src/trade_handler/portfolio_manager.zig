@@ -66,12 +66,11 @@ pub const PortfolioManager = struct {
 
     mutex: std.Thread.Mutex,
 
-
     last_balance_log: i128,
     balance_log_interval: i128,
 
     pub fn init(allocator: std.mem.Allocator, sym_map: *const SymbolMap) PortfolioManager {
-        const initial_balance = 1000.0; // Increased for better HFT testing
+        const initial_balance = 1000.0;
         const base_size = initial_balance / 20.0; // 5% base position
 
         return PortfolioManager{
@@ -79,7 +78,7 @@ pub const PortfolioManager = struct {
             .symbol_map = sym_map,
             .initial_balance = initial_balance,
             .current_balance = initial_balance,
-            .max_positions = 15, // Increased for HFT
+            .max_positions = 15,
 
             // Dynamic sizing parameters
             .base_position_size_usdt = base_size,
@@ -95,7 +94,7 @@ pub const PortfolioManager = struct {
             .total_trades = 0,
             .winning_trades = 0,
 
-            // Signal strength tracking
+            // signal strength tracking
             .strong_signal_trades = 0,
             .strong_signal_wins = 0,
             .normal_signal_trades = 0,
@@ -123,7 +122,7 @@ pub const PortfolioManager = struct {
         position_size = @max(self.min_position_size_usdt, position_size);
         position_size = @min(self.max_position_size_usdt, position_size);
 
-        // portfolio risk check 
+        // portfolio risk check
         const current_portfolio_value = self.current_balance + self.total_unrealized_pnl;
         const max_risk_amount = current_portfolio_value * self.max_portfolio_risk_pct;
         position_size = @min(position_size, max_risk_amount);

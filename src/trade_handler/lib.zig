@@ -9,7 +9,6 @@ const SignalType = types.SignalType;
 pub const TradeHandler = struct {
     allocator: std.mem.Allocator,
     signal_queue: std.ArrayList(TradingSignal),
-    positions: std.StringHashMap(Position),
     signal_thread: ?std.Thread,
     should_stop: std.atomic.Value(bool),
     mutex: std.Thread.Mutex,
@@ -19,7 +18,6 @@ pub const TradeHandler = struct {
         return TradeHandler{
             .allocator = allocator,
             .signal_queue = std.ArrayList(TradingSignal).init(allocator),
-            .positions = std.StringHashMap(Position).init(allocator),
             .signal_thread = null,
             .should_stop = std.atomic.Value(bool).init(false),
             .mutex = std.Thread.Mutex{},
@@ -33,7 +31,7 @@ pub const TradeHandler = struct {
             thread.join();
         }
         self.signal_queue.deinit();
-        self.positions.deinit();
+        self.portfolio_manager.deinit();
     }
 
     pub fn start(self: *TradeHandler) !void {
@@ -44,25 +42,27 @@ pub const TradeHandler = struct {
         self.mutex.lock();
         defer self.mutex.unlock();
         try self.signal_queue.append(signal);
-        if (signal.signal_type == .BUY) {
-            try self.positions.put(signal.symbol_name, Position{
-                .symbol_name = signal.symbol_name,
-                .is_open = true,
-                .entry_rsi = signal.rsi_value,
-                .timestamp = signal.timestamp,
-                .signal_strength = signal.signal_strength,
-            });
-            //std.log.info("SIGNAL QUEUED: {s} BUY - RSI: {d:.2}, Orderbook: {d:.2}%", .{ signal.symbol_name, signal.rsi_value, signal.orderbook_percentage });
-        } else if (signal.signal_type == .SELL) {
-            if (self.positions.getPtr(signal.symbol_name)) |position| {
-                position.is_open = false;
-            }
-            //std.log.info("SIGNAL QUEUED: {s} SELL - RSI: {d:.2}, Orderbook: {d:.2}%", .{ signal.symbol_name, signal.rsi_value, signal.orderbook_percentage });
-        }
+        // if (signal.signal_type == .BUY) {
+        //     // try self.positions.put(signal.symbol_name, Position{
+        //     //     .symbol_name = signal.symbol_name,
+        //     //     .is_open = true,
+        //     //     .entry_rsi = signal.rsi_value,
+        //     //     .timestamp = signal.timestamp,
+        //     //     .signal_strength = signal.signal_strength,
+        //     // });
+        //     //std.log.info("SIGNAL QUEUED: {s} BUY - RSI: {d:.2}, Orderbook: {d:.2}%", .{ signal.symbol_name, signal.rsi_value, signal.orderbook_percentage });
+        // } else if (signal.signal_type == .SELL) {
+        //     // if (self.positions.getPtr(signal.symbol_name)) |position| {
+        //     //     position.is_open = false;
+        //     // }
+        //     //std.log.info("SIGNAL QUEUED: {s} SELL - RSI: {d:.2}, Orderbook: {d:.2}%", .{ signal.symbol_name, signal.rsi_value, signal.orderbook_percentage });
+        // }
     }
 
     pub fn hasOpenPosition(self: *TradeHandler, symbol_name: []const u8) bool {
-        if (self.positions.get(symbol_name)) |position| {
+        self.mutex.lock();
+        defer self.mutex.unlock();
+        if (self.portfolio_manager.positions.get(symbol_name)) |position| {
             return position.is_open;
         }
         return false;
@@ -70,7 +70,9 @@ pub const TradeHandler = struct {
 
     pub fn getOpenPositionsCount(self: *TradeHandler) usize {
         var count: usize = 0;
-        var iterator = self.positions.iterator();
+        self.mutex.lock();
+        defer self.mutex.unlock();
+        var iterator = self.portfolio_manager.positions.iterator();
         while (iterator.next()) |entry| {
             if (entry.value_ptr.is_open) {
                 count += 1;
@@ -80,8 +82,6 @@ pub const TradeHandler = struct {
     }
 
     pub fn getPendingSignalsCount(self: *TradeHandler) usize {
-        self.mutex.lock();
-        defer self.mutex.unlock();
         return self.signal_queue.items.len;
     }
 
