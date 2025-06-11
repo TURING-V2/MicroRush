@@ -256,7 +256,7 @@ pub const SignalEngine = struct {
             self.batch_queue_mutex.unlock();
 
             self.batch_condition.signal();
-            std.time.sleep(500_000); // 0.5ms
+            std.time.sleep(50_000_000); // 50ms
         }
 
         std.log.info("Batch processing thread stopped", .{});
@@ -315,8 +315,6 @@ pub const SignalEngine = struct {
 
         const symbol_names = try self.allocator.alloc([]const u8, num_symbols);
         defer self.allocator.free(symbol_names);
-
-        // brief lock is to ensure a consistent snapshot of the symbol map and positions.
         self.mutex.lock();
         var symbol_idx: usize = 0;
         var iterator = self.symbol_map.iterator();

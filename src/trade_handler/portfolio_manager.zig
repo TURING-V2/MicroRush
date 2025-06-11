@@ -219,7 +219,6 @@ pub const PortfolioManager = struct {
         } else {
             self.normal_signal_trades += 1;
         }
-
         std.log.info("EXECUTED BUY: {s} | Amount: {d:.6} | Price: ${d:.4} | Size: ${d:.2} | Strength: {d:.2} | Fee: ${d:.4} | RSI: {d:.2}", .{
             signal.symbol_name, amount, price, position_size_usdt, signal.signal_strength, fee, signal.rsi_value,
         });
