@@ -2,7 +2,7 @@
 
 **MicroRush** is a high-performance, real-time high-frequency trading (HFT) engine written in [Zig](https://ziglang.org/). It is designed for ultra-low-latency signal processing and execution using cutting-edge system-level features.
 
-## 🚀 Features
+## Features
 
 - **Ultra-Fast Signal Engine**  
   SIMD-accelerated signal generation using AVX2 across multiple CPU cores and thread pools.
@@ -30,7 +30,7 @@
 
 ---
 
-## 🧩 Key Components
+## Key Components
 
 - **`core/`** – Core HFT runtime loop, lock-free logic, signal dispatch.
 - **`signal_engine.zig`** – SIMD-powered, batched signal calculations.
@@ -40,7 +40,7 @@
 
 ---
 
-## 🔧 Requirements
+## Requirements
 
 - Zig (latest [master build](https://ziglang.org/download/))
 - CUDA Toolkit nvcc (>=release 12.8, V12.8.93)
@@ -49,7 +49,7 @@
 
 ---
 
-## 🛠️ Building
+## Building
 
 Use the provided Makefile:
 
