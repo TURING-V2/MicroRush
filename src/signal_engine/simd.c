@@ -30,14 +30,13 @@ void analyze_trading_signals_simd(
     const __m256 bid_buy_threshold = _mm256_set1_ps(85.0f);
     const __m256 ask_sell_threshold = _mm256_set1_ps(60.0f);
     
-    // tighter spread for crypto HFT (need to overcome 0.2% round-trip fee)
-    const __m256 spread_threshold = _mm256_set1_ps(0.0000f);
-    const __m256 spread_optimal = _mm256_set1_ps(0.0000f);
+    // Tighter spread for crypto HFT (need to overcome 0.2% round-trip fee)
+    const __m256 spread_threshold = _mm256_set1_ps(0.0200f);
     
     const __m256 rsi_valid_min = _mm256_set1_ps(0.0f);
     const __m256 rsi_valid_max = _mm256_set1_ps(100.0f);
 
-    // for scalar loop
+    // Extract constants for scalar loop
     const float rsi_buy_thresh = 25.0f;
     const float rsi_strong_buy_thresh = 15.0f;
     const float rsi_sell_thresh = 85.0f;
@@ -46,7 +45,7 @@ void analyze_trading_signals_simd(
     const float bid_thresh = 85.0f;
     const float ask_strong_thresh = 56.0f;
     const float ask_thresh = 60.0f;
-    const float spread_thresh = 0.0f;
+    const float spread_thresh = 0.02f;
     
     int i = 0;
     
@@ -71,7 +70,7 @@ void analyze_trading_signals_simd(
             _mm256_cmp_ps(rsi_chunk, rsi_valid_max, _CMP_LE_OQ)
         );
         
-        // Spread validity checks (kept for output struct)
+        // Spread validity checks
         __m256 spread_valid = _mm256_cmp_ps(spread_chunk, spread_threshold, _CMP_GE_OQ);
         
         // RSI conditions
@@ -86,7 +85,7 @@ void analyze_trading_signals_simd(
         
         __m256 no_position = _mm256_xor_ps(has_pos_mask, _mm256_set1_ps(*(float*)&(int){0xFFFFFFFF}));
         
-        // BUY CONDITIONS - Simplified (spread logic commented out)
+        // BUY CONDITIONS - Simplified
         // Strong buy: Very oversold RSI + strong bid
         __m256 buy_strong = _mm256_and_ps(
             _mm256_and_ps(rsi_very_oversold, bid_strong),
@@ -99,8 +98,7 @@ void analyze_trading_signals_simd(
                 _mm256_and_ps(rsi_oversold, bid_threshold),
                 bid_strong
             ),
-            // _mm256_and_ps(no_position, spread_valid)
-            no_position
+            _mm256_and_ps(no_position, spread_valid)
         );
         
         __m256 buy_condition = _mm256_or_ps(buy_strong, buy_normal);
@@ -119,8 +117,7 @@ void analyze_trading_signals_simd(
                 _mm256_or_ps(rsi_sell_strong, rsi_sell_normal),  // RSI conditions
                 _mm256_or_ps(ask_strong, ask_threshold)          // Orderbook conditions
             ),
-            // _mm256_and_ps(has_pos_mask, spread_valid)
-            has_pos_mask
+            _mm256_and_ps(has_pos_mask, spread_valid)
         );
         
         // Calculate signal strength
@@ -165,10 +162,9 @@ void analyze_trading_signals_simd(
         
         float signal_strength = 0.0f;
         
-        // buy logic - simplified (spread logic commented out)
+        // buy logic - simplified
         bool should_buy = false;
-        // if (!has_positions[i] && spread_valid) {
-        if (!has_positions[i]) {
+        if (!has_positions[i] && spread_valid) {
             // Strong buy: Very oversold + strong bid
             if (rsi_valid && rsi_values[i] <= rsi_strong_buy_thresh && bid_percentages[i] > bid_strong_thresh) {
                 should_buy = true;
@@ -184,8 +180,7 @@ void analyze_trading_signals_simd(
         
         // sell logic - RSI OR orderbook, whichever happens first
         bool should_sell = false;
-        // if (has_positions[i] && spread_valid) {
-        if (has_positions[i]) {
+        if (has_positions[i] && spread_valid) {
             // RSI sell conditions
             bool rsi_very_overbought = rsi_valid && rsi_values[i] >= rsi_strong_sell_thresh;
             bool rsi_overbought = rsi_valid && rsi_values[i] >= rsi_sell_thresh;
@@ -214,9 +209,9 @@ void analyze_trading_signals_simd(
     }
 }
 
-// float calculate_position_size(float signal_strength, float base_size, float max_size) {
-//     // Scale position size based on signal strength
-//     // Strong signals (1.0) get full size, weaker signals get reduced size
-//     float size = base_size * signal_strength;
-//     return size > max_size ? max_size : size;
-// }
+float calculate_position_size(float signal_strength, float base_size, float max_size) {
+    // Scale position size based on signal strength
+    // Strong signals (1.0) get full size, weaker signals get reduced size
+    float size = base_size * signal_strength;
+    return size > max_size ? max_size : size;
+}
