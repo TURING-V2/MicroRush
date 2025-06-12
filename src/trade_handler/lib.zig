@@ -6,12 +6,6 @@ const TradingSignal = types.TradingSignal;
 const Position = types.Position;
 const SignalType = types.SignalType;
 
-const RecentSignal = struct {
-    symbol_name: []const u8,
-    signal_type: SignalType,
-    timestamp: i64,
-};
-
 pub const TradeHandler = struct {
     allocator: std.mem.Allocator,
     signal_queue: std.ArrayList(TradingSignal),
@@ -19,8 +13,11 @@ pub const TradeHandler = struct {
     should_stop: std.atomic.Value(bool),
     mutex: std.Thread.Mutex,
     portfolio_manager: PortfolioManager,
-    recent_signals: std.ArrayList(RecentSignal),
-    signal_cooldown_ns: i64,
+
+    high_strength_sell: std.ArrayList(TradingSignal),
+    high_strength_buy: std.ArrayList(TradingSignal),
+    low_strength_sell: std.ArrayList(TradingSignal),
+    low_strength_buy: std.ArrayList(TradingSignal),
 
     pub fn init(allocator: std.mem.Allocator, symbol_map: *const SymbolMap) TradeHandler {
         return TradeHandler{
@@ -30,8 +27,11 @@ pub const TradeHandler = struct {
             .should_stop = std.atomic.Value(bool).init(false),
             .mutex = std.Thread.Mutex{},
             .portfolio_manager = PortfolioManager.init(allocator, symbol_map),
-            .recent_signals = std.ArrayList(RecentSignal).init(allocator),
-            .signal_cooldown_ns = 1_000_000_000, // 1 second
+
+            .high_strength_sell = std.ArrayList(TradingSignal).init(allocator),
+            .high_strength_buy = std.ArrayList(TradingSignal).init(allocator),
+            .low_strength_sell = std.ArrayList(TradingSignal).init(allocator),
+            .low_strength_buy = std.ArrayList(TradingSignal).init(allocator),
         };
     }
 
@@ -41,35 +41,11 @@ pub const TradeHandler = struct {
             thread.join();
         }
         self.signal_queue.deinit();
-        self.recent_signals.deinit();
+        self.high_strength_sell.deinit();
+        self.high_strength_buy.deinit();
+        self.low_strength_sell.deinit();
+        self.low_strength_buy.deinit();
         self.portfolio_manager.deinit();
-    }
-
-    fn isDuplicateSignal(self: *TradeHandler, signal: TradingSignal) bool {
-        const current_time = std.time.nanoTimestamp();
-
-        for (self.recent_signals.items) |recent| {
-            if (std.mem.eql(u8, recent.symbol_name, signal.symbol_name) and
-                recent.signal_type == signal.signal_type and
-                (current_time - recent.timestamp) < self.signal_cooldown_ns)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    fn cleanupRecentSignals(self: *TradeHandler) void {
-        const current_time = std.time.nanoTimestamp();
-        var i: usize = 0;
-
-        while (i < self.recent_signals.items.len) {
-            if ((current_time - self.recent_signals.items[i].timestamp) > self.signal_cooldown_ns) {
-                _ = self.recent_signals.orderedRemove(i);
-            } else {
-                i += 1;
-            }
-        }
     }
 
     pub fn start(self: *TradeHandler) !void {
@@ -80,43 +56,32 @@ pub const TradeHandler = struct {
         self.mutex.lock();
         defer self.mutex.unlock();
 
-        //self.cleanupRecentSignals();
-
-        // if (self.isDuplicateSignal(signal)) {
-        //     std.log.debug("DUPLICATE SIGNAL IGNORED: {s} {s}", .{ signal.symbol_name, @tagName(signal.signal_type) });
-        //     return;
-        // }
+        const is_high = signal.signal_strength > 0.9;
 
         switch (signal.signal_type) {
-            .BUY => {
+            .SELL => {
                 if (self.hasOpenPosition(signal.symbol_name)) {
-                    std.log.debug("BUY SIGNAL IGNORED - Position exists: {s}", .{signal.symbol_name});
-                    return;
+                    if (is_high) {
+                        try self.high_strength_sell.append(signal);
+                    } else {
+                        try self.low_strength_sell.append(signal);
+                    }
                 }
             },
-            .SELL => {
+            .BUY => {
                 if (!self.hasOpenPosition(signal.symbol_name)) {
-                    std.log.debug("SELL SIGNAL IGNORED - No position: {s}", .{signal.symbol_name});
-                    return;
+                    if (is_high) {
+                        try self.high_strength_buy.append(signal);
+                    } else {
+                        try self.low_strength_buy.append(signal);
+                    }
                 }
             },
             .HOLD => return,
         }
-
-        try self.signal_queue.append(signal);
-
-        try self.recent_signals.append(RecentSignal{
-            .symbol_name = signal.symbol_name,
-            .signal_type = signal.signal_type,
-            .timestamp = signal.timestamp,
-        });
-
-        //std.log.debug("SIGNAL QUEUED: {s} {s} - RSI: {d:.2}, Strength: {d:.2}", .{ signal.symbol_name, @tagName(signal.signal_type), signal.rsi_value, signal.signal_strength });
     }
 
-    pub fn hasOpenPosition(self: *TradeHandler, symbol_name: []const u8) bool {
-        // self.mutex.lock();
-        // defer self.mutex.unlock();
+    pub inline fn hasOpenPosition(self: *TradeHandler, symbol_name: []const u8) bool {
         if (self.portfolio_manager.positions.get(symbol_name)) |position| {
             return position.is_open;
         }
@@ -137,55 +102,52 @@ pub const TradeHandler = struct {
     }
 
     pub fn getPendingSignalsCount(self: *TradeHandler) usize {
-        return self.signal_queue.items.len;
+        return self.signal_queue.items.len + self.sell_queue.items.len;
     }
 
     fn signalThreadFunction(self: *TradeHandler) !void {
         std.log.info("Trade handler thread started", .{});
         while (!self.should_stop.load(.seq_cst)) {
             self.mutex.lock();
-            // process all pending signals
-            while (self.signal_queue.items.len > 0) {
-                const signal = self.signal_queue.orderedRemove(0);
-                self.mutex.unlock();
-                try self.executeSignal(signal);
-                self.mutex.lock();
+
+            const queues = &[_]*std.ArrayList(TradingSignal){
+                &self.high_strength_sell,
+                &self.high_strength_buy,
+                &self.low_strength_sell,
+                &self.low_strength_buy,
+            };
+
+            for (queues) |queue| {
+                while (queue.items.len > 0) {
+                    const signal = queue.orderedRemove(0);
+                    self.mutex.unlock();
+                    try self.executeSignalFast(signal);
+                    self.mutex.lock();
+                }
             }
+
             self.mutex.unlock();
-            std.time.sleep(1_000_000); // 1ms
+            std.time.sleep(100_000); // 0.1 ms
         }
         std.log.info("Trade handler thread stopped", .{});
     }
 
-    fn executeSignal(self: *TradeHandler, signal: TradingSignal) !void {
-        switch (signal.signal_type) {
-            .BUY => {
-                if (self.hasOpenPosition(signal.symbol_name)) {
-                    std.log.warn("EXECUTION BLOCKED: Already have position for {s}", .{signal.symbol_name});
-                    return;
-                }
-            },
-            .SELL => {
-                if (!self.hasOpenPosition(signal.symbol_name)) {
-                    std.log.warn("EXECUTION BLOCKED: No position to sell for {s}", .{signal.symbol_name});
-                    return;
-                }
-            },
-            .HOLD => return,
-        }
+    inline fn executeSignalFast(self: *TradeHandler, signal: TradingSignal) !void {
         try self.portfolio_manager.processSignal(signal);
     }
 
     pub fn getStats(self: *TradeHandler) struct {
         open_positions: usize,
-        pending_signals: usize,
+        pending_buy_signals: usize,
+        pending_sell_signals: usize,
         recent_signals: usize,
     } {
         self.mutex.lock();
         defer self.mutex.unlock();
         return .{
             .open_positions = self.getOpenPositionsCount(),
-            .pending_signals = self.getPendingSignalsCount(),
+            .pending_buy_signals = self.signal_queue.items.len,
+            .pending_sell_signals = self.sell_queue.items.len,
             .recent_signals = self.recent_signals.items.len,
         };
     }

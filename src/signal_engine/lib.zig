@@ -243,7 +243,7 @@ pub const SignalEngine = struct {
         std.log.info("Batch processing thread started", .{});
 
         while (!self.should_stop.load(.seq_cst)) {
-            const batch_results = self.stat_calc.?.calculateSymbolMapBatch(self.symbol_map, 6) catch |err| {
+            const batch_results = self.stat_calc.?.calculateSymbolMapBatch(self.symbol_map, 14) catch |err| {
                 std.log.err("Error calculating batch: {}", .{err});
                 std.time.sleep(1_000_000_000); // 1s
                 continue;
@@ -256,7 +256,7 @@ pub const SignalEngine = struct {
             self.batch_queue_mutex.unlock();
 
             self.batch_condition.signal();
-            std.time.sleep(50_000_000); // 50ms
+            std.time.sleep(10_000_000); // 10ms
         }
 
         std.log.info("Batch processing thread stopped", .{});
