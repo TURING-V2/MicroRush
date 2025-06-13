@@ -140,7 +140,10 @@ pub const PortfolioManager = struct {
     pub fn checkStopLossConditions(self: *PortfolioManager) !void {
         var positions_to_close = std.ArrayList([]const u8).init(self.allocator);
         defer positions_to_close.deinit();
+
+        const current_time = std.time.nanoTimestamp();
         var iterator = self.positions.iterator();
+
         while (iterator.next()) |entry| {
             const position = entry.value_ptr;
             if (!position.is_open) continue;
@@ -149,32 +152,69 @@ pub const PortfolioManager = struct {
                 std.log.warn("Failed to get current price for {s}: {}", .{ position.symbol, err });
                 continue;
             };
+
+            var should_close = false;
+            var close_reason: []const u8 = "";
+
             const stop_loss_price = position.avg_entry_price * (1.0 - self.stop_loss_percentage);
             if (current_price <= stop_loss_price) {
+                should_close = true;
+                close_reason = "STOP LOSS";
+            }
+
+            const time_elapsed = current_time - position.entry_timestamp;
+            if (time_elapsed >= 5_000_000_000) { // crosses 5 seconds
+                should_close = true;
+                close_reason = "TIME LIMIT";
+            }
+
+            const profit_percentage = ((current_price - position.avg_entry_price) / position.avg_entry_price) * 100.0;
+            if (profit_percentage > 0.3) {
+                should_close = true;
+                close_reason = "PROFIT TARGET";
+            }
+
+            if (should_close) {
                 positions_to_close.append(position.symbol) catch |err| {
                     std.log.err("Failed to add position to close list: {}", .{err});
                     continue;
                 };
             }
         }
+
         for (positions_to_close.items) |symbol| {
             if (self.positions.getPtr(symbol)) |position| {
                 const current_price = symbol_map.getLastClosePrice(self.symbol_map, symbol) catch continue;
-                std.log.warn("STOP LOSS TRIGGERED for {s}: Entry: ${d:.4}, Current: ${d:.4}, Loss: {d:.1}%", .{
+                const current_time_final = std.time.nanoTimestamp();
+                const time_elapsed = current_time_final - position.entry_timestamp;
+                const profit_percentage = ((current_price - position.avg_entry_price) / position.avg_entry_price) * 100.0;
+
+                var actual_reason: []const u8 = "STOP LOSS";
+                if (time_elapsed >= 5_000_000_000) {
+                    actual_reason = "TIME LIMIT";
+                } else if (profit_percentage > 0.3) {
+                    actual_reason = "PROFIT TARGET";
+                }
+
+                std.log.warn("{s} TRIGGERED for {s}: Entry: ${d:.4}, Current: ${d:.4}, P&L: {d:.1}%, Time: {d:.1}s", .{
+                    actual_reason,
                     symbol,
                     position.avg_entry_price,
                     current_price,
-                    ((current_price - position.avg_entry_price) / position.avg_entry_price) * 100.0,
+                    profit_percentage,
+                    @as(f64, @floatFromInt(time_elapsed)) / 1_000_000_000.0,
                 });
-                const stop_loss_signal = TradingSignal{
+
+                const sell_signal = TradingSignal{
                     .symbol_name = symbol,
                     .signal_type = .SELL,
-                    .rsi_value = 50.0, // neutral RSI for stop loss
+                    .rsi_value = 50.0, // neutral RSI
                     .orderbook_percentage = 0.0,
-                    .timestamp = std.time.nanoTimestamp(),
-                    .signal_strength = 1.0, // high strength for stop loss
+                    .timestamp = current_time_final,
+                    .signal_strength = 1.0,
                 };
-                self.executeSell(stop_loss_signal, current_price, std.time.nanoTimestamp());
+
+                self.executeSell(sell_signal, current_price, current_time_final);
             }
         }
     }
@@ -203,7 +243,7 @@ pub const PortfolioManager = struct {
         }
 
         if (self.getOpenPositionsCount() >= self.max_positions) {
-            std.log.warn("Max positions reached, skipping BUY for {s}", .{signal.symbol_name});
+            //std.log.warn("Max positions reached, skipping BUY for {s}", .{signal.symbol_name});
             return;
         }
 

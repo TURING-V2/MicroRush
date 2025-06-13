@@ -25,9 +25,9 @@ void analyze_trading_signals_simd(
     const __m256 rsi_strong_sell = _mm256_set1_ps(80.0f);
     
     // adjusted for crypto volatility and HFT
-    const __m256 bid_strong_buy_threshold = _mm256_set1_ps(80.0f);
+    const __m256 bid_strong_buy_threshold = _mm256_set1_ps(72.0f);
     const __m256 ask_strong_sell_threshold = _mm256_set1_ps(46.0f);
-    const __m256 bid_buy_threshold = _mm256_set1_ps(85.0f);
+    const __m256 bid_buy_threshold = _mm256_set1_ps(80.0f);
     const __m256 ask_sell_threshold = _mm256_set1_ps(50.0f);
     
     // Tighter spread for crypto HFT (need to overcome 0.2% round-trip fee)
@@ -40,9 +40,9 @@ void analyze_trading_signals_simd(
     const float rsi_buy_thresh = 15.0f;
     const float rsi_strong_buy_thresh = 10.0f;
     const float rsi_sell_thresh = 85.0f;
-    const float rsi_strong_sell_thresh = 80.0f;
+    const float rsi_strong_sell_thresh = 72.0f;
     const float bid_strong_thresh = 80.0f;
-    const float bid_thresh = 85.0f;
+    const float bid_thresh = 80.0f;
     const float ask_strong_thresh = 46.0f;
     const float ask_thresh = 50.0f;
     const float spread_thresh = 0.00001f;
