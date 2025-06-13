@@ -116,32 +116,24 @@ pub const PortfolioManager = struct {
         self.trade_history.deinit();
     }
 
-    fn calculatePositionSize(self: *PortfolioManager, signal_strength: f32, current_price: f64) f64 {
-        _ = current_price;
+    pub fn calculatePositionSize(self: *const PortfolioManager, signal_strength: f32, available_liquidity: f64, symbol_price: f64) f32 {
+        const base_size = self.base_position_size_usdt * signal_strength;
 
-        const strength_multiplier = @max(0.5, @min(1.5, signal_strength)); // Clamp between 0.5-1.5
-        var position_size = self.base_position_size_usdt * @as(f64, strength_multiplier);
+        // Adjust based on liquidity
+        const max_liquidity_consumption = 0.25; // Max 25% of available liquidity
+        const available_size = available_liquidity * symbol_price * max_liquidity_consumption;
 
-        // min/max limits
-        position_size = @max(self.min_position_size_usdt, position_size);
-        position_size = @min(self.max_position_size_usdt, position_size);
+        // Take minimum of intended size and liquidity-constrained size
+        const liquidity_adjusted = @min(base_size, available_size);
 
-        // portfolio risk check
-        const current_portfolio_value = self.current_balance + self.total_unrealized_pnl;
-        const max_risk_amount = current_portfolio_value * self.max_portfolio_risk_pct;
-        position_size = @min(position_size, max_risk_amount);
-
-        // available balance check
-        position_size = @min(position_size, self.current_balance * 0.95); // Keep 5% buffer
-
-        return position_size;
+        return @as(f32, @floatCast(@max(self.min_position_size_usdt, @min(liquidity_adjusted, self.max_position_size_usdt))));
     }
 
     pub fn checkStopLossConditions(self: *PortfolioManager) !void {
         var positions_to_close = std.ArrayList([]const u8).init(self.allocator);
         defer positions_to_close.deinit();
 
-        const current_time = std.time.nanoTimestamp();
+        //const current_time = std.time.nanoTimestamp();
         var iterator = self.positions.iterator();
 
         while (iterator.next()) |entry| {
@@ -162,11 +154,11 @@ pub const PortfolioManager = struct {
                 close_reason = "STOP LOSS";
             }
 
-            const time_elapsed = current_time - position.entry_timestamp;
-            if (time_elapsed >= 5_000_000_000) { // crosses 5 seconds
-                should_close = true;
-                close_reason = "TIME LIMIT";
-            }
+            // const time_elapsed = current_time - position.entry_timestamp;
+            // if (time_elapsed >= 5_000_000_000) { // crosses 5 seconds
+            //     should_close = true;
+            //     close_reason = "TIME LIMIT";
+            // }
 
             const profit_percentage = ((current_price - position.avg_entry_price) / position.avg_entry_price) * 100.0;
             if (profit_percentage > 0.3) {
@@ -247,7 +239,7 @@ pub const PortfolioManager = struct {
             return;
         }
 
-        const position_size_usdt = self.calculatePositionSize(signal.signal_strength, price);
+        const position_size_usdt = self.calculatePositionSize(signal.signal_strength, self.current_balance, price);
 
         if (self.current_balance < position_size_usdt) {
             std.log.warn("Insufficient balance for BUY {s} (need ${d:.2}, have ${d:.2})", .{ signal.symbol_name, position_size_usdt, self.current_balance });

@@ -179,7 +179,9 @@ __global__ void orderbook_kernel_batch(const GPUOrderBookDataBatch_C *orderbook_
         __syncthreads();
     }
 
+
     if (idx == 0) {
+        // --- Existing Calculations ---
         float total_bid = partial_bid_sums[0];
         float total_ask = partial_ask_sums[0];
         results->total_bid_volume[symbol_idx] = total_bid;
@@ -194,19 +196,33 @@ __global__ void orderbook_kernel_batch(const GPUOrderBookDataBatch_C *orderbook_
             results->ask_percentage[symbol_idx] = 50.0f;
         }
 
+        // --- MODIFIED SPREAD & NEW BEST BID/ASK LOGIC ---
         if (bid_count > 0 && ask_count > 0) {
+            // Get best bid/ask from the top of the book (index 0)
             float best_bid = orderbook_batch->bid_prices[symbol_idx][0];
             float best_ask = orderbook_batch->ask_prices[symbol_idx][0];
+            
+            // Populate the new fields in the results struct
+            results->best_bid_price[symbol_idx] = best_bid;
+            results->best_ask_price[symbol_idx] = best_ask;
+            results->best_bid_qty[symbol_idx] = orderbook_batch->bid_quantities[symbol_idx][0];
+            results->best_ask_qty[symbol_idx] = orderbook_batch->ask_quantities[symbol_idx][0];
+            
+            // Calculate spread
             if (best_bid > 0.000001f && best_ask > 0.000001f && best_ask > best_bid) {
                 float mid_price = (best_bid + best_ask) / 2.0f;
                 float spread = best_ask - best_bid;
-                results->spread_percentage[symbol_idx] = (spread / mid_price) * 100.0f;
+                results->spread_percentage[symbol_idx] = (spread / mid_price) * 100.0f; // This is now a percentage
             } else {
-                // Invalid prices or negative spread
-                results->spread_percentage[symbol_idx] = 0.0f;
+                results->spread_percentage[symbol_idx] = 1000.0f; // Invalid prices, set a high spread
             }
         } else {
-            results->spread_percentage[symbol_idx] = 0.0f;
+            // Handle cases with a one-sided or empty book
+            results->spread_percentage[symbol_idx] = 1000.0f; // High spread
+            results->best_bid_price[symbol_idx] = 0.0f;
+            results->best_ask_price[symbol_idx] = 0.0f;
+            results->best_bid_qty[symbol_idx] = 0.0f;
+            results->best_ask_qty[symbol_idx] = 0.0f;
         }
     }
 }

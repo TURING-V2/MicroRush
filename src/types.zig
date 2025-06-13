@@ -63,6 +63,10 @@ pub const GPUOrderBookResultBatch = extern struct {
     total_bid_volume: [MAX_SYMBOLS]f32,
     total_ask_volume: [MAX_SYMBOLS]f32,
     spread_percentage: [MAX_SYMBOLS]f32,
+    best_bid_price: [MAX_SYMBOLS]f32,
+    best_ask_price: [MAX_SYMBOLS]f32,
+    best_bid_qty: [MAX_SYMBOLS]f32,
+    best_ask_qty: [MAX_SYMBOLS]f32,
 };
 
 pub const GPUBatchResult = struct {

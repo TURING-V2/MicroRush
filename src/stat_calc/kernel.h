@@ -60,6 +60,10 @@ struct GPUOrderBookResultBatch_C {
     float total_bid_volume[MAX_SYMBOLS_CUDA];
     float total_ask_volume[MAX_SYMBOLS_CUDA];
     float spread_percentage[MAX_SYMBOLS_CUDA];
+    float best_bid_price[MAX_SYMBOLS_CUDA];
+    float best_ask_price[MAX_SYMBOLS_CUDA];
+    float best_bid_qty[MAX_SYMBOLS_CUDA];
+    float best_ask_qty[MAX_SYMBOLS_CUDA];
 };
 
 extern "C" {
