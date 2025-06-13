@@ -109,7 +109,6 @@ pub const TradeHandler = struct {
         std.log.info("Trade handler thread started", .{});
         while (!self.should_stop.load(.seq_cst)) {
             self.mutex.lock();
-
             const queues = &[_]*std.ArrayList(TradingSignal){
                 &self.high_strength_sell,
                 &self.high_strength_buy,
@@ -117,17 +116,25 @@ pub const TradeHandler = struct {
                 &self.low_strength_buy,
             };
 
+            var signals_processed = false;
             for (queues) |queue| {
                 while (queue.items.len > 0) {
                     const signal = queue.orderedRemove(0);
                     self.mutex.unlock();
                     try self.executeSignalFast(signal);
+                    signals_processed = true;
                     self.mutex.lock();
                 }
             }
-
             self.mutex.unlock();
-            std.time.sleep(100_000); // 0.1 ms
+
+            self.portfolio_manager.checkStopLossConditions() catch |err| {
+                std.log.warn("Failed to check stop loss conditions: {}", .{err});
+            };
+
+            if (!signals_processed) {
+                std.time.sleep(100_000);
+            }
         }
         std.log.info("Trade handler thread stopped", .{});
     }

@@ -14,7 +14,7 @@ pub const TradingSignal = struct {
     signal_type: SignalType,
     rsi_value: f32,
     orderbook_percentage: f32,
-    timestamp: i64,
+    timestamp: i128,
     signal_strength: f32,
 };
 
@@ -22,12 +22,12 @@ pub const Position = struct {
     symbol_name: []const u8,
     is_open: bool,
     entry_rsi: f32,
-    timestamp: i64,
+    timestamp: i128,
     signal_strength: f32,
 };
 
 //////////////////////////////////////////////////////////
-pub const MAX_SYMBOLS_CUDA = 403;
+pub const MAX_SYMBOLS_CUDA = 404;
 pub const MAX_SYMBOLS = MAX_SYMBOLS_CUDA;
 pub const MAX_RSI_VALUES_PER_SYMBOL = 15;
 

@@ -69,6 +69,9 @@ pub const PortfolioManager = struct {
     last_balance_log: i128,
     balance_log_interval: i128,
 
+    // Stop loss configuration
+    stop_loss_percentage: f64, // e.g., 0.02 for 2% stop loss
+
     pub fn init(allocator: std.mem.Allocator, sym_map: *const SymbolMap) PortfolioManager {
         const initial_balance = 1000.0;
         const base_size = initial_balance / 20.0; // 5% base position
@@ -104,6 +107,7 @@ pub const PortfolioManager = struct {
             .mutex = std.Thread.Mutex{},
             .last_balance_log = std.time.nanoTimestamp(),
             .balance_log_interval = 30_000_000_000, // 30 seconds for HFT
+            .stop_loss_percentage = 0.01,
         };
     }
 
@@ -131,6 +135,48 @@ pub const PortfolioManager = struct {
         position_size = @min(position_size, self.current_balance * 0.95); // Keep 5% buffer
 
         return position_size;
+    }
+
+    pub fn checkStopLossConditions(self: *PortfolioManager) !void {
+        var positions_to_close = std.ArrayList([]const u8).init(self.allocator);
+        defer positions_to_close.deinit();
+        var iterator = self.positions.iterator();
+        while (iterator.next()) |entry| {
+            const position = entry.value_ptr;
+            if (!position.is_open) continue;
+
+            const current_price = symbol_map.getLastClosePrice(self.symbol_map, position.symbol) catch |err| {
+                std.log.warn("Failed to get current price for {s}: {}", .{ position.symbol, err });
+                continue;
+            };
+            const stop_loss_price = position.avg_entry_price * (1.0 - self.stop_loss_percentage);
+            if (current_price <= stop_loss_price) {
+                positions_to_close.append(position.symbol) catch |err| {
+                    std.log.err("Failed to add position to close list: {}", .{err});
+                    continue;
+                };
+            }
+        }
+        for (positions_to_close.items) |symbol| {
+            if (self.positions.getPtr(symbol)) |position| {
+                const current_price = symbol_map.getLastClosePrice(self.symbol_map, symbol) catch continue;
+                std.log.warn("STOP LOSS TRIGGERED for {s}: Entry: ${d:.4}, Current: ${d:.4}, Loss: {d:.1}%", .{
+                    symbol,
+                    position.avg_entry_price,
+                    current_price,
+                    ((current_price - position.avg_entry_price) / position.avg_entry_price) * 100.0,
+                });
+                const stop_loss_signal = TradingSignal{
+                    .symbol_name = symbol,
+                    .signal_type = .SELL,
+                    .rsi_value = 50.0, // neutral RSI for stop loss
+                    .orderbook_percentage = 0.0,
+                    .timestamp = std.time.nanoTimestamp(),
+                    .signal_strength = 1.0, // high strength for stop loss
+                };
+                self.executeSell(stop_loss_signal, current_price, std.time.nanoTimestamp());
+            }
+        }
     }
 
     pub fn processSignal(self: *PortfolioManager, signal: TradingSignal) !void {
