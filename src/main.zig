@@ -35,7 +35,7 @@ pub fn main() !void {
     std.debug.print("WebSockets flowing, starting continuous Signal Engine and Trading...\n", .{});
 
     const max_duration_ns = 180 * 60 * 1_000_000_000; // 180 min
-    const warm_up_duration_ns = 5 * 60 * 1_000_000_000; // 5 min
+    const warm_up_duration_ns = 10 * 60 * 1_000_000_000; // 10 min
 
     std.time.sleep(warm_up_duration_ns);
     std.log.info("Warm-up complete, starting signal engine...", .{});

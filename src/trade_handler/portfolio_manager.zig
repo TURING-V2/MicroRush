@@ -192,7 +192,7 @@ pub const PortfolioManager = struct {
             }
 
             const time_elapsed = current_time - position.entry_timestamp;
-            if (time_elapsed >= 5_000_000_000) { // crosses 5 seconds
+            if (time_elapsed >= 1 * 60 * 1_000_000_000) { // crosses 1 minute
                 should_close = true;
                 close_reason = "TIME LIMIT";
             }
