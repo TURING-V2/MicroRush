@@ -21,6 +21,71 @@ typedef struct {
     float available_liquidity_ratio;
 } TradingDecision;
 
+void calculate_liquidity_adjusted_threshold_simd(
+    __m256 base_spread_threshold,
+    __m256 bid_volume,
+    __m256 ask_volume,
+    __m256 intended_position_size_usdt,
+    __m256 best_bid,
+    __m256 best_ask,
+    __m256* liquidity_multiplier_out,
+    __m256* market_impact_penalty_out,
+    __m256* is_liquid_enough_out,
+    __m256* volume_weighted_spread_out
+) {
+    // Calculate total available liquidity at best prices
+    __m256 bid_liquidity_usdt = _mm256_mul_ps(bid_volume, best_bid);
+    __m256 ask_liquidity_usdt = _mm256_mul_ps(ask_volume, best_ask);
+    __m256 total_liquidity_usdt = _mm256_add_ps(bid_liquidity_usdt, ask_liquidity_usdt);
+    
+    // Liquidity ratio: how much of available liquidity our trade would consume
+    __m256 liquidity_consumption_ratio = _mm256_div_ps(intended_position_size_usdt, total_liquidity_usdt);
+    
+    // Base threshold adjustment based on liquidity consumption
+    __m256 liquidity_multiplier = _mm256_set1_ps(1.0f);
+    
+    // If we'd consume >50% of top-level liquidity, widen threshold significantly
+    __m256 high_consumption_mask = _mm256_cmp_ps(liquidity_consumption_ratio, _mm256_set1_ps(0.5f), _CMP_GT_OQ);
+    __m256 high_consumption_multiplier = _mm256_add_ps(_mm256_set1_ps(1.0f), 
+        _mm256_mul_ps(liquidity_consumption_ratio, _mm256_set1_ps(2.0f)));
+    
+    // If we'd consume 20-50%, moderate adjustment
+    __m256 med_consumption_mask = _mm256_and_ps(
+        _mm256_cmp_ps(liquidity_consumption_ratio, _mm256_set1_ps(0.2f), _CMP_GT_OQ),
+        _mm256_cmp_ps(liquidity_consumption_ratio, _mm256_set1_ps(0.5f), _CMP_LE_OQ)
+    );
+    __m256 med_consumption_multiplier = _mm256_add_ps(_mm256_set1_ps(1.0f),
+        _mm256_mul_ps(liquidity_consumption_ratio, _mm256_set1_ps(0.5f)));
+    
+    // Apply multipliers
+    liquidity_multiplier = _mm256_blendv_ps(liquidity_multiplier, high_consumption_multiplier, high_consumption_mask);
+    liquidity_multiplier = _mm256_blendv_ps(liquidity_multiplier, med_consumption_multiplier, med_consumption_mask);
+    
+    // Market impact penalty for thin books
+    __m256 thin_book_threshold = _mm256_mul_ps(intended_position_size_usdt, _mm256_set1_ps(3.0f));
+    __m256 thin_book_mask = _mm256_cmp_ps(total_liquidity_usdt, thin_book_threshold, _CMP_LT_OQ);
+    __m256 market_impact_penalty = _mm256_blendv_ps(
+        _mm256_setzero_ps(),
+        _mm256_mul_ps(base_spread_threshold, _mm256_set1_ps(0.5f)),
+        thin_book_mask
+    );
+    
+    // Volume-weighted spread calculation (simplified)
+    __m256 mid_price = _mm256_mul_ps(_mm256_add_ps(best_bid, best_ask), _mm256_set1_ps(0.5f));
+    __m256 raw_spread = _mm256_div_ps(_mm256_sub_ps(best_ask, best_bid), mid_price);
+    
+    // Liquidity sufficiency check
+    __m256 consumption_ok = _mm256_cmp_ps(liquidity_consumption_ratio, _mm256_set1_ps(0.3f), _CMP_LT_OQ);
+    __m256 liquidity_ok = _mm256_cmp_ps(total_liquidity_usdt, intended_position_size_usdt, _CMP_GT_OQ);
+    __m256 is_liquid_enough = _mm256_and_ps(consumption_ok, liquidity_ok);
+    
+    // Set output values
+    *liquidity_multiplier_out = liquidity_multiplier;
+    *market_impact_penalty_out = market_impact_penalty;
+    *is_liquid_enough_out = is_liquid_enough;
+    *volume_weighted_spread_out = raw_spread;
+}
+
 LiquidityAdjustedThreshold calculate_liquidity_adjusted_threshold(
     float base_spread_threshold,
     float bid_volume,
@@ -67,7 +132,6 @@ LiquidityAdjustedThreshold calculate_liquidity_adjusted_threshold(
     return result;
 }
 
-// Updated SIMD analysis function with liquidity consideration
 void analyze_trading_signals_with_liquidity_simd(
     float *rsi_values,
     float *bid_percentages,
@@ -94,9 +158,6 @@ void analyze_trading_signals_with_liquidity_simd(
     const __m256 base_spread_threshold = _mm256_set1_ps(0.02f); // 0.02% base
     const __m256 max_spread_threshold = _mm256_set1_ps(0.005f);   // 0.5% max
     
-    const __m256 min_liquidity_ratio = _mm256_set1_ps(3.0f);  // Min 3x our position size
-    const __m256 max_consumption_ratio = _mm256_set1_ps(0.3f); // Max 30% of available liquidity
-    
     int i = 0;
     
     // Process 8 symbols at once
@@ -121,41 +182,37 @@ void analyze_trading_signals_with_liquidity_simd(
             }
         }
         
-        // Calculate total available liquidity in USDT
+        __m256 liquidity_multiplier, market_impact_penalty, is_liquid_enough, volume_weighted_spread;
+        calculate_liquidity_adjusted_threshold_simd(
+            base_spread_threshold,
+            bid_vol_chunk,
+            ask_vol_chunk,
+            position_size_chunk,
+            best_bid_chunk,
+            best_ask_chunk,
+            &liquidity_multiplier,
+            &market_impact_penalty,
+            &is_liquid_enough,
+            &volume_weighted_spread
+        );
+        
+        // Calculate final adjusted spread threshold
+        __m256 adjusted_threshold = _mm256_add_ps(
+            _mm256_mul_ps(base_spread_threshold, liquidity_multiplier),
+            market_impact_penalty
+        );
+        adjusted_threshold = _mm256_min_ps(adjusted_threshold, max_spread_threshold);
+        
+        // Calculate liquidity consumption ratio for output
         __m256 bid_liquidity_usdt = _mm256_mul_ps(bid_vol_chunk, best_bid_chunk);
         __m256 ask_liquidity_usdt = _mm256_mul_ps(ask_vol_chunk, best_ask_chunk);
         __m256 total_liquidity = _mm256_add_ps(bid_liquidity_usdt, ask_liquidity_usdt);
-        
-        // Calculate liquidity consumption ratio
         __m256 consumption_ratio = _mm256_div_ps(position_size_chunk, total_liquidity);
         
-        // Liquidity-based threshold adjustment
-        __m256 liquidity_multiplier = _mm256_set1_ps(1.0f);
-        __m256 high_consumption = _mm256_cmp_ps(consumption_ratio, _mm256_set1_ps(0.5f), _CMP_GT_OQ);
-        __m256 med_consumption = _mm256_cmp_ps(consumption_ratio, _mm256_set1_ps(0.2f), _CMP_GT_OQ);
-        
-        // Adjust multiplier based on consumption
-        liquidity_multiplier = _mm256_blendv_ps(liquidity_multiplier, 
-            _mm256_add_ps(_mm256_set1_ps(1.0f), _mm256_mul_ps(consumption_ratio, _mm256_set1_ps(2.0f))), 
-            high_consumption);
-        liquidity_multiplier = _mm256_blendv_ps(liquidity_multiplier,
-            _mm256_add_ps(_mm256_set1_ps(1.0f), _mm256_mul_ps(consumption_ratio, _mm256_set1_ps(0.5f))),
-            _mm256_andnot_ps(high_consumption, med_consumption));
-        
-        // Calculate adjusted spread threshold
-        __m256 adjusted_threshold = _mm256_mul_ps(base_spread_threshold, liquidity_multiplier);
-        adjusted_threshold = _mm256_min_ps(adjusted_threshold, max_spread_threshold);
-        
-        // Liquidity sufficiency check
-        __m256 liquidity_sufficient = _mm256_and_ps(
-            _mm256_cmp_ps(consumption_ratio, max_consumption_ratio, _CMP_LT_OQ),
-            _mm256_cmp_ps(total_liquidity, _mm256_mul_ps(position_size_chunk, min_liquidity_ratio), _CMP_GT_OQ)
-        );
-        
-        // spread validity (original spread check + liquidity check)
+        // Spread validity (original spread check + liquidity check)
         __m256 spread_valid = _mm256_and_ps(
             _mm256_cmp_ps(spread_chunk, adjusted_threshold, _CMP_LT_OQ),
-            liquidity_sufficient
+            is_liquid_enough
         );
         
         // RSI validity check
@@ -235,7 +292,7 @@ void analyze_trading_signals_with_liquidity_simd(
         int buy_mask = _mm256_movemask_ps(buy_condition);
         int sell_mask = _mm256_movemask_ps(sell_condition);
         int spread_mask = _mm256_movemask_ps(spread_valid);
-        int liquidity_mask = _mm256_movemask_ps(liquidity_sufficient);
+        int liquidity_mask = _mm256_movemask_ps(is_liquid_enough);
         
         for (int j = 0; j < 8 && (i + j) < len; j++) {
             decisions[i + j].should_generate_buy = (buy_mask & (1 << j)) != 0;
