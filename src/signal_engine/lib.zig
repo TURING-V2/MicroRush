@@ -28,8 +28,6 @@ extern fn analyze_trading_signals_with_liquidity_simd(
     decisions: [*]TradingDecision,
 ) void;
 
-// CHANGED: Updated TradingDecision to match the C struct layout for correct FFI.
-// The order of fields is critical.
 const TradingDecision = extern struct {
     should_generate_buy: bool,
     should_generate_sell: bool,
@@ -41,7 +39,6 @@ const TradingDecision = extern struct {
     available_liquidity_ratio: f32,
 };
 
-// CHANGED: work item for parallel processing updated with new data slices
 const ProcessingTask = struct {
     rsi_values: []f32,
     bid_percentages: []f32,
@@ -231,7 +228,6 @@ pub const SignalEngine = struct {
             const start_time = std.time.nanoTimestamp();
             local_signals.clearRetainingCapacity();
 
-            // CHANGED: call to processTaskChunk now handles the updated task struct
             self.processTaskChunk(task, &local_signals) catch |err| {
                 std.log.err("Worker {} error processing task {}: {}", .{ worker_id, task.task_id, err });
             };
@@ -324,7 +320,6 @@ pub const SignalEngine = struct {
         const spread_percentages = try self.allocator.alloc(f32, num_symbols);
         defer self.allocator.free(spread_percentages);
 
-        // CHANGED: Allocate buffers for new data required by the SIMD function
         const bid_volumes = try self.allocator.alloc(f32, num_symbols);
         defer self.allocator.free(bid_volumes);
 
@@ -368,7 +363,6 @@ pub const SignalEngine = struct {
             bid_percentages[symbol_idx] = orderbook_results.bid_percentage[symbol_idx];
             ask_percentages[symbol_idx] = orderbook_results.ask_percentage[symbol_idx];
 
-            // The spread from CUDA is now a percentage, so divide by 100 for the ratio.
             spread_percentages[symbol_idx] = orderbook_results.spread_percentage[symbol_idx] / 100.0;
             bid_volumes[symbol_idx] = orderbook_results.best_bid_qty[symbol_idx];
             ask_volumes[symbol_idx] = orderbook_results.best_ask_qty[symbol_idx];
@@ -397,7 +391,6 @@ pub const SignalEngine = struct {
                 const end_idx = @min(start_idx + chunk_size, num_symbols);
                 if (start_idx >= end_idx) continue;
 
-                // CHANGED: Append the new data slices to the task
                 try self.task_queue.append(ProcessingTask{
                     .rsi_values = current_rsi_values,
                     .bid_percentages = bid_percentages,
@@ -419,12 +412,10 @@ pub const SignalEngine = struct {
         }
         self.task_condition.broadcast();
 
-        // --- 3. Wait for All Tasks to Complete ---
         for (0..num_chunks) |_| {
             self.tasks_finished_sem.wait();
         }
 
-        // --- 4. Collect and Process Results ---
         var collected_signals = std.ArrayList(TradingSignal).init(self.allocator);
         defer collected_signals.deinit();
 
@@ -439,7 +430,6 @@ pub const SignalEngine = struct {
         const chunk_len = task.end_idx - task.start_idx;
         if (chunk_len == 0) return;
 
-        // CHANGED: Call the new C function with all required parameters
         analyze_trading_signals_with_liquidity_simd(
             task.rsi_values[task.start_idx..].ptr,
             task.bid_percentages[task.start_idx..].ptr,
@@ -455,8 +445,6 @@ pub const SignalEngine = struct {
             task.decisions[task.start_idx..].ptr,
         );
 
-        // This result processing logic remains valid, as `decision.spread_valid`
-        // now correctly incorporates the liquidity check from the C side.
         for (task.start_idx..task.end_idx) |i| {
             const decision = task.decisions[i];
             if (!decision.spread_valid) continue;

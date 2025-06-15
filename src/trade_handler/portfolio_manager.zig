@@ -54,12 +54,30 @@ pub const PortfolioManager = struct {
     total_unrealized_pnl: f64,
     total_trades: usize,
     winning_trades: usize,
+    losing_trades: usize,
+
+    // Profit/Loss statistics
+    total_profit_pct: f64,
+    total_loss_pct: f64,
+    highest_profit_pct: f64,
+    lowest_loss_pct: f64,
 
     // Signal strength statistics
     strong_signal_trades: usize,
     strong_signal_wins: usize,
+    strong_signal_losses: usize,
+    strong_signal_total_profit_pct: f64,
+    strong_signal_total_loss_pct: f64,
+    strong_signal_highest_profit_pct: f64,
+    strong_signal_lowest_loss_pct: f64,
+
     normal_signal_trades: usize,
     normal_signal_wins: usize,
+    normal_signal_losses: usize,
+    normal_signal_total_profit_pct: f64,
+    normal_signal_total_loss_pct: f64,
+    normal_signal_highest_profit_pct: f64,
+    normal_signal_lowest_loss_pct: f64,
 
     // binance testnet connection (mock for now)
     testnet_enabled: bool,
@@ -96,12 +114,31 @@ pub const PortfolioManager = struct {
             .total_unrealized_pnl = 0.0,
             .total_trades = 0,
             .winning_trades = 0,
+            .losing_trades = 0,
 
-            // signal strength tracking
+            // P&L statistics
+            .total_profit_pct = 0.0,
+            .total_loss_pct = 0.0,
+            .highest_profit_pct = 0.0,
+            .lowest_loss_pct = 0.0,
+
+            // Strong signal statistics
             .strong_signal_trades = 0,
             .strong_signal_wins = 0,
+            .strong_signal_losses = 0,
+            .strong_signal_total_profit_pct = 0.0,
+            .strong_signal_total_loss_pct = 0.0,
+            .strong_signal_highest_profit_pct = 0.0,
+            .strong_signal_lowest_loss_pct = 0.0,
+
+            // Normal signal statistics
             .normal_signal_trades = 0,
             .normal_signal_wins = 0,
+            .normal_signal_losses = 0,
+            .normal_signal_total_profit_pct = 0.0,
+            .normal_signal_total_loss_pct = 0.0,
+            .normal_signal_highest_profit_pct = 0.0,
+            .normal_signal_lowest_loss_pct = 0.0,
 
             .testnet_enabled = true,
             .mutex = std.Thread.Mutex{},
@@ -344,13 +381,50 @@ pub const PortfolioManager = struct {
             self.total_realized_pnl += pnl;
             self.total_trades += 1;
 
-            // track wins by signal strength
+            // Update overall statistics
             if (pnl > 0) {
                 self.winning_trades += 1;
-                if (position.entry_signal_strength >= 0.9) {
+                self.total_profit_pct += pnl_percentage;
+                if (pnl_percentage > self.highest_profit_pct) {
+                    self.highest_profit_pct = pnl_percentage;
+                }
+            } else {
+                self.losing_trades += 1;
+                self.total_loss_pct += pnl_percentage; // This will be negative
+                if (pnl_percentage < self.lowest_loss_pct) {
+                    self.lowest_loss_pct = pnl_percentage;
+                }
+            }
+
+            // Update signal strength specific statistics
+            const is_strong_signal = position.entry_signal_strength >= 0.9;
+            if (is_strong_signal) {
+                if (pnl > 0) {
                     self.strong_signal_wins += 1;
+                    self.strong_signal_total_profit_pct += pnl_percentage;
+                    if (pnl_percentage > self.strong_signal_highest_profit_pct) {
+                        self.strong_signal_highest_profit_pct = pnl_percentage;
+                    }
                 } else {
+                    self.strong_signal_losses += 1;
+                    self.strong_signal_total_loss_pct += pnl_percentage;
+                    if (pnl_percentage < self.strong_signal_lowest_loss_pct) {
+                        self.strong_signal_lowest_loss_pct = pnl_percentage;
+                    }
+                }
+            } else {
+                if (pnl > 0) {
                     self.normal_signal_wins += 1;
+                    self.normal_signal_total_profit_pct += pnl_percentage;
+                    if (pnl_percentage > self.normal_signal_highest_profit_pct) {
+                        self.normal_signal_highest_profit_pct = pnl_percentage;
+                    }
+                } else {
+                    self.normal_signal_losses += 1;
+                    self.normal_signal_total_loss_pct += pnl_percentage;
+                    if (pnl_percentage < self.normal_signal_lowest_loss_pct) {
+                        self.normal_signal_lowest_loss_pct = pnl_percentage;
+                    }
                 }
             }
 
@@ -404,15 +478,56 @@ pub const PortfolioManager = struct {
             (@as(f64, @floatFromInt(self.winning_trades)) / @as(f64, @floatFromInt(closed_trades))) * 100.0
         else
             0.0;
+        const overall_loss_rate = if (closed_trades > 0)
+            (@as(f64, @floatFromInt(self.losing_trades)) / @as(f64, @floatFromInt(closed_trades))) * 100.0
+        else
+            0.0;
+
+        // Calculate average profit and loss percentages
+        const avg_profit_pct = if (self.winning_trades > 0)
+            self.total_profit_pct / @as(f64, @floatFromInt(self.winning_trades))
+        else
+            0.0;
+        const avg_loss_pct = if (self.losing_trades > 0)
+            self.total_loss_pct / @as(f64, @floatFromInt(self.losing_trades))
+        else
+            0.0;
 
         // Signal strength performance
         const strong_win_rate = if (self.strong_signal_trades > 0)
             (@as(f64, @floatFromInt(self.strong_signal_wins)) / @as(f64, @floatFromInt(self.strong_signal_trades))) * 100.0
         else
             0.0;
+        const strong_loss_rate = if (self.strong_signal_trades > 0)
+            (@as(f64, @floatFromInt(self.strong_signal_losses)) / @as(f64, @floatFromInt(self.strong_signal_trades))) * 100.0
+        else
+            0.0;
 
         const normal_win_rate = if (self.normal_signal_trades > 0)
             (@as(f64, @floatFromInt(self.normal_signal_wins)) / @as(f64, @floatFromInt(self.normal_signal_trades))) * 100.0
+        else
+            0.0;
+        const normal_loss_rate = if (self.normal_signal_trades > 0)
+            (@as(f64, @floatFromInt(self.normal_signal_losses)) / @as(f64, @floatFromInt(self.normal_signal_trades))) * 100.0
+        else
+            0.0;
+
+        // Average profit/loss for signal strength categories
+        const strong_avg_profit = if (self.strong_signal_wins > 0)
+            self.strong_signal_total_profit_pct / @as(f64, @floatFromInt(self.strong_signal_wins))
+        else
+            0.0;
+        const strong_avg_loss = if (self.strong_signal_losses > 0)
+            self.strong_signal_total_loss_pct / @as(f64, @floatFromInt(self.strong_signal_losses))
+        else
+            0.0;
+
+        const normal_avg_profit = if (self.normal_signal_wins > 0)
+            self.normal_signal_total_profit_pct / @as(f64, @floatFromInt(self.normal_signal_wins))
+        else
+            0.0;
+        const normal_avg_loss = if (self.normal_signal_losses > 0)
+            self.normal_signal_total_loss_pct / @as(f64, @floatFromInt(self.normal_signal_losses))
         else
             0.0;
 
@@ -425,11 +540,17 @@ pub const PortfolioManager = struct {
         std.log.info("Realized P&L: ${d:.2} | Unrealized P&L: ${d:.2}", .{
             self.total_realized_pnl, self.total_unrealized_pnl,
         });
-        std.log.info("Closed Trades: {} | Overall Win Rate: {d:.1}%", .{
-            closed_trades, overall_win_rate,
+        std.log.info("Closed Trades: {} | Win Rate: {d:.1}% | Loss Rate: {d:.1}%", .{
+            closed_trades, overall_win_rate, overall_loss_rate,
         });
-        std.log.info("Strong Signals: {} trades, {d:.1}% win rate | Normal Signals: {} trades, {d:.1}% win rate", .{
-            self.strong_signal_trades, strong_win_rate, self.normal_signal_trades, normal_win_rate,
+        std.log.info("Avg Profit: {d:.2}% | Avg Loss: {d:.2}% | Best: {d:.2}% | Worst: {d:.2}%", .{
+            avg_profit_pct, avg_loss_pct, self.highest_profit_pct, self.lowest_loss_pct,
+        });
+        std.log.info("Strong Signals: {} trades | Win: {d:.1}% | Loss: {d:.1}% | Avg P: {d:.2}% | Avg L: {d:.2}% | Best: {d:.2}% | Worst: {d:.2}%", .{
+            self.strong_signal_trades, strong_win_rate, strong_loss_rate, strong_avg_profit, strong_avg_loss, self.strong_signal_highest_profit_pct, self.strong_signal_lowest_loss_pct,
+        });
+        std.log.info("Normal Signals: {} trades | Win: {d:.1}% | Loss: {d:.1}% | Avg P: {d:.2}% | Avg L: {d:.2}% | Best: {d:.2}% | Worst: {d:.2}%", .{
+            self.normal_signal_trades, normal_win_rate, normal_loss_rate, normal_avg_profit, normal_avg_loss, self.normal_signal_highest_profit_pct, self.normal_signal_lowest_loss_pct,
         });
         std.log.info("Open Positions: {} / {} | Available Balance: ${d:.2}", .{
             open_positions, self.max_positions, self.current_balance,
@@ -447,9 +568,24 @@ pub const PortfolioManager = struct {
         unrealized_pnl: f64,
         total_trades: usize,
         win_rate: f64,
+        loss_rate: f64,
+        avg_profit_pct: f64,
+        avg_loss_pct: f64,
+        highest_profit_pct: f64,
+        lowest_loss_pct: f64,
         open_positions: usize,
         strong_signal_win_rate: f64,
+        strong_signal_loss_rate: f64,
+        strong_signal_avg_profit_pct: f64,
+        strong_signal_avg_loss_pct: f64,
+        strong_signal_highest_profit_pct: f64,
+        strong_signal_lowest_loss_pct: f64,
         normal_signal_win_rate: f64,
+        normal_signal_loss_rate: f64,
+        normal_signal_avg_profit_pct: f64,
+        normal_signal_avg_loss_pct: f64,
+        normal_signal_highest_profit_pct: f64,
+        normal_signal_lowest_loss_pct: f64,
         portfolio_value: f64,
     } {
         const total_pnl = self.total_realized_pnl + self.total_unrealized_pnl;
@@ -458,9 +594,26 @@ pub const PortfolioManager = struct {
             (@as(f64, @floatFromInt(self.winning_trades)) / @as(f64, @floatFromInt(closed_trades))) * 100.0
         else
             0.0;
+        const loss_rate = if (closed_trades > 0)
+            (@as(f64, @floatFromInt(self.losing_trades)) / @as(f64, @floatFromInt(closed_trades))) * 100.0
+        else
+            0.0;
+
+        const avg_profit_pct = if (self.winning_trades > 0)
+            self.total_profit_pct / @as(f64, @floatFromInt(self.winning_trades))
+        else
+            0.0;
+        const avg_loss_pct = if (self.losing_trades > 0)
+            self.total_loss_pct / @as(f64, @floatFromInt(self.losing_trades))
+        else
+            0.0;
 
         const strong_win_rate = if (self.strong_signal_trades > 0)
             (@as(f64, @floatFromInt(self.strong_signal_wins)) / @as(f64, @floatFromInt(self.strong_signal_trades))) * 100.0
+        else
+            0.0;
+        const strong_loss_rate = if (self.strong_signal_trades > 0)
+            (@as(f64, @floatFromInt(self.strong_signal_losses)) / @as(f64, @floatFromInt(self.strong_signal_trades))) * 100.0
         else
             0.0;
 
@@ -468,6 +621,31 @@ pub const PortfolioManager = struct {
             (@as(f64, @floatFromInt(self.normal_signal_wins)) / @as(f64, @floatFromInt(self.normal_signal_trades))) * 100.0
         else
             0.0;
+        const normal_loss_rate = if (self.normal_signal_trades > 0)
+            (@as(f64, @floatFromInt(self.normal_signal_losses)) / @as(f64, @floatFromInt(self.normal_signal_trades))) * 100.0
+        else
+            0.0;
+
+        // Average profit/loss for signal strength categories
+        const strong_signal_avg_profit_pct = if (self.strong_signal_wins > 0)
+            self.strong_signal_total_profit_pct / @as(f64, @floatFromInt(self.strong_signal_wins))
+        else
+            0.0;
+        const strong_signal_avg_loss_pct = if (self.strong_signal_losses > 0)
+            self.strong_signal_total_loss_pct / @as(f64, @floatFromInt(self.strong_signal_losses))
+        else
+            0.0;
+
+        const normal_signal_avg_profit_pct = if (self.normal_signal_wins > 0)
+            self.normal_signal_total_profit_pct / @as(f64, @floatFromInt(self.normal_signal_wins))
+        else
+            0.0;
+        const normal_signal_avg_loss_pct = if (self.normal_signal_losses > 0)
+            self.normal_signal_total_loss_pct / @as(f64, @floatFromInt(self.normal_signal_losses))
+        else
+            0.0;
+
+        const portfolio_value = self.current_balance + self.total_unrealized_pnl;
 
         return .{
             .balance = self.current_balance,
@@ -476,10 +654,25 @@ pub const PortfolioManager = struct {
             .unrealized_pnl = self.total_unrealized_pnl,
             .total_trades = closed_trades,
             .win_rate = win_rate,
+            .loss_rate = loss_rate,
+            .avg_profit_pct = avg_profit_pct,
+            .avg_loss_pct = avg_loss_pct,
+            .highest_profit_pct = self.highest_profit_pct,
+            .lowest_loss_pct = self.lowest_loss_pct,
             .open_positions = self.getOpenPositionsCount(),
             .strong_signal_win_rate = strong_win_rate,
+            .strong_signal_loss_rate = strong_loss_rate,
+            .strong_signal_avg_profit_pct = strong_signal_avg_profit_pct,
+            .strong_signal_avg_loss_pct = strong_signal_avg_loss_pct,
+            .strong_signal_highest_profit_pct = self.strong_signal_highest_profit_pct,
+            .strong_signal_lowest_loss_pct = self.strong_signal_lowest_loss_pct,
             .normal_signal_win_rate = normal_win_rate,
-            .portfolio_value = self.current_balance + self.total_unrealized_pnl,
+            .normal_signal_loss_rate = normal_loss_rate,
+            .normal_signal_avg_profit_pct = normal_signal_avg_profit_pct,
+            .normal_signal_avg_loss_pct = normal_signal_avg_loss_pct,
+            .normal_signal_highest_profit_pct = self.normal_signal_highest_profit_pct,
+            .normal_signal_lowest_loss_pct = self.normal_signal_lowest_loss_pct,
+            .portfolio_value = portfolio_value,
         };
     }
 };

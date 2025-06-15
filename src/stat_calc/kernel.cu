@@ -181,7 +181,6 @@ __global__ void orderbook_kernel_batch(const GPUOrderBookDataBatch_C *orderbook_
 
 
     if (idx == 0) {
-        // --- Existing Calculations ---
         float total_bid = partial_bid_sums[0];
         float total_ask = partial_ask_sums[0];
         results->total_bid_volume[symbol_idx] = total_bid;
@@ -195,8 +194,6 @@ __global__ void orderbook_kernel_batch(const GPUOrderBookDataBatch_C *orderbook_
             results->bid_percentage[symbol_idx] = 50.0f;
             results->ask_percentage[symbol_idx] = 50.0f;
         }
-
-        // --- MODIFIED SPREAD & NEW BEST BID/ASK LOGIC ---
         if (bid_count > 0 && ask_count > 0) {
             // Get best bid/ask from the top of the book (index 0)
             float best_bid = orderbook_batch->bid_prices[symbol_idx][0];
@@ -212,7 +209,7 @@ __global__ void orderbook_kernel_batch(const GPUOrderBookDataBatch_C *orderbook_
             if (best_bid > 0.000001f && best_ask > 0.000001f && best_ask > best_bid) {
                 float mid_price = (best_bid + best_ask) / 2.0f;
                 float spread = best_ask - best_bid;
-                results->spread_percentage[symbol_idx] = (spread / mid_price) * 100.0f; // This is now a percentage
+                results->spread_percentage[symbol_idx] = (spread / mid_price) * 100.0f;
             } else {
                 results->spread_percentage[symbol_idx] = 1000.0f; // Invalid prices, set a high spread
             }

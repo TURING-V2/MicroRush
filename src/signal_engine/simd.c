@@ -152,7 +152,7 @@ void analyze_trading_signals_with_liquidity_simd(
             _mm256_cmp_ps(total_liquidity, _mm256_mul_ps(position_size_chunk, min_liquidity_ratio), _CMP_GT_OQ)
         );
         
-        // Enhanced spread validity (original spread check + liquidity check)
+        // spread validity (original spread check + liquidity check)
         __m256 spread_valid = _mm256_and_ps(
             _mm256_cmp_ps(spread_chunk, adjusted_threshold, _CMP_LT_OQ),
             liquidity_sufficient
