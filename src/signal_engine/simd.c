@@ -155,7 +155,7 @@ void analyze_trading_signals_with_liquidity_simd(
     const __m256 ask_strong_sell_threshold = _mm256_set1_ps(46.0f);
     const __m256 ask_sell_threshold = _mm256_set1_ps(40.0f);
 
-    const __m256 base_spread_threshold = _mm256_set1_ps(0.002f); // 0.02% base
+    const __m256 base_spread_threshold = _mm256_set1_ps(0.0002f); // 0.02% base
     const __m256 max_spread_threshold = _mm256_set1_ps(0.005f);   // 0.5% max
 
     int i = 0;
