@@ -49,7 +49,7 @@ pub const TradeHandler = struct {
     }
 
     pub fn start(self: *TradeHandler) !void {
-        self.signal_thread = try std.Thread.spawn(.{}, signalThreadFunction, .{self});
+        self.signal_thread = try std.Thread.spawn(.{ .allocator = self.allocator }, signalThreadFunction, .{self});
     }
 
     pub fn addSignal(self: *TradeHandler, signal: TradingSignal) !void {

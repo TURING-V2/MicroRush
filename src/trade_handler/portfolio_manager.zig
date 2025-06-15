@@ -170,7 +170,7 @@ pub const PortfolioManager = struct {
         var positions_to_close = std.ArrayList([]const u8).init(self.allocator);
         defer positions_to_close.deinit();
 
-        //const current_time = std.time.nanoTimestamp();
+        const current_time = std.time.nanoTimestamp();
         var iterator = self.positions.iterator();
 
         while (iterator.next()) |entry| {
@@ -191,11 +191,11 @@ pub const PortfolioManager = struct {
                 close_reason = "STOP LOSS";
             }
 
-            // const time_elapsed = current_time - position.entry_timestamp;
-            // if (time_elapsed >= 5_000_000_000) { // crosses 5 seconds
-            //     should_close = true;
-            //     close_reason = "TIME LIMIT";
-            // }
+            const time_elapsed = current_time - position.entry_timestamp;
+            if (time_elapsed >= 5_000_000_000) { // crosses 5 seconds
+                should_close = true;
+                close_reason = "TIME LIMIT";
+            }
 
             const profit_percentage = ((current_price - position.avg_entry_price) / position.avg_entry_price) * 100.0;
             if (profit_percentage > 0.3) {

@@ -155,8 +155,8 @@ void analyze_trading_signals_with_liquidity_simd(
     const __m256 ask_strong_sell_threshold = _mm256_set1_ps(46.0f);
     const __m256 ask_sell_threshold = _mm256_set1_ps(40.0f);
 
-    const __m256 base_spread_threshold = _mm256_set1_ps(0.02f); // 0.02% base
-    const __m256 max_spread_threshold = _mm256_set1_ps(0.005f);   // 0.5% max
+    const __m256 base_spread_threshold = _mm256_set1_ps(0.0002f); // 0.02% base
+    const __m256 max_spread_threshold = _mm256_set1_ps(0.0005f);   // 0.5% max
     
     int i = 0;
     
@@ -314,7 +314,7 @@ void analyze_trading_signals_with_liquidity_simd(
         float spread_pct = spread_percentages[i];
         
         LiquidityAdjustedThreshold liq_threshold = calculate_liquidity_adjusted_threshold(
-            0.02f,  // 0.02% base threshold
+            0.0002f,  // 0.02% base threshold
             bid_volumes[i],
             ask_volumes[i],
             position_sizes[i],
@@ -324,7 +324,7 @@ void analyze_trading_signals_with_liquidity_simd(
         
         float final_threshold = liq_threshold.base_spread_threshold * liq_threshold.liquidity_multiplier + 
                                liq_threshold.market_impact_penalty;
-        final_threshold = fminf(final_threshold, 0.005f); // Cap at 0.5%
+        final_threshold = fminf(final_threshold, 0.0005f); // Cap at 0.05%
         
         bool spread_valid = (spread_pct < final_threshold) && liq_threshold.is_liquid_enough;
         bool rsi_valid = (rsi >= 0.0f && rsi <= 100.0f);
