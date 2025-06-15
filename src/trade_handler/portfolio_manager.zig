@@ -219,7 +219,7 @@ pub const PortfolioManager = struct {
                 const profit_percentage = ((current_price - position.avg_entry_price) / position.avg_entry_price) * 100.0;
 
                 var actual_reason: []const u8 = "STOP LOSS";
-                if (time_elapsed >= 5_000_000_000) {
+                if (time_elapsed >= 1 * 60 * 1_000_000_000) {
                     actual_reason = "TIME LIMIT";
                 } else if (profit_percentage > 0.3) {
                     actual_reason = "PROFIT TARGET";
