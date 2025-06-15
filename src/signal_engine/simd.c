@@ -147,16 +147,27 @@ void analyze_trading_signals_with_liquidity_simd(
     TradingDecision *decisions
 ) {
     const __m256 rsi_buy_threshold = _mm256_set1_ps(15.0f);
-    const __m256 rsi_sell_threshold = _mm256_set1_ps(85.0f);
+    const __m256 rsi_sell_threshold = _mm256_set1_ps(90.0f);
     const __m256 rsi_strong_buy = _mm256_set1_ps(10.0f);
-    const __m256 rsi_strong_sell = _mm256_set1_ps(90.0f);
+    const __m256 rsi_strong_sell = _mm256_set1_ps(80.0f);
     const __m256 bid_strong_buy_threshold = _mm256_set1_ps(72.0f);
-    const __m256 bid_buy_threshold = _mm256_set1_ps(60.0f);
-    const __m256 ask_strong_sell_threshold = _mm256_set1_ps(46.0f);
-    const __m256 ask_sell_threshold = _mm256_set1_ps(40.0f);
+    const __m256 bid_buy_threshold = _mm256_set1_ps(80.0f);
+    const __m256 ask_strong_sell_threshold = _mm256_set1_ps(55.0f);
+    const __m256 ask_sell_threshold = _mm256_set1_ps(50.0f);
 
     const __m256 base_spread_threshold = _mm256_set1_ps(0.0002f); // 0.02% base
     const __m256 max_spread_threshold = _mm256_set1_ps(0.005f);   // 0.5% max
+
+    const float SCALAR_RSI_BUY_THRESHOLD = 15.0f;
+    const float SCALAR_RSI_SELL_THRESHOLD = 90.0f;
+    const float SCALAR_RSI_STRONG_BUY = 10.0f;
+    const float SCALAR_RSI_STRONG_SELL = 80.0f;
+    const float SCALAR_BID_STRONG_BUY_THRESHOLD = 72.0f;
+    const float SCALAR_BID_BUY_THRESHOLD = 80.0f;
+    const float SCALAR_ASK_STRONG_SELL_THRESHOLD = 55.0f;
+    const float SCALAR_ASK_SELL_THRESHOLD = 50.0f;
+    const float SCALAR_BASE_SPREAD_THRESHOLD = 0.0002f;
+    const float SCALAR_MAX_SPREAD_THRESHOLD = 0.005f;
 
     int i = 0;
     
@@ -314,7 +325,7 @@ void analyze_trading_signals_with_liquidity_simd(
         float spread_pct = spread_percentages[i];
         
         LiquidityAdjustedThreshold liq_threshold = calculate_liquidity_adjusted_threshold(
-            0.02f,  // 0.02% base threshold
+            SCALAR_BASE_SPREAD_THRESHOLD,
             bid_volumes[i],
             ask_volumes[i],
             position_sizes[i],
@@ -324,22 +335,27 @@ void analyze_trading_signals_with_liquidity_simd(
         
         float final_threshold = liq_threshold.base_spread_threshold * liq_threshold.liquidity_multiplier + 
                                liq_threshold.market_impact_penalty;
-        final_threshold = fminf(final_threshold, 0.005f); // Cap at 0.5%
+        final_threshold = fminf(final_threshold, SCALAR_MAX_SPREAD_THRESHOLD);
         
         bool spread_valid = (spread_pct < final_threshold) && liq_threshold.is_liquid_enough;
         bool rsi_valid = (rsi >= 0.0f && rsi <= 100.0f);
         bool has_position = has_positions[i];
         
-        // Buy conditions
-        bool buy_strong = !has_position && rsi_valid && rsi <= 10.0f && bid_pct > 72.0f;
-        bool buy_normal = !has_position && spread_valid && 
-                         ((rsi <= 15.0f && bid_pct > 60.0f) || bid_pct > 72.0f);
+        // Buy conditions 
+        bool buy_strong = !has_position && rsi_valid && 
+                         rsi <= SCALAR_RSI_STRONG_BUY && 
+                         bid_pct > SCALAR_BID_STRONG_BUY_THRESHOLD;
         
-        // Sell conditions
-        bool sell_strong = has_position && spread_valid && 
-                          (rsi_valid && (rsi >= 90.0f || ask_pct > 46.0f));
-        bool sell_normal = has_position && spread_valid && 
-                          (rsi_valid && (rsi >= 85.0f || ask_pct > 40.0f));
+        bool buy_normal = !has_position && spread_valid && 
+                         ((rsi <= SCALAR_RSI_BUY_THRESHOLD && bid_pct > SCALAR_BID_BUY_THRESHOLD) || 
+                          bid_pct > SCALAR_BID_STRONG_BUY_THRESHOLD);
+        
+        // Sell conditions 
+        bool sell_strong = has_position && spread_valid && rsi_valid &&
+                          (rsi >= SCALAR_RSI_SELL_THRESHOLD || ask_pct > SCALAR_ASK_STRONG_SELL_THRESHOLD);
+        
+        bool sell_normal = has_position && spread_valid && rsi_valid &&
+                          (rsi >= SCALAR_RSI_STRONG_SELL || ask_pct > SCALAR_ASK_SELL_THRESHOLD);
         
         decisions[i].should_generate_buy = buy_strong || buy_normal;
         decisions[i].should_generate_sell = sell_strong || sell_normal;
